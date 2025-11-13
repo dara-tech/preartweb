@@ -204,7 +204,6 @@ const ReportConfiguration = ({
                 onSiteChange={onSiteChange}
                 disabled={sitesLoading}
                 showAllOption={!isViewer}
-                variant="minimal"
                 className="w-full h-10 sm:h-11 text-sm border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               />
             </div>
@@ -220,7 +219,7 @@ const ReportConfiguration = ({
                     type="text"
                     value={`${selectedYear}-Q${selectedQuarter}`}
                     readOnly
-                    className="w-full h-10 sm:h-11 px-3 pr-10 text-sm border border-gray-300 rounded-lg  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 cursor-pointer transition-colors"
+                    className="w-full h-10 sm:h-11 px-3 pr-10 text-sm border border-gray-300 rounded-none  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 cursor-pointer transition-colors"
                     onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -230,7 +229,7 @@ const ReportConfiguration = ({
 
                 {/* Custom Period Picker Panel */}
                 {isPeriodPickerOpen && (
-                  <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border rounded-xl shadow-xl p-6 min-w-[320px]">
+                  <div ref={pickerRef} className="absolute bg-card top-full left-0 right-0 z-50 mt-2 border border-border rounded-none shadow-xl p-6 min-w-[320px]">
                     {/* Year Navigation */}
                     <div className="flex items-center justify-between mb-6">
                       <Button
@@ -239,9 +238,9 @@ const ReportConfiguration = ({
                         variant="ghost"
                         size="sm"
                         disabled={!canNavigatePreviousYear}
-                        className={`p-2 rounded-lg transition-colors ${
+                        className={`p-2 rounded-none transition-colors ${
                           canNavigatePreviousYear 
-                            ? 'hover:bg-primary text-primary' 
+                            ? 'hover: text-primary' 
                             : 'text-gray-300 cursor-not-allowed'
                         }`}
                         title={canNavigatePreviousYear ? "Previous year (Shift+Click for decade)" : "No previous year available"}
@@ -259,7 +258,7 @@ const ReportConfiguration = ({
                         type="button"
                         onClick={() => setShowYearGrid(!showYearGrid)}
                         variant="ghost"
-                        className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-lg transition-colors cursor-pointer"
+                        className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-none transition-colors cursor-pointer"
                         title="Click to show year grid"
                       >
                         {selectedYear}
@@ -271,9 +270,9 @@ const ReportConfiguration = ({
                         variant="ghost"
                         size="sm"
                         disabled={!canNavigateNextYear}
-                        className={`p-2 rounded-lg transition-colors ${
+                        className={`p-2 rounded-none transition-colors ${
                           canNavigateNextYear 
-                            ? 'hover:bg-primary text-primary' 
+                            ? 'hover: text-primary' 
                             : 'text-gray-300 cursor-not-allowed'
                         }`}
                         title={canNavigateNextYear ? "Next year (Shift+Click for decade)" : "No next year available"}
@@ -311,7 +310,7 @@ const ReportConfiguration = ({
                               variant={isSelected ? "default" : "ghost"}
                               size="sm"
                               className={`
-                                px-3 py-2 text-sm rounded-md transition-all duration-200 relative
+                                px-3 py-2 text-sm rounded-none transition-all duration-200 relative
                                 ${isSelected
                                   ? 'bg-blue-500 text-white shadow-md'
                                   : isCurrentYear && isAvailable && isInCurrentDecade
@@ -326,7 +325,7 @@ const ReportConfiguration = ({
                             >
                               {year}
                               {isCurrentYear && isAvailable && !isSelected && isInCurrentDecade && (
-                                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-full"></div>
+                                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-none"></div>
                               )}
                             </Button>
                           );
@@ -349,7 +348,7 @@ const ReportConfiguration = ({
                           variant={selectedQuarter === quarter.value ? "default" : "outline"}
                           size="sm"
                           className={`
-                            px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
+                            px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
                             ${selectedQuarter === quarter.value
                               ? 'bg-blue-500 text-white shadow-md'
                               : quarter.disabled
@@ -375,7 +374,7 @@ const ReportConfiguration = ({
               disabled={loading} 
               variant="outline" 
               size="sm" 
-              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group rounded-full"
+              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group rounded-none"
               title={loading ? 'Refreshing...' : 'Refresh'}
             >
               <RefreshCw className={`h-4 w-4 transition-transform duration-200 ${loading ? 'animate-spin' : 'group-hover:rotate-180'}`} />
@@ -385,7 +384,7 @@ const ReportConfiguration = ({
               onClick={onExport} 
               variant="outline" 
               size="sm" 
-              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-red-300 text-red-700 hover:border-red-500 hover:bg-red-50 transition-all duration-200 group rounded-full"
+              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-red-300 text-red-700 hover:border-red-500 hover:bg-red-50 transition-all duration-200 group rounded-none"
               disabled={loading}
               title="Download"
             >
@@ -397,7 +396,7 @@ const ReportConfiguration = ({
                   onClick={onPreview} 
                   variant="outline" 
                   size="sm" 
-                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group rounded-full"
+                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group rounded-none"
                   disabled={loading}
                   title="Preview"
                 >
@@ -406,7 +405,7 @@ const ReportConfiguration = ({
                 {/* <Button 
                   onClick={onPrint} 
                   size="sm" 
-                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 bg-green-600 hover:bg-green-700 text-white transition-all duration-200 group rounded-full"
+                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 bg-green-600 hover:bg-green-700 text-white transition-all duration-200 group rounded-none"
                   disabled={loading}
                   title="Print"
                 >

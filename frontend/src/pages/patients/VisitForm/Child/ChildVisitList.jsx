@@ -284,9 +284,9 @@ function ChildVisitList() {
       {loading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="p-4 border rounded-lg animate-pulse">
+            <div key={i} className="p-4 border rounded-none animate-pulse">
               <div className="flex items-center space-x-3">
-                <Skeleton className="w-10 h-10 rounded-full" />
+                <Skeleton className="w-10 h-10 rounded-none" />
                 <div className="space-y-2 flex-1">
                   <Skeleton className="h-4 w-1/4" />
                   <Skeleton className="h-3 w-1/2" />
@@ -309,7 +309,7 @@ function ChildVisitList() {
       ) : (
         <div className="space-y-2">
           {visits.map((visit, index) => (
-            <div key={`${visit.visitId || visit.id}-${visit.site_code || visit.siteName || index}`} className="p-4 border rounded-lg hover:bg-accent transition-colors">
+            <div key={`${visit.visitId || visit.id}-${visit.site_code || visit.siteName || index}`} className="p-4 border rounded-none hover:bg-accent transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
@@ -324,12 +324,12 @@ function ChildVisitList() {
                     {visit.artNumber && <span>ART: {visit.artNumber}</span>}
                   </div>
                   <div className="flex items-center space-x-4 text-sm mt-1">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    <span className={`px-2 py-1 rounded-none text-xs font-medium ${
                       visit.sex === 'Male' ? 'status-active' : 'status-warning'
                     }`}>
                       {visit.sex || 'Unknown'}
                     </span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    <span className={`px-2 py-1 rounded-none text-xs font-medium ${
                       visit.patientStatus === 'Active' ? 'status-active' :
                       visit.patientStatus === 'Dead' ? 'status-critical' :
                       visit.patientStatus === 'Lost' ? 'status-warning' :
@@ -339,17 +339,17 @@ function ChildVisitList() {
                       {visit.patientStatus || 'Unknown'}
                     </span>
                     {visit.hivViral && visit.hivViral !== '0' && (
-                      <span className="px-2 py-1 rounded text-xs font-medium viral-load-high">
+                      <span className="px-2 py-1 rounded-none text-xs font-medium viral-load-high">
                         VL: {visit.hivViral}
                       </span>
                     )}
                     {visit.cd4 && (
-                      <span className="px-2 py-1 rounded text-xs font-medium cd4-high">
+                      <span className="px-2 py-1 rounded-none text-xs font-medium cd4-high">
                         CD4: {visit.cd4}
                       </span>
                     )}
                     {visit.nationality !== null && visit.nationality !== undefined && visit.nationality !== '' && visit.nationality !== -1 && visit.nationality !== 0 && getNationalityLabel(visit.nationality) && (
-                      <span className="px-2 py-1 rounded text-xs font-medium cd4-low">
+                      <span className="px-2 py-1 rounded-none text-xs font-medium cd4-low">
                         {getNationalityLabel(visit.nationality)}
                         </span>
                     )}

@@ -227,7 +227,7 @@ const IndicatorDetailsModal = ({
       const button = document.querySelector('[data-export-button]');
       const originalContent = button?.innerHTML;
       if (button) {
-        button.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Preparing export...';
+        button.innerHTML = '<div class="animate-spin rounded-none h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Preparing export...';
         button.disabled = true;
       }
       
@@ -249,7 +249,7 @@ const IndicatorDetailsModal = ({
       const token = localStorage.getItem('token');
       
       if (button) {
-        button.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Fetching all records...';
+        button.innerHTML = '<div class="animate-spin rounded-none h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Fetching all records...';
       }
       
       // Map indicator names to their corresponding SQL file names
@@ -347,7 +347,7 @@ const IndicatorDetailsModal = ({
       try {
         while (hasMore) {
           if (button) {
-            button.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Page ${page}...`;
+            button.innerHTML = `<div class="animate-spin rounded-none h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Page ${page}...`;
           }
           
           const filterParams = {
@@ -453,7 +453,7 @@ const IndicatorDetailsModal = ({
           // Update progress with better calculation
           if (button && totalCount > 0) {
             const progress = Math.min(100, Math.round((allRecords.length / totalCount) * 100));
-            button.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-1"></div>${progress}% (${allRecords.length.toLocaleString()}/${totalCount.toLocaleString()})`;
+            button.innerHTML = `<div class="animate-spin rounded-none h-4 w-4 border-b-2 border-gray-900 mr-1"></div>${progress}% (${allRecords.length.toLocaleString()}/${totalCount.toLocaleString()})`;
             
             // Update toast progress (only for non-viewers)
             if (!isViewerUser() && exportToast) {
@@ -463,7 +463,7 @@ const IndicatorDetailsModal = ({
               });
             }
           } else if (button) {
-            button.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-1"></div>${allRecords.length.toLocaleString()} records`;
+            button.innerHTML = `<div class="animate-spin rounded-none h-4 w-4 border-b-2 border-gray-900 mr-1"></div>${allRecords.length.toLocaleString()} records`;
             
             // Update toast progress (only for non-viewers)
             if (!isViewerUser() && exportToast) {
@@ -511,7 +511,7 @@ const IndicatorDetailsModal = ({
       }
       
       if (button) {
-        button.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Generating CSV...';
+        button.innerHTML = '<div class="animate-spin rounded-none h-4 w-4 border-b-2 border-gray-900 mr-1"></div>Generating CSV...';
       }
       
       // Update toast to CSV generation (only for non-viewers)
@@ -620,11 +620,11 @@ const IndicatorDetailsModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-3xl lg:max-w-5xl h-[95vh] max-h-[95vh] p-0 flex flex-col">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-3xl bg-card lg:max-w-5xl h-[95vh] max-h-[95vh] p-0 flex flex-col">
         <DialogHeader className="p-4 pb-3 border-b flex-shrink-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-start gap-2 flex-1 min-w-0">
-              <div className="p-1.5 bg-blue-600 rounded-lg flex-shrink-0 mt-0.5">
+              <div className="p-1.5 bg-blue-600 rounded-none flex-shrink-0 mt-0.5">
                 <FileText className="h-4 w-4 text-white" />
               </div>
               <div className="min-w-0 flex-1">
@@ -644,7 +644,7 @@ const IndicatorDetailsModal = ({
                  </DialogTitle>
                  <DialogDescription className="text-xs sm:text-base text-muted-foreground mt-1">
                    {detailsLoading ? (
-                     <span className="inline-block h-4 w-1/2 bg-gray-200 rounded animate-pulse" />
+                     <span className="inline-block h-4 w-1/2 bg-gray-200 rounded-none animate-pulse" />
                    ) : (
                      <>
                        {processedRecords.length.toLocaleString()} of {(safePagination?.totalCount || 0).toLocaleString()} records
@@ -671,7 +671,7 @@ const IndicatorDetailsModal = ({
                     placeholder="Search records..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="pl-10 h-10"
+                    className="pl-10 h-9"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         onSearch(1, searchTerm);
@@ -719,7 +719,7 @@ const IndicatorDetailsModal = ({
         
         {/* Sample Data Warning */}
         {isSampleData && sampleDataInfo && (
-          <div className="mx-4 mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="mx-4 mb-4 p-3 bg-amber-50 border border-amber-200 rounded-none">
             <div className="flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm">
@@ -742,7 +742,7 @@ const IndicatorDetailsModal = ({
                 {detailsLoading || searchLoading ? (
                   <div className="overflow-auto scrollbar-hide">
                     <Table>
-                      <TableHeader className="sticky top-0 bg-card z-10">
+                      <TableHeader className="sticky top-0 z-10 border-b border-primary/30">
                         <TableRow className="bg-muted">
                           {Array.from({ length: 8 }, (_, index) => (
                             <TableHead 
@@ -789,11 +789,11 @@ const IndicatorDetailsModal = ({
                   <div className="overflow-auto scrollbar-hide" style={{ maxHeight: 'calc(95vh - 300px)' }}>
                     <Table>
                       <TableHeader className="sticky top-0 bg-card z-10">
-                        <TableRow className="bg-primary/10 border-b-2 border-primary/30">
+                        <TableRow className=" border-b-2 border-primary/30">
                           {columnConfig.map((column, index) => (
                             <TableHead 
                               key={index}
-                              className={`cursor-pointer hover:bg-primary/20 text-xs px-2 py-3 whitespace-nowrap text-primary font-medium ${index < columnConfig.length - 1 ? 'border-r border-primary/30' : ''}`}
+                              className={`cursor-pointer hover:/20 text-xs px-2 py-3 whitespace-nowrap text-primary font-medium ${index < columnConfig.length - 1 ? 'border-r border-primary/30' : ''}`}
                               onClick={() => handleSort(column.key)}
                             >
                               <div className="flex items-center space-x-1">

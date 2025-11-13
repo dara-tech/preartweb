@@ -104,7 +104,7 @@ const SiteSelector = ({
     <div className={`space-y-2 ${className}`}>
       {/* Current Site Display */}
       {showCurrentSite && currentSite && (
-        <div className="flex items-center space-x-2 p-2 status-active rounded-md">
+        <div className="flex items-center space-x-2 p-2 status-active rounded-none">
           <CheckCircle className="h-4 w-4 text-foreground" />
           <Building2 className="h-4 w-4 text-foreground" />
           <div>
@@ -150,7 +150,7 @@ const SiteSelector = ({
           <input
             type="text"
             placeholder="e.g., Maung Russey RH"
-            className="ml-1 px-2 py-1 border rounded text-xs"
+            className="ml-1 px-2 py-1 border rounded-none text-xs"
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 handleSiteNameChange(e.target.value);

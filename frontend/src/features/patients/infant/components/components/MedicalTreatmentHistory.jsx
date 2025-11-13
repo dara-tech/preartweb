@@ -76,7 +76,7 @@ function MedicalTreatmentHistory({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-yellow-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-yellow-600 font-bold">1</span>
             </div>
             ប្រវត្តិជំងឺរបេង / TB History
@@ -228,7 +228,7 @@ function MedicalTreatmentHistory({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-blue-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-blue-600 font-bold">2</span>
             </div>
             ប្រវត្តិនៃការប្រើប្រាស់ថ្នាំARV (ARV Treatment History)
@@ -371,7 +371,7 @@ function MedicalTreatmentHistory({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-green-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-green-600 font-bold">3</span>
             </div>
             ប្រវត្តិព្យាបាលវេជ្ជសាស្ត្រផ្សេងទៀត / Other Medical Treatment History

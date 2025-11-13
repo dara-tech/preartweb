@@ -1,7 +1,6 @@
-import { Button, Card, CardContent, CardHeader, CardTitle, Separator, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Separator, Tabs, TabsContent, TabsList, TabsTrigger, Progress, Badge } from "@/components/ui";
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, FileText, User, Stethoscope, Loader2 } from "lucide-react";
 import api from "../../../../services/api";
 
 // Import form components
@@ -20,6 +19,8 @@ function AdultVisitForm() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showKhmerLabels, setShowKhmerLabels] = useState(false);
+  const [currentSection, setCurrentSection] = useState(0);
   // Initialize drug fields
   const initializeDrugFields = () => {
     const drugFields = {};
@@ -335,127 +336,184 @@ function AdultVisitForm() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-gray-600" />
-          <p className="text-gray-600">កំពុងផ្ទុកទិន្នន័យមកពិនិត្យ... (Loading visit data...)</p>
+          <div className="bg-white p-8 border border-gray-300">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Loading Visit Data</h3>
+            <p className="text-gray-600">Please wait while we load the patient information...</p>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Calculate form completion progress
+  const calculateProgress = () => {
+    const requiredFields = [
+      'artNumber', 'visitDate', 'name', 'age', 'gender', 'weight', 'height',
+      'whoStage', 'cd4', 'hivViral', 'arvLine'
+    ];
+    const completedFields = requiredFields.filter(field => 
+      formData[field] && formData[field] !== '' && formData[field] !== '0' && formData[field] !== '1900-01-01'
+    ).length;
+    return Math.round((completedFields / requiredFields.length) * 100);
+  };
+
+  const progress = calculateProgress();
+
+  const sections = [
+    { id: 'patient-info', title: 'Patient Information', description: 'Basic information and demographics' },
+    { id: 'demographics', title: 'Assessment', description: 'Symptoms, counselling and adherence' },
+    { id: 'treatment', title: 'Treatment Plan', description: 'Medical assessment and follow-up' }
+  ];
+
+  const renderCurrentSection = () => {
+    switch (currentSection) {
+      case 0:
+        return (
+          <div className="space-y-6">
+            <PatientInformation formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+            <Demographics formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+            <PhysicalMeasurements formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+          </div>
+        );
+      case 1:
+        return (
+          <div className="space-y-6">
+            <Counselling formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+            <Symptoms formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+            <Hospitalization formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+            <Adherence formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+            <Assessment formData={formData} handleInputChange={handleInputChange} showKhmer={showKhmerLabels} />
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-6">
+            <AssessmentPlan formData={formData} handleInputChange={handleInputChange} visitId={visitId} showKhmer={showKhmerLabels} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Professional Header */}
-      <div className="mb-2">
-        <div className="max-w-7xl mx-auto ">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
+    <div className="min-h-screen bg-white">
+      {/* Simple Header */}
+      <div className="border-b border-gray-300">
+        <div className="max-w-4xl mx-auto px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <button 
                 onClick={handleBack} 
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                className="text-gray-600 hover:text-gray-900 text-sm mb-2"
               >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-              <div className="h-6 w-px bg-gray-300" />
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">ទម្រង់ព័ត៌មាននៃអ្នកជំងឺពេលមកពិនិត្យជំងឺ (Adult Patient Visit Form)</h1>
-                <p className="text-sm text-gray-500">
-                  {visitId ? `លេខកូដមកពិនិត្យ: ${visitId}` : 'មកពិនិត្យថ្មី (New Visit)'}
-                  {clinicId && ` • លេខកូដអ្នកជំងឺ: ${clinicId}`}
-                </p>
-              </div>
+                ← Back to visits
+              </button>
+              <h1 className="text-2xl font-medium text-gray-900">
+                Adult Patient Visit Form
+              </h1>
+              <p className="text-gray-600 mt-1">
+                {clinicId && `Patient ID: ${clinicId}`}
+                {formData.name && ` • ${formData.name}`}
+              </p>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button 
-                variant="outline" 
-                onClick={() => handleSave(true)}
-                disabled={saving}
-                className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Draft
-              </Button>
-              <Button 
-                onClick={() => handleSave(false)}
-                disabled={saving}
-                className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white"
-              >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                Save
-              </Button>
+            <div className="text-right">
+              <div className="text-sm text-gray-600 mb-1">
+                Progress: {progress}%
+              </div>
+              <div className="w-32 h-1 bg-gray-200">
+                <div 
+                  className="h-1 bg-gray-600" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content with Tabs */}
-      <div >
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <Tabs defaultValue="patient-info" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-50 border-b border-gray-200 rounded-none">
-              <TabsTrigger 
-                value="patient-info" 
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-gray-900 rounded-none"
-              >
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  ព័ត៌មានអ្នកជំងឺ និង ការវាយតម្លៃ (Patient & Clinical Info)
-                </div>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="medical-assessment"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-gray-900 rounded-none"
-              >
-                <div className="flex items-center gap-2">
-                  <Stethoscope className="w-4 h-4" />
-                  ការព្យាបាល និង ផែនការ (Treatment & Plan)
-                </div>
-              </TabsTrigger>
-            </TabsList>
+      {/* Simple Section Navigation */}
+      <div className="border-b border-gray-300">
+        <div className="max-w-4xl mx-auto px-8">
+          <div className="flex space-x-12">
+            {sections.map((section, index) => {
+              const isActive = currentSection === index;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setCurrentSection(index)}
+                  className={`py-4 text-left border-b-2 transition-colors ${
+                    isActive 
+                      ? 'border-gray-900 text-gray-900' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <div className="font-medium">{section.title}</div>
+                  <div className="text-sm text-gray-500">{section.description}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
-            <div className="p-8">
-              <TabsContent value="patient-info" className="mt-0 space-y-8">
-                <div className="space-y-8">
-                  <PatientInformation formData={formData} handleInputChange={handleInputChange} />
-                  <Demographics formData={formData} handleInputChange={handleInputChange} />
-                  <PhysicalMeasurements formData={formData} handleInputChange={handleInputChange} />
-                  <Counselling formData={formData} handleInputChange={handleInputChange} />
-                  <Symptoms formData={formData} handleInputChange={handleInputChange} />
-                  <Hospitalization formData={formData} handleInputChange={handleInputChange} />
-                  <Adherence formData={formData} handleInputChange={handleInputChange} />
-                  <Assessment formData={formData} handleInputChange={handleInputChange} />
-                </div>
-              </TabsContent>
+      {/* Main Content - Paper Style */}
+      <div className="max-w-4xl mx-auto px-8 py-8">
+        <div className="bg-white border border-gray-300">
+          <div className="p-12">
+            {renderCurrentSection()}
+          </div>
 
-              <TabsContent value="medical-assessment" className="mt-0 space-y-8">
-                <div className="space-y-8">
-                  <AssessmentPlan formData={formData} handleInputChange={handleInputChange} visitId={visitId} />
-                </div>
-              </TabsContent>
-            </div>
-          </Tabs>
-
-          {/* Footer Actions */}
-          <div className="bg-gray-50 px-8 py-6 border-t border-gray-200">
-            <div className="flex items-center justify-end space-x-3">
-              <Button 
-                variant="outline" 
-                onClick={handleBack}
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                បោះបង់ (Cancel)
-              </Button>
-              <Button 
-                onClick={() => handleSave(false)}
-                disabled={saving}
-                className="bg-gray-900 hover:bg-gray-800 text-white"
-              >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                រក្សាទុក និង បញ្ចប់ (Save & Complete)
-              </Button>
+          {/* Simple Footer */}
+          <div className="bg-gray-50 px-12 py-6 border-t border-gray-300">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                {saving ? 'Saving...' : 'Auto-saved'} • Last saved: {new Date().toLocaleTimeString()}
+              </div>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center text-sm text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={showKhmerLabels}
+                    onChange={(e) => setShowKhmerLabels(e.target.checked)}
+                    className="mr-2"
+                  />
+                  Show Khmer Labels
+                </label>
+                {currentSection > 0 && (
+                  <button 
+                    onClick={() => setCurrentSection(currentSection - 1)}
+                    className="px-4 py-2 text-sm border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    Previous
+                  </button>
+                )}
+                <button 
+                  onClick={() => handleSave(true)}
+                  disabled={saving}
+                  className="px-4 py-2 text-sm border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Save Draft
+                </button>
+                {currentSection < sections.length - 1 ? (
+                  <button 
+                    onClick={() => setCurrentSection(currentSection + 1)}
+                    className="px-6 py-2 text-sm bg-gray-900 text-white hover:bg-gray-800"
+                  >
+                    Next →
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => handleSave(false)}
+                    disabled={saving}
+                    className="px-6 py-2 text-sm bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50"
+                  >
+                    Save & Complete
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

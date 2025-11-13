@@ -94,6 +94,7 @@ class SiteOptimizedIndicators {
     });
   }
 
+
   // Generate cache key for site-specific data
   generateCacheKey(siteCode, indicatorId, params) {
     const paramString = JSON.stringify(params);

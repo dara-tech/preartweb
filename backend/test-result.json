@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "result": {
+    "siteCode": "1705",
+    "indicatorId": "1_percentage_died",
+    "data": [
+      {
+        "Indicator": "1. Percentage of ART patients who died",
+        "Deaths": 3,
+        "Total_ART": 302,
+        "Percentage": "0.99",
+        "Male_0_14_Deaths": "0",
+        "Female_0_14_Deaths": "0",
+        "Male_over_14_Deaths": "3",
+        "Female_over_14_Deaths": "0",
+        "TOTAL": 0,
+        "Male_0_14": 0,
+        "Female_0_14": 0,
+        "Male_over_14": 0,
+        "Female_over_14": 0
+      }
+    ],
+    "executionTime": 129,
+    "timestamp": "2025-10-17T03:12:34.276Z"
+  },
+  "timestamp": "2025-10-17T03:12:34.280Z"
+}

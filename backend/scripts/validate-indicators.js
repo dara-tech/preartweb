@@ -4,7 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 // Database configuration for site-specific testing
-const siteCode = '0201'; // Test with site 0201 (Battambang PH)
+const siteCode = '1705'; // Test with site 0201 (Battambang PH)
 const sequelize = new Sequelize({
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 3306,

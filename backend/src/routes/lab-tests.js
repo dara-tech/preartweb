@@ -81,7 +81,7 @@ router.post('/results', [
     const labResults = await makeLabApiRequest('/test_result', {
       start,
       end,
-      type: 'hiv', // Use 'hiv' instead of the passed type parameter
+      type: type, // Use the passed type parameter
       site_code: siteCode
     });
 

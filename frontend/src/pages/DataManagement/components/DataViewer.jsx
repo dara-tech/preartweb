@@ -356,7 +356,7 @@ const DataViewer = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="bg-card rounded-lg border border-border">
+          <div className="bg-card rounded-none border border-border">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-muted">
@@ -386,7 +386,7 @@ const DataViewer = () => {
                               type="text"
                               value={editingSiteNameValue}
                               onChange={(e) => setEditingSiteNameValue(e.target.value)}
-                              className="flex-1 px-2 py-1 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="flex-1 px-2 py-1 text-sm border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                               placeholder="Enter site name"
                               autoFocus
                               onKeyDown={(e) => {
@@ -437,7 +437,7 @@ const DataViewer = () => {
                               type="text"
                               value={editingProvinceValue}
                               onChange={(e) => setEditingProvinceValue(e.target.value)}
-                              className="flex-1 px-2 py-1 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="flex-1 px-2 py-1 text-sm border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                               placeholder="Enter province"
                               autoFocus
                               onKeyDown={(e) => {
@@ -490,7 +490,7 @@ const DataViewer = () => {
                                 type="text"
                                 value={editingValue}
                                 onChange={(e) => setEditingValue(e.target.value)}
-                                className="flex-1 px-2 py-1 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 px-2 py-1 text-sm border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter file name"
                                 autoFocus
                                 onKeyDown={(e) => {

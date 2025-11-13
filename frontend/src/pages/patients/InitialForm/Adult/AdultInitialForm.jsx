@@ -588,7 +588,7 @@ function AdultInitialForm() {
         // Form View - Show tabs and action buttons
         <>
           {/* Clean Header with action buttons - only when editing/adding */}
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="bg-white border border-gray-200 rounded-none shadow-sm p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div className="flex items-center space-x-3 sm:space-x-4 order-2 sm:order-1">
                 <Button onClick={backToList} variant="outline" size="sm" className="flex-shrink-0">

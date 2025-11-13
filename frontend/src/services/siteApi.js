@@ -7,6 +7,12 @@ export const siteApi = {
     return response.data
   },
 
+  // Get sites (alias for getAllSites for compatibility)
+  getSites: async () => {
+    const response = await api.get('/apiv1/site-operations/sites')
+    return response.data
+  },
+
   // Get active sites only
   getActiveSites: async () => {
     const response = await api.get('/apiv1/site-operations/sites')

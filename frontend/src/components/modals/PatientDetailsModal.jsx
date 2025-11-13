@@ -198,7 +198,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
         <DialogHeader className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-3">
-              <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-none shadow-lg">
                 {getCategoryIcon(category)}
               </div>
               <div className="min-w-0 flex-1">
@@ -236,7 +236,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
             {/* Enhanced Search and Controls Bar */}
-            <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-none p-4 sm:p-6 shadow-sm">
               <div className="space-y-4">
                 {/* Search Row */}
                 <div className="w-full">
@@ -246,7 +246,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                       placeholder="Search by Clinic ID, Type, or Gender..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 h-10 sm:h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg w-full"
+                      className="pl-10 h-10 sm:h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-none w-full"
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           loadPatientDetails()
@@ -260,7 +260,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-3 sm:space-y-0 sm:space-x-4">
                   <div className="flex items-center space-x-3">
                     <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(parseInt(value))}>
-                      <SelectTrigger className="w-20 h-10 border-gray-300 rounded-lg">
+                      <SelectTrigger className="w-20 h-10 border-gray-300 rounded-none">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -272,7 +272,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                       </SelectContent>
                     </Select>
                     
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                    <div className="flex items-center border border-gray-300 rounded-none overflow-hidden">
                       <Button
                         variant={viewMode === 'table' ? 'default' : 'ghost'}
                         size="sm"
@@ -352,12 +352,12 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                     <Card key={i} className="animate-pulse">
                       <CardContent className="p-4 sm:p-6">
                         <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-full"></div>
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-none"></div>
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-muted rounded w-1/4"></div>
-                            <div className="h-3 bg-muted rounded w-1/2"></div>
+                            <div className="h-4 bg-muted rounded-none w-1/4"></div>
+                            <div className="h-3 bg-muted rounded-none w-1/2"></div>
                           </div>
-                          <div className="w-16 sm:w-20 h-6 bg-muted rounded"></div>
+                          <div className="w-16 sm:w-20 h-6 bg-muted rounded-none"></div>
                         </div>
                       </CardContent>
                     </Card>
@@ -477,7 +477,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                             </TableCell>
                             <TableCell className="font-medium">
                               <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-none flex items-center justify-center text-white font-semibold text-sm">
                                   {patient.ClinicID ? patient.ClinicID.charAt(0) : '?'}
                                 </div>
                                 <span className="truncate">{patient.ClinicID || 'Unknown ID'}</span>
@@ -537,10 +537,10 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                           <div className="flex items-center space-x-4">
                             {/* Avatar */}
                             <div className="relative flex-shrink-0">
-                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-base sm:text-lg shadow-lg">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-none flex items-center justify-center text-white font-semibold text-base sm:text-lg shadow-lg">
                                 {patient.ClinicID ? patient.ClinicID.charAt(0) : '?'}
                               </div>
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-full flex items-center justify-center shadow-md">
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-none flex items-center justify-center shadow-md">
                                 {getCategoryIcon(category)}
                               </div>
                             </div>

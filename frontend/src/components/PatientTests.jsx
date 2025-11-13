@@ -878,7 +878,7 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             </Button>
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-none border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -1768,7 +1768,7 @@ const PatientTests = () => {
               <SelectTrigger>
                 <SelectValue placeholder="All facilities" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background backdrop-blur-sm">
                 <SelectItem value="all">All facilities</SelectItem>
                 {sites.map(site => (
                   <SelectItem key={site.siteCode || site.code} value={site.siteCode || site.code}>
@@ -1792,7 +1792,7 @@ const PatientTests = () => {
               <SelectTrigger>
                 <SelectValue placeholder="All test types" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background backdrop-blur-sm">
                 <SelectItem value="all">All test types</SelectItem>
                 <SelectItem value="cd4">CD4</SelectItem>
                 <SelectItem value="viral_load">Viral Load</SelectItem>
@@ -1800,6 +1800,7 @@ const PatientTests = () => {
                 <SelectItem value="chemistry">Chemistry</SelectItem>
                 <SelectItem value="hematology">Hematology</SelectItem>
                 <SelectItem value="microbiology">Microbiology</SelectItem>
+                <SelectItem value="dna">DNA Test</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -1816,7 +1817,7 @@ const PatientTests = () => {
                     ? 'Custom Range' 
                     : `FY${selectedFiscalYear}-Q${selectedQuarterNum}`}
                   readOnly
-                  className="w-full h-9 sm:h-9 px-3 pr-10 text-sm border shadow-sm  rounded-lg  cursor-pointer transition-colors "
+                  className="w-full h-9 sm:h-9 px-3 pr-10 text-sm border shadow-sm  rounded-none  cursor-pointer transition-colors "
                   onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -1826,7 +1827,7 @@ const PatientTests = () => {
 
               {/* Custom Period Picker Panel */}
               {isPeriodPickerOpen && (
-                <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border rounded-xl shadow-xl p-6 min-w-[320px]">
+                <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background backdrop-blur-sm border border-border rounded-none shadow-xl p-6 min-w-[320px]">
                   {/* Year Navigation */}
                   <div className="flex items-center justify-between mb-6">
                     <Button
@@ -1834,7 +1835,7 @@ const PatientTests = () => {
                       onClick={() => setCurrentDecade(currentDecade - 10)}
                       variant="ghost"
                       size="sm"
-                      className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                      className="p-2 rounded-none hover: transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4 text-primary" />
                     </Button>
@@ -1843,7 +1844,7 @@ const PatientTests = () => {
                       type="button"
                       onClick={() => setShowYearGrid(!showYearGrid)}
                       variant="ghost"
-                      className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-lg transition-colors cursor-pointer"
+                      className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-none transition-colors cursor-pointer"
                     >
                       FY {selectedFiscalYear}
                     </Button>
@@ -1853,7 +1854,7 @@ const PatientTests = () => {
                       onClick={() => setCurrentDecade(currentDecade + 10)}
                       variant="ghost"
                       size="sm"
-                      className="p-2 rounded-lg hover:bg-primary/10 transition-colors text-primary"
+                      className="p-2 rounded-none hover: transition-colors text-primary"
                     >
                       <ChevronRight className="w-4 h-4 text-primary" />
                     </Button>
@@ -1878,7 +1879,7 @@ const PatientTests = () => {
                             variant={isSelected ? "default" : "ghost"}
                             size="sm"
                             className={`
-                              px-3 py-2 text-sm rounded-md transition-all duration-200 relative
+                              px-3 py-2 text-sm rounded-none transition-all duration-200 relative
                               ${isSelected
                                 ? 'bg-blue-500 text-white shadow-md'
                                 : isCurrentYear && isInCurrentDecade
@@ -1891,7 +1892,7 @@ const PatientTests = () => {
                           >
                             {year}
                             {isCurrentYear && !isSelected && isInCurrentDecade && (
-                              <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-full"></div>
+                              <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-none"></div>
                             )}
                           </Button>
                         );
@@ -1918,7 +1919,7 @@ const PatientTests = () => {
                         variant={selectedQuarterNum === q ? "default" : "outline"}
                         size="sm"
                         className={`
-                          px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
+                          px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
                           ${selectedQuarterNum === q
                             ? 'bg-blue-500 text-white shadow-md'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:border-gray-300'
@@ -2205,7 +2206,7 @@ const PatientTests = () => {
                     No test results found
                   </div>
                 ) : (
-                  <div className="rounded-md border">
+                  <div className="rounded-none border">
                     <Table>
                       <TableHeader>
                         <TableRow>

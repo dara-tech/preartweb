@@ -59,7 +59,7 @@ function PatientInformation({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-purple-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-purple-600 font-bold">1</span>
             </div>
             ព័ត៌មានមូលដ្ឋាន / Basic Information
@@ -164,7 +164,7 @@ function PatientInformation({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-blue-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-blue-600 font-bold">2</span>
             </div>
             ព័ត៌មានអាសយដ្ឋាន / Address Information
@@ -261,7 +261,7 @@ function PatientInformation({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-green-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-green-600 font-bold">3</span>
             </div>
             ព័ត៌មានទំនាក់ទំនង / Contact Information
@@ -312,7 +312,7 @@ function PatientInformation({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-orange-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-orange-600 font-bold">4</span>
             </div>
             ព័ត៌មានគ្រួសារ / Family Information
@@ -465,7 +465,7 @@ function PatientInformation({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-red-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-red-600 font-bold">5</span>
             </div>
             ព័ត៌មានការកើត / Delivery Information
@@ -588,7 +588,7 @@ function PatientInformation({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-indigo-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-indigo-600 font-bold">6</span>
             </div>
             ព័ត៌មាន HIV / HIV Information

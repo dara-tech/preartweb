@@ -70,7 +70,7 @@ function MedicalTreatmentHistory({
       <Card className="border border-gray-200 shadow-sm">
       <CardHeader className="bg-teal-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-teal-600 font-bold">1</span>
             </div>
             ប្រវត្តិជំងឺរបេង និង ការព្យាបាល (TB Past Medical History and Treatment)
@@ -201,7 +201,7 @@ function MedicalTreatmentHistory({
               </RadioGroup>
             </div>
 
-            <div className="ml-6 p-4 status-critical rounded-lg border border-border">
+            <div className="ml-6 p-4 status-critical rounded-none border border-border">
               <Label className="text-sm font-semibold text-foreground">របេងសួត(PTB)</Label>
               <RadioGroup
                 value={safeFormData.tbResult === -1 || safeFormData.tbResult === null || safeFormData.tbResult === undefined ? "" : safeFormData.tbResult.toString()}
@@ -314,7 +314,7 @@ function MedicalTreatmentHistory({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-blue-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-blue-600 font-bold">2</span>
             </div>
             ប្រវត្តិនៃការប្រើប្រាស់ថ្នាំARV (ARV Treatment History)
@@ -437,7 +437,7 @@ function MedicalTreatmentHistory({
       <Card className="border-2 border-green-200 shadow-lg">
         <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white">
           <CardTitle className="text-xl font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-green-600 font-bold">3</span>
             </div>
             ប្រវត្តិនៃការព្យាបាលជំងឺផ្សេងទៀត (Other Medical Treatment History)
@@ -582,7 +582,7 @@ function MedicalTreatmentHistory({
       <Card className="border-2 border-purple-200 shadow-lg">
         <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
           <CardTitle className="text-xl font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-purple-600 font-bold">4</span>
             </div>
             ប្រតិកម្មឱសថ (Drug Allergy)

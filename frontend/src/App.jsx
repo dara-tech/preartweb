@@ -20,9 +20,12 @@ import DataManagement from './pages/DataManagement'
 import RoleManagement from './pages/RoleManagement'
 import DataImportExport from './pages/DataManagement/components/DataImportExport'
 import IndicatorsReport from './pages/indicators/IndicatorsReport'
+import MortalityRetentionIndicators from './pages/MortalityRetentionIndicators'
 import AnalyticsAdmin from './pages/admin/AnalyticsAdmin'
+import IndicatorManagement from './pages/admin/IndicatorManagement'
 import LabTestResultsPage from './pages/LabTestResults'
 import PatientTestsPage from './pages/PatientTests'
+import InfantTestsPage from './pages/InfantTests'
 import AdvancedLayout from './components/layout/AdvancedLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -201,13 +204,30 @@ function App() {
             </ProtectedRoute>
           } />
           
+          {/* Infant Tests - Accessible to all authenticated users except viewers */}
+          <Route path="/infant-tests" element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin', 'data_manager', 'doctor', 'nurse', 'data_entry', 'site_manager']}>
+              <InfantTestsPage />
+            </ProtectedRoute>
+          } />
+          
           {/* Indicators - Accessible to all authenticated users */}
           <Route path="/indicators" element={<IndicatorsReport />} />
+          
+          {/* Mortality and Retention Indicators - Accessible to all authenticated users */}
+          <Route path="/mortality-retention-indicators" element={<MortalityRetentionIndicators />} />
           
           {/* Analytics Admin - Only for super_admin and admin */}
           <Route path="/analytics-admin" element={
             <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
               <AnalyticsAdmin />
+            </ProtectedRoute>
+          } />
+          
+          {/* Indicator Management - Only for super_admin and admin */}
+          <Route path="/indicator-management" element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <IndicatorManagement />
             </ProtectedRoute>
           } />
           

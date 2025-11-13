@@ -84,12 +84,12 @@ function PatientList() {
       {Array.from({ length: 3 }).map((_, i) => (
         <Card key={i} className="hover:shadow-lg transition-shadow">
           <CardHeader className="text-center">
-            <div className="h-12 w-12 mx-auto bg-muted rounded-full animate-pulse" />
-            <div className="h-6 bg-muted rounded w-24 mx-auto animate-pulse" />
+            <div className="h-12 w-12 mx-auto bg-muted rounded-none animate-pulse" />
+            <div className="h-6 bg-muted rounded-none w-24 mx-auto animate-pulse" />
           </CardHeader>
           <CardContent className="text-center">
-            <div className="h-4 bg-muted rounded w-32 mx-auto mb-4 animate-pulse" />
-            <div className="h-10 bg-muted rounded w-full animate-pulse" />
+            <div className="h-4 bg-muted rounded-none w-32 mx-auto mb-4 animate-pulse" />
+            <div className="h-10 bg-muted rounded-none w-full animate-pulse" />
           </CardContent>
         </Card>
       ))}
@@ -103,7 +103,7 @@ function PatientList() {
         {/* Top row - Title and primary actions */}
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-            <div className="p-2 sm:p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-lg sm:rounded-xl shadow-lg">
+            <div className="p-2 sm:p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-none sm:rounded-none shadow-lg">
               <Users className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
             <div className="min-w-0 flex-1">
@@ -139,7 +139,7 @@ function PatientList() {
             <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">
               {loading ? (
                 <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 bg-muted rounded animate-pulse" />
+                  <div className="w-3 h-3 bg-muted rounded-none animate-pulse" />
                   <span>Loading...</span>
                 </div>
               ) : (
@@ -418,7 +418,7 @@ function PatientList() {
               <div className="text-sm text-muted-foreground">
                 {loading ? (
                   <div className="flex items-center space-x-1">
-                    <div className="w-3 h-3 bg-muted rounded animate-pulse" />
+                    <div className="w-3 h-3 bg-muted rounded-none animate-pulse" />
                     <span>Loading patient types...</span>
                   </div>
                 ) : (

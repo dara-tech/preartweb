@@ -223,9 +223,9 @@ function MinimalisticPatientList({
       {loading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="p-4 border rounded-lg animate-pulse">
+            <div key={i} className="p-4 border rounded-none animate-pulse">
               <div className="flex items-center space-x-3">
-                <Skeleton className="w-10 h-10 rounded-full" />
+                <Skeleton className="w-10 h-10 rounded-none" />
                 <div className="space-y-2 flex-1">
                   <Skeleton className="h-4 w-1/4" />
                   <Skeleton className="h-3 w-1/2" />
@@ -248,7 +248,7 @@ function MinimalisticPatientList({
       ) : (
         <div className="space-y-2">
           {patients.map((patient, index) => (
-            <div key={`${patient.clinicId}-${patient.site_code || patient.siteName || index}`} className="p-4 border rounded-lg hover:bg-accent transition-colors">
+            <div key={`${patient.clinicId}-${patient.site_code || patient.siteName || index}`} className="p-4 border rounded-none hover:bg-accent transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
@@ -263,12 +263,12 @@ function MinimalisticPatientList({
                     {patient.artNumber && <span>ART: {patient.artNumber}</span>}
                   </div>
                   <div className="flex items-center space-x-4 text-sm mt-1">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    <span className={`px-2 py-1 rounded-none text-xs font-medium ${
                       patient.sex === 'Male' ? 'status-active' : 'status-warning'
                     }`}>
                       {patient.sex || 'Unknown'}
                     </span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    <span className={`px-2 py-1 rounded-none text-xs font-medium ${
                       patient.patientStatus === 'Active' ? 'status-active' :
                       patient.patientStatus === 'Dead' ? 'status-critical' :
                       patient.patientStatus === 'Lost' ? 'status-warning' :
@@ -278,22 +278,22 @@ function MinimalisticPatientList({
                       {patient.patientStatus || 'Unknown'}
                     </span>
                     {patient.targetGroup !== null && patient.targetGroup !== undefined && patient.targetGroup !== '' && (
-                      <span className="px-2 py-1 rounded text-xs font-medium viral-load-undetectable">
+                      <span className="px-2 py-1 rounded-none text-xs font-medium viral-load-undetectable">
                         {getTargetGroupLabel(patient.targetGroup)}
                       </span>
                     )}
                     {patient.nationality !== null && patient.nationality !== undefined && patient.nationality !== '' && patient.nationality !== -1 && (
-                      <span className="px-2 py-1 rounded text-xs font-medium cd4-low">
+                      <span className="px-2 py-1 rounded-none text-xs font-medium cd4-low">
                         {getNationalityLabel(patient.nationality)}
                       </span>
                     )}
                     {patient.hivViral && patient.hivViral !== '0' && (
-                      <span className="px-2 py-1 rounded text-xs font-medium viral-load-high">
+                      <span className="px-2 py-1 rounded-none text-xs font-medium viral-load-high">
                         VL: {patient.hivViral}
                       </span>
                     )}
                     {patient.cd4 && (
-                      <span className="px-2 py-1 rounded text-xs font-medium cd4-high">
+                      <span className="px-2 py-1 rounded-none text-xs font-medium cd4-high">
                         CD4: {patient.cd4}
                       </span>
                     )}

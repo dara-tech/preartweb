@@ -193,25 +193,25 @@ const RealTimeLogViewer = () => {
   };
 
   return (
-    <div className="h-96 bg-black border border-gray-800 rounded-lg overflow-hidden shadow-2xl">
+    <div className="h-96 bg-black border border-gray-800 rounded-none overflow-hidden shadow-2xl">
       {/* Terminal Header */}
       <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex gap-1">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-red-500 rounded-none"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-none"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-none"></div>
           </div>
           <span className="text-gray-300 text-sm font-mono">analytics@:~$</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+          <div className={`w-2 h-2 rounded-none ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
           <span className="text-gray-400 text-xs font-mono">
             {isConnected ? 'CONNECTED' : 'DISCONNECTED'}
           </span>
           {isRunning && (
             <div className="flex items-center gap-1">
-              <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+              <div className="w-1 h-1 bg-green-400 rounded-none animate-pulse"></div>
               <span className="text-green-400 text-xs font-mono">RUNNING</span>
             </div>
           )}
@@ -222,19 +222,19 @@ const RealTimeLogViewer = () => {
       <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center gap-2">
         <button
           onClick={clearLogs}
-          className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-mono rounded transition-colors"
+          className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-mono rounded-none transition-colors"
         >
           clear
         </button>
         <button
           onClick={copyLogs}
-          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-mono rounded transition-colors"
+          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-mono rounded-none transition-colors"
         >
           copy
         </button>
         <button
           onClick={downloadLogs}
-          className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-mono rounded transition-colors"
+          className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-mono rounded-none transition-colors"
         >
           save
         </button>
@@ -244,7 +244,7 @@ const RealTimeLogViewer = () => {
             id="autoScroll"
             checked={autoScroll}
             onChange={(e) => setAutoScroll(e.target.checked)}
-            className="w-3 h-3 text-green-500 bg-gray-700 border-gray-600 rounded focus:ring-green-500"
+            className="w-3 h-3 text-green-500 bg-gray-700 border-gray-600 rounded-none focus:ring-green-500"
           />
           <label htmlFor="autoScroll" className="text-gray-400 text-xs font-mono">
             auto-scroll
@@ -288,7 +288,7 @@ const RealTimeLogViewer = () => {
                       <summary className="cursor-pointer hover:text-green-400 transition-colors">
                         [details]
                       </summary>
-                      <pre className="mt-1 p-2 bg-gray-900 border border-gray-700 rounded text-xs overflow-x-auto text-gray-300">
+                      <pre className="mt-1 p-2 bg-gray-900 border border-gray-700 rounded-none text-xs overflow-x-auto text-gray-300">
                         {JSON.stringify(log.data, null, 2)}
                       </pre>
                     </details>

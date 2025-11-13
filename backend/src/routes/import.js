@@ -139,7 +139,8 @@ router.post('/sql', [
       siteName,
       province,
       district,
-      fileName
+      fileName,
+      importMode = 'replace'
     } = req.body;
 
     let databaseName;
@@ -189,6 +190,81 @@ router.post('/sql', [
         });
       }
       databaseName = siteInfo.database_name;
+      
+      console.log(`🎯 Importing to existing site: ${targetSite} (${databaseName})`);
+      console.log(`📋 Import mode: ${importMode}`);
+      
+      // Handle different import modes for existing sites
+      if (importMode === 'replace') {
+        console.log(`🔄 REPLACE mode: Dropping and recreating database ${databaseName}`);
+        try {
+          // Drop existing database
+          const { sequelize } = require('../config/database');
+          const connection = await sequelize.getQueryInterface().sequelize.connectionManager.getConnection();
+          await connection.promise().query(`DROP DATABASE IF EXISTS \`${databaseName}\``);
+          console.log(`🗑️ Dropped existing database: ${databaseName}`);
+          
+          // Create fresh database
+          await createSiteDatabase(databaseName);
+          console.log(`✅ Created fresh database: ${databaseName}`);
+          
+          await sequelize.getQueryInterface().sequelize.connectionManager.releaseConnection(connection);
+        } catch (error) {
+          console.error('Error in REPLACE mode:', error);
+          return res.status(500).json({
+            success: false,
+            message: `Failed to replace database: ${error.message}`
+          });
+        }
+      } else if (importMode === 'append') {
+        console.log(`➕ APPEND mode: Adding data to existing database ${databaseName}`);
+        // Check if database exists, create if not
+        try {
+          const { sequelize } = require('../config/database');
+          const connection = await sequelize.getQueryInterface().sequelize.connectionManager.getConnection();
+          
+          const [databases] = await connection.promise().query(`SHOW DATABASES LIKE '${databaseName}'`);
+          if (databases.length === 0) {
+            console.log(`🔨 Database ${databaseName} doesn't exist, creating...`);
+            await createSiteDatabase(databaseName);
+            console.log(`✅ Database created: ${databaseName}`);
+          } else {
+            console.log(`✅ Database exists: ${databaseName}`);
+          }
+          
+          await sequelize.getQueryInterface().sequelize.connectionManager.releaseConnection(connection);
+        } catch (error) {
+          console.error('Error in APPEND mode:', error);
+          return res.status(500).json({
+            success: false,
+            message: `Failed to prepare database for append: ${error.message}`
+          });
+        }
+      } else if (importMode === 'skip') {
+        console.log(`⏭️ SKIP mode: Will skip conflicts in database ${databaseName}`);
+        // Check if database exists, create if not
+        try {
+          const { sequelize } = require('../config/database');
+          const connection = await sequelize.getQueryInterface().sequelize.connectionManager.getConnection();
+          
+          const [databases] = await connection.promise().query(`SHOW DATABASES LIKE '${databaseName}'`);
+          if (databases.length === 0) {
+            console.log(`🔨 Database ${databaseName} doesn't exist, creating...`);
+            await createSiteDatabase(databaseName);
+            console.log(`✅ Database created: ${databaseName}`);
+          } else {
+            console.log(`✅ Database exists: ${databaseName}`);
+          }
+          
+          await sequelize.getQueryInterface().sequelize.connectionManager.releaseConnection(connection);
+        } catch (error) {
+          console.error('Error in SKIP mode:', error);
+          return res.status(500).json({
+            success: false,
+            message: `Failed to prepare database for skip mode: ${error.message}`
+          });
+        }
+      }
     }
 
     // Validate required fields for new database
@@ -217,7 +293,7 @@ router.post('/sql', [
           const connection = await sequelize.getQueryInterface().sequelize.connectionManager.getConnection();
           
           // Check if database exists and has tables
-          const [databases] = await connection.query(`SHOW DATABASES LIKE '${databaseName}'`);
+          const [databases] = await connection.promise().query(`SHOW DATABASES LIKE '${databaseName}'`);
           if (databases.length === 0) {
             console.log(`🔨 Database ${databaseName} doesn't exist, creating...`);
             await createSiteDatabase(databaseName);
@@ -263,7 +339,7 @@ router.post('/sql', [
     }
 
     // Execute SQL file
-    const result = await executeSqlFile(req.file.path, databaseName);
+    const result = await executeSqlFile(req.file.path, databaseName, importMode);
 
     // Clean up uploaded file
     await fs.unlink(req.file.path);
@@ -279,7 +355,10 @@ router.post('/sql', [
       result: {
         tablesCreated: result.tablesCreated,
         recordsInserted: result.recordsInserted,
-        executionTime: result.executionTime
+        recordsSkipped: result.recordsSkipped,
+        recordsUpdated: result.recordsUpdated,
+        executionTime: result.executionTime,
+        importMode: result.importMode
       },
       extractedSiteInfo: extractedSiteInfo ? {
         source: 'tblsitename table',
@@ -337,7 +416,7 @@ const createSiteDatabase = async (databaseName) => {
 };
 
 // Execute SQL file
-const executeSqlFile = async (filePath, databaseName) => {
+const executeSqlFile = async (filePath, databaseName, importMode = 'replace') => {
   try {
     const startTime = Date.now();
 
@@ -367,24 +446,73 @@ const executeSqlFile = async (filePath, databaseName) => {
     
     let tablesCreated = 0;
     let recordsInserted = 0;
+    let recordsSkipped = 0;
+    let recordsUpdated = 0;
+
+    console.log(`🚀 Executing SQL with mode: ${importMode}`);
 
     // Execute each statement
     for (const statement of statements) {
       try {
-        const result = await siteSequelize.query(statement);
+        let modifiedStatement = statement;
+        
+        // Modify INSERT statements based on import mode
+        if (importMode === 'skip' && statement.toUpperCase().includes('INSERT INTO')) {
+          // Convert INSERT INTO to INSERT IGNORE INTO to skip conflicts
+          modifiedStatement = statement.replace(/INSERT INTO/gi, 'INSERT IGNORE INTO');
+          console.log(`⏭️ Modified INSERT to IGNORE: ${statement.substring(0, 50)}...`);
+        } else if (importMode === 'append' && statement.toUpperCase().includes('INSERT INTO')) {
+          // For append mode, use INSERT ... ON DUPLICATE KEY UPDATE
+          // This will update existing records instead of failing
+          if (statement.toUpperCase().includes('ON DUPLICATE KEY UPDATE')) {
+            // Already has ON DUPLICATE KEY UPDATE, use as is
+            modifiedStatement = statement;
+          } else {
+            // Add basic ON DUPLICATE KEY UPDATE to prevent conflicts
+            modifiedStatement = statement.replace(/;$/gi, ' ON DUPLICATE KEY UPDATE id=id;');
+            console.log(`➕ Modified INSERT for append mode: ${statement.substring(0, 50)}...`);
+          }
+        }
+        
+        // Skip problematic statements
+        if (statement.toUpperCase().includes('CREATE ALGORITHM') || 
+            statement.toUpperCase().includes('SET CHARACTER_SET_CLIENT') ||
+            statement.toUpperCase().includes('DEFINER=')) {
+          console.log(`⏭️ Skipping problematic statement: ${statement.substring(0, 50)}...`);
+          continue;
+        }
+        
+        const result = await siteSequelize.query(modifiedStatement);
         
         // Count tables created
         if (statement.toUpperCase().includes('CREATE TABLE')) {
           tablesCreated++;
         }
         
-        // Count records inserted
+        // Count records inserted/updated
         if (result[1] && typeof result[1] === 'number') {
-          recordsInserted += result[1];
+          if (importMode === 'skip' && result[1] === 0) {
+            recordsSkipped++;
+          } else if (importMode === 'append' && result[1] === 2) {
+            recordsUpdated++;
+          } else {
+            recordsInserted += result[1];
+          }
         }
       } catch (stmtError) {
-        console.warn(`Warning: Statement failed: ${statement.substring(0, 100)}...`);
-        console.warn(`Error: ${stmtError.message}`);
+        if (importMode === 'skip') {
+          console.warn(`⏭️ Skipped statement (conflict): ${statement.substring(0, 100)}...`);
+          recordsSkipped++;
+        } else if (stmtError.message.includes('already exists')) {
+          console.warn(`⚠️ Table already exists, skipping: ${statement.substring(0, 100)}...`);
+          recordsSkipped++;
+        } else if (stmtError.message.includes('Validation error')) {
+          console.warn(`⚠️ Validation error, skipping: ${statement.substring(0, 100)}...`);
+          recordsSkipped++;
+        } else {
+          console.warn(`Warning: Statement failed: ${statement.substring(0, 100)}...`);
+          console.warn(`Error: ${stmtError.message}`);
+        }
         // Continue with other statements
       }
     }
@@ -397,7 +525,10 @@ const executeSqlFile = async (filePath, databaseName) => {
     return {
       tablesCreated,
       recordsInserted,
-      executionTime
+      recordsSkipped,
+      recordsUpdated,
+      executionTime,
+      importMode
     };
 
   } catch (error) {

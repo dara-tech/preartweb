@@ -29,9 +29,11 @@ const roleManagementRoutes = require('./routes/role-management');
 const importRoutes = require('./routes/import');
 const dataManagementRoutes = require('./routes/data-management');
 const analyticsRoutes = require('./routes/analytics');
+const mortalityRetentionIndicatorsRoutes = require('./routes/mortality-retention-indicators');
 const adminRoutes = require('./routes/admin');
 const labTestRoutes = require('./routes/lab-tests');
 const patientTestRoutes = require('./routes/patientTests');
+const infantTestRoutes = require('./routes/infantTests');
 const { router: userLogsRoutes } = require('./routes/user-logs');
 const schedulerService = require('./services/scheduler');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -177,9 +179,11 @@ app.use('/apiv1/roles', roleManagementRoutes);
 app.use('/apiv1/import', importRoutes);
 app.use('/apiv1/data', dataManagementRoutes);
 app.use('/apiv1/analytics', analyticsRoutes);
+app.use('/apiv1/mortality-retention-indicators', mortalityRetentionIndicatorsRoutes);
 app.use('/apiv1/admin', adminRoutes);
 app.use('/apiv1/lab-tests', labTestRoutes);
 app.use('/apiv1/patient-tests', patientTestRoutes);
+app.use('/apiv1/infant-tests', infantTestRoutes);
 app.use('/apiv1', userLogsRoutes);
 
 // Make io available to routes

@@ -191,7 +191,7 @@ function UnifiedInitialForm({
       ) : (
         <>
           {/* Minimal Header */}
-          <div className="flex items-center justify-between p-4 bg-white border rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white border rounded-none">
             <div className="flex items-center space-x-3">
               <Button onClick={backToList} variant="outline" size="sm">
                 Back

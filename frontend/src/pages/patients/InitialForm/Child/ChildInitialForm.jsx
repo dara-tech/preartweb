@@ -431,7 +431,7 @@ function ChildInitialForm() {
         // Form View - Show tabs and action buttons
         <>
           {/* Clean Header with action buttons - only when editing/adding */}
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <div className="bg-white border border-gray-200 rounded-none shadow-sm p-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
                 <Button onClick={backToList} variant="outline" size="sm">

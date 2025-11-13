@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { 
-  Menu, 
-  Search, 
-
-  User, 
-
-  Maximize2,
-  Minimize2,
-  LogOut,
-  Download
-} from "lucide-react"
 import { useAuth } from '../../contexts/AuthContext'
 import { ThemeToggle } from '../ui/theme-toggle'
 import Sidebar from './Sidebar'
+
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { Settings } from "lucide-react"
+import { 
+  MdMenu, 
+  MdFullscreen, 
+  MdFullscreenExit, 
+  MdDownload, 
+  MdLogout, 
+  MdPerson, 
+  MdSettings 
+} from 'react-icons/md'
 
 const AdvancedLayout = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -205,15 +202,15 @@ const AdvancedLayout = ({ children }) => {
         <div className={`flex-1 flex flex-col overflow-hidden ${isViewer ? 'w-full' : ''}`}>
           {/* Top Header */}
           <header className={`bg-card/95 backdrop-blur-md border-b border-border/50 px-4 py-1   ${
-            isFullscreen ? 'border-primary/30 bg-primary/5' : ''
+            isFullscreen ? 'border-primary/30/5' : ''
           }`}>
             <div className="flex items-center justify-between">
               {/* Left Section */}
               <div className="flex items-center space-x-4">
                 {/* App Mode Status Indicator */}
                 {isFullscreen && (
-                  <div className="flex items-center space-x-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-xs font-medium text-primary">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                  <div className="flex items-center space-x-2 px-3 py-1.5 border border-primary/20 rounded-none text-xs font-medium text-primary">
+                    <div className="w-2 h-2 rounded-none animate-pulse"></div>
                     <span>App Mode</span>
                   </div>
                 )}
@@ -224,9 +221,9 @@ const AdvancedLayout = ({ children }) => {
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsMobileOpen(true)}
-                    className="lg:hidden hover:bg-accent/80 rounded-lg transition-all duration-200"
+                    className="lg:hidden hover:bg-accent/80 rounded-none transition-all duration-200"
                   >
-                    <Menu className="w-5 h-5 text-muted-foreground" />
+                    <MdMenu className="w-5 h-5 text-muted-foreground" />
                   </Button>
                 )}
                 
@@ -240,16 +237,16 @@ const AdvancedLayout = ({ children }) => {
                   variant="ghost" 
                   size="sm" 
                   onClick={toggleFullFrame}
-                  className={`hover:bg-accent/80 transition-all duration-200 rounded-lg ${
-                    isFullscreen ? 'bg-primary/10 text-primary border border-primary/20' : ''
+                  className={`hover:bg-accent/80 transition-all duration-200 rounded-none ${
+                    isFullscreen ? ' text-primary border border-primary/20' : ''
                   }`}
                   title={isFullscreen ? "Exit App Mode (F11)" : "Enter App Mode (F11)"}
                   disabled={!isFullscreenSupported()}
                 >
                   {isFullscreen ? (
-                    <Minimize2 className="w-4 h-4" />
+                    <MdFullscreenExit className="w-4 h-4" />
                   ) : (
-                    <Maximize2 className="w-4 h-4" />
+                    <MdFullscreen className="w-4 h-4" />
                   )}
                 </Button>
 
@@ -264,13 +261,13 @@ const AdvancedLayout = ({ children }) => {
                       size="sm" 
                       onClick={downloadAllScripts}
                       disabled={isDownloading}
-                      className="hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all duration-200 rounded-lg"
+                      className="hover: hover:text-primary hover:border-primary/30 transition-all duration-200 rounded-none"
                       title="Download Analysis Scripts"
                     >
                       {isDownloading ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+                        <div className="animate-spin rounded-none h-4 w-4 border-2 border-primary border-t-transparent"></div>
                       ) : (
-                        <Download className="w-4 h-4" />
+                        <MdDownload className="w-4 h-4" />
                       )}
                       <span className="ml-2 hidden sm:inline">Download Scripts</span>
                     </Button>
@@ -278,24 +275,24 @@ const AdvancedLayout = ({ children }) => {
                       variant="destructive" 
                       size="sm" 
                       onClick={handleLogout}
-                      className="hover:bg-destructive/10 hover:text-destructive transition-all duration-200 rounded-lg cursor-pointer"
+                      className="hover:bg-destructive/10 hover:text-destructive transition-all duration-200 rounded-none cursor-pointer"
                       title="Sign Out"
                     >
-                      <LogOut className=" h-4 w-4 " />
+                      <MdLogout className=" h-4 w-4 " />
                     </Button>
                   </div>
                 )}
 
                 {/* User Profile Menu */}
                 {!isViewer && (
-                  <DropdownMenu>
+                  <DropdownMenu >
                     <DropdownMenuTrigger asChild>
                       <Button 
                         variant="ghost" 
-                        className="flex items-center space-x-3 px-3 py-2 h-auto hover:bg-accent/80 transition-all duration-200 rounded-lg ml-2"
+                        className="flex items-center space-x-3 px-3 py-2 h-auto hover:bg-accent/80 transition-all duration-200 rounded-none ml-2"
                       >
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center shadow-sm ring-1 ring-border/50">
-                          <User className="w-4 h-4 text-primary" />
+                        <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/40 rounded-none flex items-center justify-center shadow-sm ring-1 ring-border/50">
+                          <MdPerson className="w-4 h-4 text-primary" />
                         </div>
                         <div className="hidden lg:block text-left">
                           <p className="text-sm font-medium text-foreground leading-tight">{user?.fullName || 'User'}</p>
@@ -303,7 +300,7 @@ const AdvancedLayout = ({ children }) => {
                         </div>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 shadow-lg border-border/50">
+                    <DropdownMenuContent align="end" className="w-56 shadow-lg border-border/50 ">
                       <DropdownMenuLabel className="font-medium">
                         <div className="flex flex-col space-y-1">
                           <span>{user?.fullName || 'User'}</span>
@@ -312,11 +309,11 @@ const AdvancedLayout = ({ children }) => {
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="hover:bg-accent/80 transition-colors cursor-pointer">
-                        <User className="mr-3 h-4 w-4" />
+                        <MdPerson className="mr-3 h-4 w-4" />
                         <span>Profile Settings</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="hover:bg-accent/80 transition-colors cursor-pointer">
-                        <Settings className="mr-3 h-4 w-4" />
+                        <MdSettings className="mr-3 h-4 w-4" />
                         <span>Preferences</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -324,7 +321,7 @@ const AdvancedLayout = ({ children }) => {
                         onClick={handleLogout} 
                         className="text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
                       >
-                        <LogOut className="mr-3 h-4 w-4 rounded-full text-destructive" />
+                        <MdLogout className="mr-3 h-4 w-4 rounded-none text-destructive" />
                         <span>Sign Out</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

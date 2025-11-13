@@ -438,6 +438,7 @@ const LabTestResults = () => {
     }
   }, [filters.siteCode, sites.length]);
 
+
   // Time Period Filter Panel Component
   const FilterPanel = () => {
     return (
@@ -463,7 +464,7 @@ const LabTestResults = () => {
                 <SelectTrigger>
                   <SelectValue placeholder="Select site" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background backdrop-blur-sm">
                   {sites.map(site => (
                     <SelectItem key={site.siteCode || site.code} value={site.siteCode || site.code}>
                       <div className="flex items-center gap-2">
@@ -481,18 +482,57 @@ const LabTestResults = () => {
               <Label htmlFor="testType">Test Type</Label>
               <Select
                 value={filters.type}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}
+                onValueChange={async (value) => {
+                  setFilters(prev => ({ ...prev, type: value }));
+                  // Trigger search with the new type
+                  if (filters.siteCode && sites.length > 0) {
+                    try {
+                      setLoading(true);
+                      setError(null);
+                      
+                      const searchParams = {
+                        type: value, // Use the new value directly
+                        siteCode: filters.siteCode,
+                        startDate: filters.startDate,
+                        endDate: filters.endDate
+                      };
+                      
+                      const results = await labTestApi.getTestResults(searchParams);
+                      
+                      if (results.success) {
+                        const testResultsData = results.data;
+                        if (Array.isArray(testResultsData)) {
+                          setTestResults(testResultsData);
+                        } else if (testResultsData && typeof testResultsData === 'object') {
+                          const possibleArray = testResultsData.results || testResultsData.data || testResultsData.items || [];
+                          setTestResults(Array.isArray(possibleArray) ? possibleArray : []);
+                        } else {
+                          setTestResults([]);
+                        }
+                      } else {
+                        setError(results.message || 'Failed to fetch test results');
+                        setTestResults([]);
+                      }
+                    } catch (err) {
+                      setError('Failed to fetch test results: ' + err.message);
+                      setTestResults([]);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select test type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background backdrop-blur-sm">
                   <SelectItem value="hiv">HIV Viral Load</SelectItem>
                   <SelectItem value="cd4">CD4 Count</SelectItem>
                   <SelectItem value="viral_load">Viral Load</SelectItem>
                   <SelectItem value="hepatitis">Hepatitis</SelectItem>
                   <SelectItem value="syphilis">Syphilis</SelectItem>
                   <SelectItem value="tb">TB Test</SelectItem>
+                  <SelectItem value="dna">DNA Test</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -500,7 +540,7 @@ const LabTestResults = () => {
             {/* Elegant Period Picker - Popup Style */}
             <div className="space-y-2">
               <Label>Period</Label>
-              <div className="relative">
+              <div className="relative ">
                 <div className="relative">
                   <input
                     type="text"
@@ -508,7 +548,7 @@ const LabTestResults = () => {
                       ? 'Custom Range' 
                       : `${selectedFiscalYear}-Q${selectedQuarterNum}`}
                     readOnly
-                    className="w-full h-9 px-3 pr-10 text-sm border shadow-sm  rounded-lg cursor-pointer transition-colors "
+                    className="w-full h-9 px-3 pr-10 text-sm border shadow-sm  rounded-none cursor-pointer transition-colors "
                     onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -518,7 +558,7 @@ const LabTestResults = () => {
 
                 {/* Custom Period Picker Panel */}
                 {isPeriodPickerOpen && (
-                  <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border rounded-xl shadow-xl p-6 min-w-[320px]">
+                  <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background backdrop-blur-sm border border-border rounded-none shadow-xl p-6 min-w-[320px]">
                     {/* Year Navigation */}
                     <div className="flex items-center justify-between mb-6">
                       <Button
@@ -526,7 +566,7 @@ const LabTestResults = () => {
                         onClick={() => setCurrentDecade(currentDecade - 10)}
                         variant="ghost"
                         size="sm"
-                        className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                        className="p-2 rounded-none hover: transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4 text-primary" />
                       </Button>
@@ -535,7 +575,7 @@ const LabTestResults = () => {
                         type="button"
                         onClick={() => setShowYearGrid(!showYearGrid)}
                         variant="ghost"
-                        className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-lg transition-colors cursor-pointer"
+                        className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-none transition-colors cursor-pointer"
                       >
                         {selectedFiscalYear}
                       </Button>
@@ -545,7 +585,7 @@ const LabTestResults = () => {
                         onClick={() => setCurrentDecade(currentDecade + 10)}
                         variant="ghost"
                         size="sm"
-                        className="p-2 rounded-lg hover:bg-primary/10 transition-colors text-primary"
+                        className="p-2 rounded-none hover: transition-colors text-primary"
                       >
                         <ChevronRight className="w-4 h-4 text-primary" />
                       </Button>
@@ -570,7 +610,7 @@ const LabTestResults = () => {
                               variant={isSelected ? "default" : "ghost"}
                               size="sm"
                               className={`
-                                px-3 py-2 text-sm rounded-md transition-all duration-200 relative
+                                px-3 py-2 text-sm rounded-none transition-all duration-200 relative
                                 ${isSelected
                                   ? 'bg-blue-500 text-white shadow-md'
                                   : isCurrentYear && isInCurrentDecade
@@ -583,7 +623,7 @@ const LabTestResults = () => {
                             >
                               {year}
                               {isCurrentYear && !isSelected && isInCurrentDecade && (
-                                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-full"></div>
+                                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-none"></div>
                               )}
                             </Button>
                           );
@@ -610,7 +650,7 @@ const LabTestResults = () => {
                           variant={selectedQuarterNum === q ? "default" : "outline"}
                           size="sm"
                           className={`
-                            px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
+                            px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
                             ${selectedQuarterNum === q
                               ? 'bg-blue-500 text-white shadow-md'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:border-gray-300'
@@ -892,7 +932,7 @@ const LabTestResults = () => {
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Sort by" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background backdrop-blur-sm">
                         <SelectItem value="test_blood_dt">Test Date</SelectItem>
                         <SelectItem value="laboratory_id">Lab ID</SelectItem>
                         <SelectItem value="clinic_id">Clinic ID</SelectItem>
@@ -927,7 +967,7 @@ const LabTestResults = () => {
                   <div className="space-y-4">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="flex items-center space-x-4">
-                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <Skeleton className="h-12 w-12 rounded-none" />
                         <div className="space-y-2">
                           <Skeleton className="h-4 w-[250px]" />
                           <Skeleton className="h-4 w-[200px]" />
@@ -943,7 +983,7 @@ const LabTestResults = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="rounded-md border">
+                    <div className="rounded-none border">
                       <Table>
                         <TableHeader>
                           <TableRow>

@@ -146,7 +146,7 @@ function PatientInformation({
             />
           </div>
 
-          <div className="flex items-center space-x-2 p-4 bg-blue-50 rounded-lg">
+          <div className="flex items-center space-x-2 p-4 bg-blue-50 rounded-none">
             <Checkbox
               id="reLost"
               checked={safeFormData.reLost || false}
@@ -235,19 +235,19 @@ function PatientInformation({
                 onValueChange={(value) => handleInputChange('referred', parseInt(value))}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="0" id="self" className="w-4 h-4" />
                   <Label htmlFor="self" className="text-sm font-medium">Self</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="1" id="hospital" className="w-4 h-4" />
                   <Label htmlFor="hospital" className="text-sm font-medium">Hospital</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="2" id="healthCenter" className="w-4 h-4" />
                   <Label htmlFor="healthCenter" className="text-sm font-medium">Health Center</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="3" id="communityCare" className="w-4 h-4" />
                   <Label htmlFor="communityCare" className="text-sm font-medium">Community Care</Label>
                 </div>
@@ -262,11 +262,11 @@ function PatientInformation({
                 onValueChange={(value) => handleInputChange('typeTest', parseInt(value))}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="0" id="vcct" className="w-4 h-4" />
                   <Label htmlFor="vcct" className="text-sm font-medium">VCCT</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="1" id="tb" className="w-4 h-4" />
                   <Label htmlFor="tb" className="text-sm font-medium">TB Program</Label>
                 </div>
@@ -281,11 +281,11 @@ function PatientInformation({
                 onValueChange={(value) => handleInputChange('offIn', parseInt(value))}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="0" id="no" className="w-4 h-4" />
                   <Label htmlFor="no" className="text-sm font-medium">No</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-orange-50">
                   <RadioGroupItem value="1" id="yes" className="w-4 h-4" />
                   <Label htmlFor="yes" className="text-sm font-medium">Yes</Label>
                 </div>
@@ -312,23 +312,23 @@ function PatientInformation({
               onValueChange={(value) => handleInputChange('feeding', parseInt(value))}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
             >
-              <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-purple-50">
+              <div className="flex items-center space-x-2 p-3 rounded-none hover:bg-purple-50">
                 <RadioGroupItem value="0" id="breastfeeding" className="w-4 h-4" />
                 <Label htmlFor="breastfeeding" className="text-sm font-medium">Breastfeeding</Label>
               </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-purple-50">
+              <div className="flex items-center space-x-2 p-3 rounded-none hover:bg-purple-50">
                 <RadioGroupItem value="1" id="formula" className="w-4 h-4" />
                 <Label htmlFor="formula" className="text-sm font-medium">Formula</Label>
               </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-purple-50">
+              <div className="flex items-center space-x-2 p-3 rounded-none hover:bg-purple-50">
                 <RadioGroupItem value="2" id="mixed" className="w-4 h-4" />
                 <Label htmlFor="mixed" className="text-sm font-medium">Mixed</Label>
               </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-purple-50">
+              <div className="flex items-center space-x-2 p-3 rounded-none hover:bg-purple-50">
                 <RadioGroupItem value="3" id="solid" className="w-4 h-4" />
                 <Label htmlFor="solid" className="text-sm font-medium">Solid Food</Label>
               </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-purple-50">
+              <div className="flex items-center space-x-2 p-3 rounded-none hover:bg-purple-50">
                 <RadioGroupItem value="4" id="other" className="w-4 h-4" />
                 <Label htmlFor="other" className="text-sm font-medium">Other</Label>
               </div>
@@ -396,7 +396,7 @@ function PatientInformation({
               <h4 className="text-lg font-semibold text-gray-800">Family Members</h4>
               <div className="space-y-2">
                 {familyMembers.map((member, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-none">
                     <div className="flex space-x-4">
                       <span className="font-medium">{member.familyType}</span>
                       <span className="text-gray-600">Age: {member.age}</span>

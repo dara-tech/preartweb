@@ -47,7 +47,7 @@ router.get('/', [
   query('clinicId').optional().isString().withMessage('Clinic ID must be a string'),
   query('startDate').optional().isISO8601().withMessage('Start date must be valid ISO date'),
   query('endDate').optional().isISO8601().withMessage('End date must be valid ISO date'),
-  query('testType').optional().isIn(['cd4', 'viral_load', 'hcv', 'chemistry', 'hematology', 'microbiology']).withMessage('Invalid test type'),
+  query('testType').optional().isIn(['cd4', 'viral_load', 'hcv', 'chemistry', 'hematology', 'microbiology', 'dna']).withMessage('Invalid test type'),
   query('search').optional().isString().withMessage('Search term must be a string'),
   query('site').optional().isString().withMessage('Site must be a string')
 ], async (req, res, next) => {
@@ -114,6 +114,11 @@ router.get('/', [
           break;
         case 'microbiology':
           whereConditions.push(`(pt.SputumAFB IS NOT NULL OR pt.BloodCulture IS NOT NULL)`);
+          break;
+        case 'dna':
+          // DNA tests - for now, we'll check if there are any DNA-related fields
+          // This can be expanded when DNA test fields are added to the database
+          whereConditions.push(`(pt.CTNA IS NOT NULL OR pt.GCNA IS NOT NULL)`);
           break;
       }
     }

@@ -101,7 +101,7 @@ const NationalReportTest = () => {
       <CardContent>
         <div className="space-y-4">
           {Object.entries(testResults).map(([testName, result]) => (
-            <div key={testName} className="p-4 border rounded-lg">
+            <div key={testName} className="p-4 border rounded-none">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold capitalize">{testName} Test</h3>
                 {getStatusBadge(result.success)}

@@ -318,7 +318,7 @@ const SmartForm = ({
             {formData.ageDisplay && (
               <div>
                 <Label>Calculated Age</Label>
-                <div className="p-2 bg-muted rounded-md">
+                <div className="p-2 bg-muted rounded-none">
                   <span className="font-medium">{formData.ageDisplay}</span>
                 </div>
               </div>
@@ -365,7 +365,7 @@ const SmartForm = ({
                     id="motherHIVStatus"
                     value={formData.motherHIVStatus}
                     onChange={(e) => handleInputChange('motherHIVStatus', e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-none"
                   >
                     <option value="">Select Status</option>
                     <option value="positive">Positive</option>

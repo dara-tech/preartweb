@@ -729,7 +729,7 @@ const UserLogs = ({ users = [] }) => {
                       <TableRow>
                         <TableCell colSpan="7" className="text-center py-8">
                           <div className="flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                            <div className="animate-spin rounded-none h-6 w-6 border-b-2 border-primary"></div>
                             <span className="ml-2">Loading logs...</span>
                           </div>
                         </TableCell>
@@ -745,7 +745,7 @@ const UserLogs = ({ users = [] }) => {
                         <TableRow key={`log-${log.id}-${index}`} className="hover:bg-muted/50">
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-none bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
                                 <User className="h-5 w-5 text-primary" />
                               </div>
                               <div>
@@ -766,7 +766,7 @@ const UserLogs = ({ users = [] }) => {
                               variant={
                                 log.action === 'login' ? 'default' : 
                                 log.action === 'never_logged_in' ? 'destructive' : 
-                                'outline'
+                                'primary'
                               }
                               className="flex items-center gap-1 w-fit"
                             >
@@ -842,7 +842,7 @@ const UserLogs = ({ users = [] }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {logsLoading ? (
               <div className="col-span-full flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="animate-spin rounded-none h-8 w-8 border-b-2 border-primary"></div>
                 <span className="ml-3">Loading logs...</span>
               </div>
             ) : userLogs.length === 0 ? (
@@ -855,7 +855,7 @@ const UserLogs = ({ users = [] }) => {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-none bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
                           <User className="h-5 w-5 text-primary" />
                         </div>
                         <div>
@@ -1037,7 +1037,7 @@ const UserLogs = ({ users = [] }) => {
 
       {/* Log Detail Dialog */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-card">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5" />
@@ -1053,7 +1053,7 @@ const UserLogs = ({ users = [] }) => {
                 <div>
                   <Label className="text-sm font-medium">User</Label>
                   <div className="flex items-center gap-2 mt-1">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-none flex items-center justify-center">
                       <User className="h-4 w-4 text-primary" />
                     </div>
                     <div>
@@ -1073,7 +1073,7 @@ const UserLogs = ({ users = [] }) => {
                         selectedLog.action === 'delete' ? 'destructive' :
                         selectedLog.action === 'view' ? 'outline' :
                         selectedLog.action === 'never_logged_in' ? 'destructive' : 
-                        'outline'
+                        'outline`'
                       }
                     >
                       {selectedLog.action === 'never_logged_in' ? 'Never Logged In' : selectedLog.action}
@@ -1123,7 +1123,7 @@ const UserLogs = ({ users = [] }) => {
               {selectedLog.userAgent && (
                 <div>
                   <Label className="text-sm font-medium">User Agent</Label>
-                  <div className="mt-1 p-2 bg-muted rounded text-xs font-mono break-all">
+                  <div className="mt-1 p-2 bg-muted rounded-none text-xs font-mono break-all">
                     {selectedLog.userAgent}
                   </div>
                 </div>
@@ -1132,7 +1132,7 @@ const UserLogs = ({ users = [] }) => {
               {selectedLog.details && (
                 <div>
                   <Label className="text-sm font-medium">Additional Details</Label>
-                  <div className="mt-1 p-2 bg-muted rounded text-sm">
+                  <div className="mt-1 p-2 bg-muted rounded-none text-sm">
                     <pre className="whitespace-pre-wrap">{JSON.stringify(selectedLog.details, null, 2)}</pre>
                   </div>
                 </div>

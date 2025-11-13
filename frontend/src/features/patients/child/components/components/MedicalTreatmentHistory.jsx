@@ -60,11 +60,11 @@ function MedicalTreatmentHistory({
                 onValueChange={(value) => setFormData({...formData, tbPast: parseInt(value)})}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="0" id="tbNo" className="w-4 h-4" />
                   <Label htmlFor="tbNo" className="text-sm font-medium">ទេ (No)</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="1" id="tbYes" className="w-4 h-4" />
                   <Label htmlFor="tbYes" className="text-sm font-medium">បាទ (Yes)</Label>
                 </div>
@@ -79,11 +79,11 @@ function MedicalTreatmentHistory({
                 onValueChange={(value) => setFormData({...formData, tptHistory: parseInt(value)})}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="0" id="tptNo" className="w-4 h-4" />
                   <Label htmlFor="tptNo" className="text-sm font-medium">ទេ (No)</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="1" id="tptYes" className="w-4 h-4" />
                   <Label htmlFor="tptYes" className="text-sm font-medium">បាទ (Yes)</Label>
                 </div>
@@ -128,11 +128,11 @@ function MedicalTreatmentHistory({
                 onValueChange={(value) => setFormData({...formData, tbType: parseInt(value)})}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="0" id="tbPulmonary" className="w-4 h-4" />
                   <Label htmlFor="tbPulmonary" className="text-sm font-medium">Pulmonary</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="1" id="tbExtra" className="w-4 h-4" />
                   <Label htmlFor="tbExtra" className="text-sm font-medium">Extra-pulmonary</Label>
                 </div>
@@ -147,15 +147,15 @@ function MedicalTreatmentHistory({
                 onValueChange={(value) => setFormData({...formData, tbResult: parseInt(value)})}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="0" id="tbCured" className="w-4 h-4" />
                   <Label htmlFor="tbCured" className="text-sm font-medium">Cured</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="1" id="tbCompleted" className="w-4 h-4" />
                   <Label htmlFor="tbCompleted" className="text-sm font-medium">Completed</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="2" id="tbFailed" className="w-4 h-4" />
                   <Label htmlFor="tbFailed" className="text-sm font-medium">Failed</Label>
                 </div>
@@ -170,11 +170,11 @@ function MedicalTreatmentHistory({
                 onValueChange={(value) => setFormData({...formData, tbTreatment: parseInt(value)})}
                 className="space-y-2"
               >
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="0" id="tbNoTreatment" className="w-4 h-4" />
                   <Label htmlFor="tbNoTreatment" className="text-sm font-medium">No Treatment</Label>
                 </div>
-                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-red-50">
+                <div className="flex items-center space-x-2 p-2 rounded-none hover:bg-red-50">
                   <RadioGroupItem value="1" id="tbTreated" className="w-4 h-4" />
                   <Label htmlFor="tbTreated" className="text-sm font-medium">Treated</Label>
                 </div>
@@ -205,7 +205,7 @@ function MedicalTreatmentHistory({
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="bg-blue-600 text-white">
           <CardTitle className="text-lg font-bold flex items-center">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-white rounded-none flex items-center justify-center mr-3">
               <span className="text-blue-600 font-bold">2</span>
             </div>
             ប្រវត្តិនៃការប្រើប្រាស់ថ្នាំARV (ARV Treatment History)

@@ -13,7 +13,14 @@ import {
   Trash2,
   Calendar,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  BarChart3,
+  TrendingUp,
+  Database,
+  Filter,
+  Search,
+  Eye,
+  FileText
 } from 'lucide-react';
 
 // Function to get bilingual indicator names (Khmer/English) - same as IndicatorsTable
@@ -352,273 +359,393 @@ const AnalyticsAdmin = () => {
   if (loading && !summary) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading analytics admin...</span>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-none animate-spin"></div>
+            <BarChart3 className="w-8 h-8 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-medium text-foreground">Loading Analytics Dashboard</p>
+            <p className="text-sm text-muted-foreground">Preparing your data insights...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Analytics</h1>
-        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Activity className="h-4 w-4" />
-          <span>{summary?.completedRecords || 0} / {summary?.totalRecords || 0}</span>
-          <Badge variant={summary?.successRate > 90 ? "default" : "secondary"}>
-            {summary?.successRate || 0}%
-          </Badge>
+    <div className="space-y-6 p-1">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-none p-6 border border-primary/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 rounded-none">
+              <BarChart3 className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
+              <p className="text-muted-foreground mt-1">Comprehensive HIV/AIDS program analytics and insights</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 bg-background/80 backdrop-blur-sm rounded-none px-4 py-2 border border-border/50">
+              <Activity className="h-5 w-5 text-primary" />
+              <div className="text-sm">
+                <span className="font-medium text-foreground">{summary?.completedRecords || 0}</span>
+                <span className="text-muted-foreground"> / {summary?.totalRecords || 0}</span>
+              </div>
+              <Badge variant={summary?.successRate > 90 ? "default" : "secondary"} className="font-medium">
+                {summary?.successRate || 0}%
+              </Badge>
+            </div>
+            <div className="flex items-center space-x-2 bg-background/80 backdrop-blur-sm rounded-none px-3 py-2 border border-border/50">
+              <TrendingUp className="h-4 w-4 text-green-500" />
+              <span className="text-sm font-medium text-foreground">Active</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <Tabs defaultValue="data" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="data">Analytics Data</TabsTrigger>
-          <TabsTrigger value="yearly">Yearly Analytics</TabsTrigger>
+      <Tabs defaultValue="data" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1 rounded-none">
+          <TabsTrigger value="data" className="flex items-center space-x-2 data-[state=active]:!bg-[hsl(var(--primary))] data-[state=active]:!text-[hsl(var(--primary-foreground))] data-[state=active]:shadow-sm rounded-none">
+            <Database className="w-4 h-4" />
+            <span>Analytics Data</span>
+          </TabsTrigger>
+          <TabsTrigger value="yearly" className="flex items-center space-x-2 data-[state=active]:!bg-[hsl(var(--primary))] data-[state=active]:!text-[hsl(var(--primary-foreground))] data-[state=active]:shadow-sm rounded-none">
+            <TrendingUp className="w-4 h-4" />
+            <span>Yearly Analytics</span>
+          </TabsTrigger>
         </TabsList>
 
-        {/* Analytics Data Tab */}
-        <TabsContent value="data" className="space-y-4">
-          {/* Compact Filters */}
-          <Card className="shadow-none rounded-none">
-            <CardContent className=" py-3">
-              <div className="flex items-center space-x-4">
-                <Select value={filters.indicatorId} onValueChange={(value) => setFilters({...filters, indicatorId: value})}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="សុចនាករ Indicator" />
-                  </SelectTrigger>
-                  <SelectContent className="overflow-y-auto max-h-48 ">
-                    <SelectItem value="all">សុចនាករទាំងអស់ All Indicators</SelectItem>
-                    {indicators.map((indicator) => (
-                      <SelectItem key={indicator.indicator_id} value={indicator.indicator_id}>
-                        {getDisplayIndicatorName(indicator.indicator_name)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={filters.siteCode} onValueChange={(value) => setFilters({...filters, siteCode: value})}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Site" />
-                  </SelectTrigger>
-                  <SelectContent className="overflow-y-auto max-h-48">
-                    <SelectItem value="all">All Sites</SelectItem>
-                    {sites.map((site) => (
-                      <SelectItem key={site.site_code} value={site.site_code}>
-                        {site.site_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {/* Custom Time Picker */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={filters.periodYear === 'all' ? 'All Years' : `${filters.periodYear}-Q${filters.periodQuarter}`}
-                    readOnly
-                    className="w-32 h-10 px-3 pr-10 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 cursor-pointer transition-colors"
-                    onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <Calendar className="w-4 h-4 text-primary" />
-                  </div>
-
-                  {/* Custom Period Picker Panel */}
-                  {isPeriodPickerOpen && (
-                    <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border rounded-xl shadow-xl p-6 min-w-[320px]">
-                      {/* Year Navigation */}
-                      <div className="flex items-center justify-between mb-6">
-                        <Button
-                          type="button"
-                          onClick={() => setCurrentDecade(currentDecade - 10)}
-                          variant="ghost"
-                          size="sm"
-                          className="p-2 rounded-lg hover:bg-primary transition-colors"
-                        >
-                          <ChevronLeft className="w-4 h-4 text-primary" />
-                        </Button>
-                        
-                        <Button
-                          type="button"
-                          onClick={() => setShowYearGrid(!showYearGrid)}
-                          variant="ghost"
-                          className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-lg transition-colors cursor-pointer"
-                        >
-                          {filters.periodYear === 'all' ? 'All Years' : filters.periodYear}
-                        </Button>
-                        
-                        <Button
-                          type="button"
-                          onClick={() => setCurrentDecade(currentDecade + 10)}
-                          variant="ghost"
-                          size="sm"
-                          className="p-2 rounded-lg hover:bg-primary transition-colors text-primary"
-                        >
-                          <ChevronRight className="w-4 h-4 text-primary" />
-                        </Button>
-                      </div>
-
-                      {/* Year Grid - Conditionally Visible */}
-                      {showYearGrid && (
-                        <div className="grid grid-cols-3 gap-2 mb-4">
-                          <Button
-                            key="all"
-                            type="button"
-                            onClick={() => onYearChange('all')}
-                            variant={filters.periodYear === 'all' ? "default" : "ghost"}
-                            size="sm"
-                            className={`
-                              px-3 py-2 text-sm rounded-md transition-all duration-200
-                              ${filters.periodYear === 'all'
-                                ? 'bg-blue-500 text-white shadow-md'
-                                : 'text-gray-700 hover:bg-gray-100 hover:border-gray-300'
-                              }
-                            `}
-                          >
-                            All
-                          </Button>
-                          {decadeYears.map((year) => {
-                            const isSelected = year.toString() === filters.periodYear;
-                            const isAvailable = isYearAvailable(year);
-                            const isCurrentYear = year === new Date().getFullYear();
-                            const isInCurrentDecade = isYearInCurrentDecade(year);
-                            
-                            return (
-                              <Button
-                                key={year}
-                                type="button"
-                                onClick={() => {
-                                  if (isAvailable) {
-                                    onYearChange(year.toString());
-                                  }
-                                }}
-                                disabled={!isAvailable}
-                                variant={isSelected ? "default" : "ghost"}
-                                size="sm"
-                                className={`
-                                  px-3 py-2 text-sm rounded-md transition-all duration-200 relative
-                                  ${isSelected
-                                    ? 'bg-blue-500 text-white shadow-md'
-                                    : isCurrentYear && isAvailable && isInCurrentDecade
-                                    ? 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                                    : isAvailable && isInCurrentDecade
-                                    ? 'text-gray-700 hover:bg-gray-100 hover:border-gray-300'
-                                    : isAvailable && !isInCurrentDecade
-                                    ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-                                    : 'text-gray-300 cursor-not-allowed'
-                                  }
-                                `}
-                              >
-                                {year}
-                                {isCurrentYear && isAvailable && !isSelected && isInCurrentDecade && (
-                                  <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-full"></div>
-                                )}
-                              </Button>
-                            );
-                          })}
+        {/* Enhanced Analytics Data Tab */}
+        <TabsContent value="data" className="space-y-6">
+          {/* Enhanced Filters Card */}
+          <Card className="border-border/50 shadow-sm bg-gradient-to-r from-background to-muted/20">
+            <CardHeader className="pb-4">
+              <div className="flex items-center space-x-2">
+                <Filter className="w-5 h-5 text-primary" />
+                <CardTitle className="text-lg">Data Filters</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {/* Indicator Filter */}
+                <div className="space-y-2">
+                
+                  <Select value={filters.indicatorId} onValueChange={(value) => setFilters({...filters, indicatorId: value})}>
+                    <SelectTrigger className="w-full bg-background border-border/50 hover:border-primary/50 transition-colors">
+                      <SelectValue placeholder="សុចនាករ Indicator" />
+                    </SelectTrigger>
+                    <SelectContent className="overflow-y-auto max-h-48 bg-background backdrop-blur-sm">
+                      <SelectItem value="all" className="font-medium">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-none"></div>
+                          <span>សុចនាករទាំងអស់ All Indicators</span>
                         </div>
-                      )}
-
-                      {/* Quarter Selection */}
-                      <div className="grid grid-cols-4 gap-2">
-                        {availableQuarters.map(quarter => (
-                          <Button
-                            key={quarter.value}
-                            type="button"
-                            onClick={() => onQuarterChange(quarter.value.toString())}
-                            disabled={quarter.disabled}
-                            variant={filters.periodQuarter === quarter.value ? "default" : "outline"}
-                            size="sm"
-                            className={`
-                              px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
-                              ${filters.periodQuarter === quarter.value
-                                ? 'bg-blue-500 text-white shadow-md'
-                                : quarter.disabled
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:border-gray-300'
-                              }
-                            `}
-                          >
-                            Q{quarter.value}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                      </SelectItem>
+                      {indicators.map((indicator) => (
+                        <SelectItem key={indicator.indicator_id} value={indicator.indicator_id}>
+                          {getDisplayIndicatorName(indicator.indicator_name)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="flex space-x-2 ml-auto">
-                  <Button onClick={fetchAnalyticsData} disabled={loading} size="sm">
-                    <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
-                    Apply
-                  </Button>
-                  <Button onClick={clearCache} variant="outline" size="sm" className="text-red-600" title="Clear cache and reset auto-increment IDs">
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Clear & Reset
-                  </Button>
-                  {/* <Button onClick={exportAnalyticsData} variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" />
-                    Export
-                  </Button> */}
+                {/* Site Filter */}
+                <div className="space-y-2">
+                 
+                  <Select value={filters.siteCode} onValueChange={(value) => setFilters({...filters, siteCode: value})}>
+                    <SelectTrigger className="w-full bg-background border-border/50 hover:border-primary/50 transition-colors">
+                      <SelectValue placeholder="Site" />
+                    </SelectTrigger>
+                    <SelectContent className="overflow-y-auto max-h-48 scrollbar-hide bg-background backdrop-blur-sm">
+                      <SelectItem value="all" className="font-medium">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-none"></div>
+                          <span>All Sites</span>
+                        </div>
+                      </SelectItem>
+                      {sites.map((site) => (
+                        <SelectItem key={site.site_code} value={site.site_code}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{site.site_name}</span>
+                            <span className="text-xs text-muted-foreground">{site.site_code}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Enhanced Time Picker */}
+                <div className="space-y-2">
+                
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={filters.periodYear === 'all' ? 'All Years' : `${filters.periodYear}-Q${filters.periodQuarter}`}
+                      readOnly
+                      className="w-full h-10 px-3 pr-10 text-sm bg-background border border-border/50 rounded-none hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer transition-all"
+                      onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                      <Calendar className="w-4 h-4 text-primary" />
+                    </div>
+
+                    {/* Enhanced Period Picker Panel */}
+                    {isPeriodPickerOpen && (
+                      <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border/50 rounded-none shadow-2xl p-6 min-w-[320px] backdrop-blur-sm">
+                        {/* Year Navigation */}
+                        <div className="flex items-center justify-between mb-6">
+                          <Button
+                            type="button"
+                            onClick={() => setCurrentDecade(currentDecade - 10)}
+                            variant="ghost"
+                            size="sm"
+                            className="p-2 rounded-none hover: transition-colors"
+                          >
+                            <ChevronLeft className="w-4 h-4 text-primary" />
+                          </Button>
+                          
+                          <Button
+                            type="button"
+                            onClick={() => setShowYearGrid(!showYearGrid)}
+                            variant="ghost"
+                            className="px-4 py-2 text-base font-semibold hover:text-primary hover: rounded-none transition-colors cursor-pointer"
+                          >
+                            {filters.periodYear === 'all' ? 'All Years' : filters.periodYear}
+                          </Button>
+                          
+                          <Button
+                            type="button"
+                            onClick={() => setCurrentDecade(currentDecade + 10)}
+                            variant="ghost"
+                            size="sm"
+                            className="p-2 rounded-none hover: transition-colors"
+                          >
+                            <ChevronRight className="w-4 h-4 text-primary" />
+                          </Button>
+                        </div>
+
+                        {/* Year Grid - Conditionally Visible */}
+                        {showYearGrid && (
+                          <div className="grid grid-cols-3 gap-2 mb-4">
+                            <Button
+                              key="all"
+                              type="button"
+                              onClick={() => onYearChange('all')}
+                              variant={filters.periodYear === 'all' ? "default" : "ghost"}
+                              size="sm"
+                              className={`
+                                px-3 py-2 text-sm rounded-none transition-all duration-200
+                                ${filters.periodYear === 'all'
+                                  ? ' text-primary-foreground shadow-md'
+                                  : 'text-foreground hover:bg-muted hover:border-border'
+                                }
+                              `}
+                            >
+                              All
+                            </Button>
+                            {decadeYears.map((year) => {
+                              const isSelected = year.toString() === filters.periodYear;
+                              const isAvailable = isYearAvailable(year);
+                              const isCurrentYear = year === new Date().getFullYear();
+                              const isInCurrentDecade = isYearInCurrentDecade(year);
+                              
+                              return (
+                                <Button
+                                  key={year}
+                                  type="button"
+                                  onClick={() => {
+                                    if (isAvailable) {
+                                      onYearChange(year.toString());
+                                    }
+                                  }}
+                                  disabled={!isAvailable}
+                                  variant={isSelected ? "default" : "ghost"}
+                                  size="sm"
+                                  className={`
+                                    px-3 py-2 text-sm rounded-none transition-all duration-200 relative
+                                    ${isSelected
+                                      ? ' text-primary-foreground shadow-md'
+                                      : isCurrentYear && isAvailable && isInCurrentDecade
+                                      ? 'bg-muted text-foreground border border-border hover:bg-muted/80'
+                                      : isAvailable && isInCurrentDecade
+                                      ? 'text-foreground hover:bg-muted hover:border-border'
+                                      : isAvailable && !isInCurrentDecade
+                                      ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                                      : 'text-muted-foreground/50 cursor-not-allowed'
+                                    }
+                                  `}
+                                >
+                                  {year}
+                                  {isCurrentYear && isAvailable && !isSelected && isInCurrentDecade && (
+                                    <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-none"></div>
+                                  )}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Quarter Selection */}
+                        <div className="grid grid-cols-4 gap-2">
+                          {availableQuarters.map(quarter => (
+                            <Button
+                              key={quarter.value}
+                              type="button"
+                              onClick={() => onQuarterChange(quarter.value.toString())}
+                              disabled={quarter.disabled}
+                              variant={filters.periodQuarter === quarter.value ? "default" : "outline"}
+                              size="sm"
+                              className={`
+                                px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
+                                ${filters.periodQuarter === quarter.value
+                                  ? ' text-primary-foreground shadow-md'
+                                  : quarter.disabled
+                                  ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                                  : 'bg-background text-foreground hover:bg-muted hover:border-border'
+                                }
+                              `}
+                            >
+                              Q{quarter.value}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col space-y-2 md:col-span-2 lg:col-span-2">
+                  <div className="flex space-x-2">
+                    <Button 
+                      onClick={fetchAnalyticsData} 
+                      disabled={loading} 
+                      className="flex-1 hover:/90 text-primary-foreground shadow-sm"
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                      Apply Filters
+                    </Button>
+                    <Button 
+                      onClick={clearCache} 
+                      variant="outline" 
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20" 
+                      title="Clear cache and reset auto-increment IDs"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Clear & Reset
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Compact Data Table */}
-          <Card className="shadow-none rounded-none">
+          {/* Enhanced Data Table */}
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Database className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-lg">Analytics Data</CardTitle>
+                  <Badge variant="secondary" className="ml-2">
+                    {analyticsData.length} records
+                  </Badge>
+                </div>
+                <Button 
+                  onClick={exportAnalyticsData} 
+                  variant="outline" 
+                  size="sm"
+                  className="hover: hover:text-primary hover:border-primary/30"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
+              </div>
+            </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="border-b">
+                  <thead className="bg-muted/50 border-b border-border/50">
                     <tr>
-                      <th className="text-left p-3 font-medium">សុចនាករ Indicator</th>
-                      <th className="text-left p-3 font-medium">កន្លែង Site</th>
-                      <th className="text-left p-3 font-medium">រយៈពេល Period</th>
-                      <th className="text-right p-3 font-medium">សរុប Total</th>
-                      <th className="text-center p-3 font-medium">ស្ថានភាព Status</th>
+                      <th className="text-left p-4 font-semibold text-foreground">សុចនាករ Indicator</th>
+                      <th className="text-left p-4 font-semibold text-foreground">កន្លែង Site</th>
+                      <th className="text-left p-4 font-semibold text-foreground">រយៈពេល Period</th>
+                      <th className="text-right p-4 font-semibold text-foreground">សរុប Total</th>
+                      <th className="text-center p-4 font-semibold text-foreground">ស្ថានភាព Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
                       <tr>
-                        <td colSpan="5" className="p-8 text-center text-muted-foreground">
-                          <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
-                          Loading...
+                        <td colSpan="5" className="p-12 text-center">
+                          <div className="flex flex-col items-center space-y-4">
+                            <div className="relative">
+                              <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-none animate-spin"></div>
+                            </div>
+                            <p className="text-muted-foreground">Loading analytics data...</p>
+                          </div>
                         </td>
                       </tr>
                     ) : analyticsData.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="p-8 text-center text-muted-foreground">
-                          No data found
+                        <td colSpan="5" className="p-12 text-center">
+                          <div className="flex flex-col items-center space-y-4">
+                            <div className="w-16 h-16 bg-muted/50 rounded-none flex items-center justify-center">
+                              <Search className="w-8 h-8 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <p className="text-lg font-medium text-foreground">No data found</p>
+                              <p className="text-muted-foreground">Try adjusting your filters to see results</p>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     ) : (
-                      analyticsData.map((record) => (
-                        <tr key={record.id} className="border-b hover:bg-muted/50">
-                          <td className="p-3">
-                            <div className="font-medium">{getDisplayIndicatorName(record.indicator_name)}</div>
-                            <div className="text-xs text-muted-foreground">{record.indicator_id}</div>
-                          </td>
-                          <td className="p-3">
-                            <div className="font-medium">{record.site_name}</div>
-                            <div className="text-xs text-muted-foreground">{record.site_code}</div>
-                          </td>
-                          <td className="p-3">
-                            <div className="font-medium">{record.period_type} {record.period_year}</div>
-                            <div className="text-xs text-muted-foreground">
-                              Q{record.period_quarter}
+                      analyticsData.map((record, index) => (
+                        <tr key={record.id} className={`border-b border-border/30 hover:bg-muted/30 transition-colors ${index % 2 === 0 ? 'bg-background' : 'bg-muted/10'}`}>
+                          <td className="p-4">
+                            <div className="space-y-1">
+                              <div className="font-medium text-foreground leading-tight">{getDisplayIndicatorName(record.indicator_name)}</div>
+                              <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-none inline-block">{record.indicator_id}</div>
                             </div>
                           </td>
-                          <td className="p-3 text-right">
-                            <div className="font-medium">{record.total.toLocaleString()}</div>
-                            <div className="text-xs text-muted-foreground">
-                              M: {record.male_0_14 + record.male_over_14} | F: {record.female_0_14 + record.female_over_14}
+                          <td className="p-4">
+                            <div className="space-y-1">
+                              <div className="font-medium text-foreground">{record.site_name}</div>
+                              <div className="text-xs text-muted-foreground">{record.site_code}</div>
                             </div>
                           </td>
-                          <td className="p-3 text-center">
-                            <Badge variant={record.calculation_status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                          <td className="p-4">
+                            <div className="space-y-1">
+                              <div className="font-medium text-foreground">{record.period_type} {record.period_year}</div>
+                              <div className="text-xs text-muted-foreground text-primary px-2 py-1 rounded-none inline-block">
+                                Q{record.period_quarter}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="space-y-1">
+                              <div className="text-lg font-bold text-foreground">{record.total.toLocaleString()}</div>
+                              <div className="text-xs text-muted-foreground">
+                                <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-none mr-1">M: {record.male_0_14 + record.male_over_14}</span>
+                                <span className="bg-pink-50 text-pink-700 px-2 py-1 rounded-none">F: {record.female_0_14 + record.female_over_14}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4 text-center">
+                            <Badge 
+                              variant={record.calculation_status === 'completed' ? 'default' : 'secondary'} 
+                              className={`text-xs font-medium ${
+                                record.calculation_status === 'completed' 
+                                  ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                  : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                              }`}
+                            >
                               {record.calculation_status}
                             </Badge>
                           </td>

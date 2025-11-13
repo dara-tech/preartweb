@@ -29,7 +29,7 @@ const radioGroupVariants = cva(
 )
 
 const radioGroupItemVariants = cva(
-  "relative flex items-center justify-center rounded-full border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white data-[state=checked]:border-blue-600",
+  "relative flex items-center justify-center rounded-none border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white data-[state=checked]:border-blue-600",
   {
     variants: {
       variant: {
@@ -119,7 +119,7 @@ const RadioGroupItem = React.forwardRef(({
       dot: (
         <div 
           className={cn(
-            "rounded-full bg-current transition-all duration-200",
+            "rounded-none bg-current transition-all duration-200",
             getIndicatorSize()
           )} 
         />
@@ -160,7 +160,7 @@ const RadioGroupOption = React.forwardRef(({
   <div
     ref={ref}
     className={cn(
-      "flex items-start space-x-3 rounded-lg border border-transparent p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800",
+      "flex items-start space-x-3 rounded-none border border-transparent p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800",
       disabled && "opacity-50 cursor-not-allowed",
       className
     )}

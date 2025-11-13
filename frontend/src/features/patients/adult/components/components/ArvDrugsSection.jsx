@@ -328,7 +328,7 @@ const ArvDrugsSection = ({ visitId }) => {
 
         {loading ? (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-none h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             <p className="text-gray-600 mt-2">កំពុងផ្ទុកថ្នាំ ARV... (Loading ARV drugs...)</p>
           </div>
         ) : arvDrugs.length === 0 ? (
@@ -347,7 +347,7 @@ const ArvDrugsSection = ({ visitId }) => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-none bg-blue-100 flex items-center justify-center">
                           <Pill className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>

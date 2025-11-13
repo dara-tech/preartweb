@@ -136,7 +136,7 @@ const InfantVisit = sequelize.define('InfantVisit', {
     allowNull: true
   }
 }, {
-  tableName: 'tblivmain',
+  tableName: 'tblevmain',
   timestamps: false
 });
 

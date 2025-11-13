@@ -201,7 +201,7 @@ const YearlyAnalytics = () => {
           </div>
 
           {!engineEnabled && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-none p-3">
               <p className="text-sm text-yellow-800">
                 Analytics engine is disabled. Please enable it first to run yearly analytics.
               </p>

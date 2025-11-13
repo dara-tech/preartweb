@@ -7,13 +7,13 @@ const IndicatorsReportSkeleton = () => {
     <div className="min-h-screen bg-background mx-auto lg:max-w-[300mm]">
       <div className="p-4 space-y-6">
         {/* Report Configuration Panel Skeleton */}
-        <div className="bg-card border border-border rounded-lg shadow-sm">
+        <div className="bg-card border border-border rounded-none shadow-sm">
           <div className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4 lg:gap-6">
               {/* Health Facility Selection */}
               <div className="flex-1 min-w-0">
                 <div className="space-y-1 sm:space-y-2">
-                  <Skeleton className="h-10 sm:h-11 w-full rounded-md" />
+                  <Skeleton className="h-10 sm:h-11 w-full rounded-none" />
                 </div>
               </div>
 
@@ -21,18 +21,18 @@ const IndicatorsReportSkeleton = () => {
               <div className="flex-1 min-w-0">
                 <div className="space-y-1 sm:space-y-2">
                   <div className="flex gap-1 sm:gap-2">
-                    <Skeleton className="h-10 sm:h-11 flex-1 rounded-md" />
-                    <Skeleton className="h-10 sm:h-11 flex-1 rounded-md" />
+                    <Skeleton className="h-10 sm:h-11 flex-1 rounded-none" />
+                    <Skeleton className="h-10 sm:h-11 flex-1 rounded-none" />
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-center sm:justify-end gap-1 sm:gap-2 self-stretch sm:self-end">
-                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-md" />
-                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-md" />
-                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-md" />
-                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-md" />
+                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-none" />
+                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-none" />
+                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-none" />
+                <Skeleton className="h-10 sm:h-11 w-10 sm:w-11 rounded-none" />
               </div>
             </div>
           </div>
@@ -107,19 +107,19 @@ const IndicatorsReportSkeleton = () => {
               <thead className="bg-muted border-b-2 border-border">
                 <tr>
                   <th className="px-4 py-4 text-center text-sm font-bold text-foreground border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-32 mx-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-32 mx-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                   </th>
                 </tr>
               </thead>
@@ -132,60 +132,60 @@ const IndicatorsReportSkeleton = () => {
                     <tr className="border-b border-border">
                       {/* Indicator Name - spans 3 rows */}
                       <td className="px-4 py-4 text-sm text-foreground align-middle text-left border-r border-border" rowSpan="3">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-48 mb-2 animate-pulse"></div>
-                        <div className="h-3 bg-muted-foreground/20 rounded w-32 animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-48 mb-2 animate-pulse"></div>
+                        <div className="h-3 bg-muted-foreground/20 rounded-none w-32 animate-pulse"></div>
                       </td>
 
                       {/* Age 0-14 */}
                       <td className="px-3 py-4 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-8 mx-auto animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-8 mx-auto animate-pulse"></div>
                       </td>
 
                       {/* Male 0-14 */}
                       <td className="px-3 py-4 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                       </td>
 
                       {/* Female 0-14 */}
                       <td className="px-3 py-4 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                       </td>
 
                       {/* Total 0-14 */}
                       <td className="px-3 py-4 text-right">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                       </td>
                     </tr>
 
                     {/* 15+ Age Group Row Skeleton */}
                     <tr className="bg-muted border-b border-border">
                       <td className="px-3 py-3 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-8 mx-auto animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-8 mx-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                     </tr>
 
                     {/* Sub-Total Row Skeleton */}
                     <tr className="bg-muted border-b-2 border-border font-bold">
                       <td className="px-3 py-3 text-center text-sm font-bold text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-12 mx-auto animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-12 mx-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right">
-                        <div className="h-7 bg-muted-foreground/20 rounded w-20 ml-auto animate-pulse"></div>
+                        <div className="h-7 bg-muted-foreground/20 rounded-none w-20 ml-auto animate-pulse"></div>
                       </td>
                     </tr>
                   </React.Fragment>
@@ -196,10 +196,10 @@ const IndicatorsReportSkeleton = () => {
         </div>
 
         {/* Report Footer Skeleton */}
-        <div className="bg-muted border border-border rounded-lg p-4 sm:p-6 mt-6 sm:mt-8">
+        <div className="bg-muted border border-border rounded-none p-4 sm:p-6 mt-6 sm:mt-8">
           <div className="text-right text-muted-foreground">
-            <div className="h-4 bg-muted-foreground/20 rounded w-3/4 ml-auto animate-pulse"></div>
-            <div className="h-3 bg-muted-foreground/20 rounded w-1/2 ml-auto mt-2 animate-pulse"></div>
+            <div className="h-4 bg-muted-foreground/20 rounded-none w-3/4 ml-auto animate-pulse"></div>
+            <div className="h-3 bg-muted-foreground/20 rounded-none w-1/2 ml-auto mt-2 animate-pulse"></div>
           </div>
         </div>
       </div>

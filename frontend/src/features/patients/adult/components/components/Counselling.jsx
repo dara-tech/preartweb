@@ -1,110 +1,101 @@
 import { Card, CardContent, CardHeader, CardTitle, Checkbox, Label } from "@/components/ui";
 import React from 'react';
-import { MessageCircle, Shield, Pill, Heart, AlertTriangle, User, CheckCircle } from "lucide-react";
 
-function Counselling({ formData, handleInputChange }) {
-  console.log('Counselling formData:', {
-    prevention: formData.prevention,
-    adherence: formData.adherence,
-    spacing: formData.spacing,
-    tbInfect: formData.tbInfect,
-    partner: formData.partner,
-    condom: formData.condom
-  });
+function Counselling({ formData, handleInputChange, showKhmer = false }) {
   return (
-    <div className="space-y-6">
-      {/* Section Header */}
-      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
-            <MessageCircle className="w-6 h-6 text-teal-600" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900">
-              ការប្រឹក្សាអប់រំ (Counselling)
-            </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              ការប្រឹក្សាអប់រំអ្នកជំងឺ
-            </p>
-          </div>
-        </div>
+    <div className="space-y-8">
+      {/* Simple Section Header */}
+      <div className="border-b border-gray-300 pb-4">
+        <h3 className="text-lg font-medium text-gray-900">
+          {showKhmer ? 'ការប្រឹក្សាអប់រំ (Counselling)' : 'Counselling'}
+        </h3>
+        <p className="text-sm text-gray-600 mt-1">
+          {showKhmer ? 'ការប្រឹក្សាអប់រំអ្នកជំងឺ' : 'Patient counselling and education'}
+        </p>
       </div>
 
-      {/* Form Content */}
-      <div className="space-y-6">
-        <Card className="border border-gray-200 hover:shadow-md transition-shadow">
-          <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-teal-200">
-            <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
-                <MessageCircle className="w-4 h-4 text-teal-600" />
-              </div>
-              ការប្រឹក្សាអប់រំអ្នកជំងឺ (Patient Counselling & Education)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { 
-                  key: 'prevention', 
-                  label: 'ការបង្ការជំងឺកាមរោគ (STI Prevention)', 
-                  color: 'red', 
-                  icon: Shield 
-                },
-                { 
-                  key: 'adherence', 
-                  label: 'ការលេបថ្នាំអោយត្រឹមត្រូវ (ART Adherence)', 
-                  color: 'green', 
-                  icon: Pill 
-                },
-                { 
-                  key: 'spacing', 
-                  label: 'ការប្រើប្រាស់មធ្យោបាយពន្យារកំណើត (Birth spacing)', 
-                  color: 'pink', 
-                  icon: Heart 
-                },
-                { 
-                  key: 'tbInfect', 
-                  label: 'ការពិនិត្យសុខភាពរករោគសញ្ញាជំងឺរបេង (TB infection Control)', 
-                  color: 'orange', 
-                  icon: AlertTriangle 
-                },
-                { 
-                  key: 'partner', 
-                  label: 'ស្ថានភាពដៃគូ (Partner status)', 
-                  color: 'blue', 
-                  icon: User 
-                },
-                { 
-                  key: 'condom', 
-                  label: 'ការប្រើប្រាស់កុងដូម (Condoms use)', 
-                  color: 'purple', 
-                  icon: CheckCircle 
-                }
-              ].map((item) => (
-                <div key={item.key} className={`flex items-center space-x-3 p-4 border-2 rounded-lg hover:shadow-sm transition-all cursor-pointer ${
-                  formData[item.key] === '1' 
-                    ? `border-${item.color}-300 bg-${item.color}-50` 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}>
-                  <Checkbox
-                    id={item.key}
-                    checked={formData[item.key] === '1'}
-                    onCheckedChange={(checked) => handleInputChange(item.key, checked ? '1' : '0')}
-                    className={`text-${item.color}-600`}
-                  />
-                  <Label htmlFor={item.key} className="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2 flex-1">
-                    <item.icon className={`w-4 h-4 text-${item.color}-600`} />
-                    {item.label}
-                  </Label>
-                </div>
-              ))}
+      {/* Counselling Topics */}
+      <div className="space-y-4">
+        <h4 className="text-md font-medium text-gray-900">
+          {showKhmer ? 'ប្រធានបទប្រឹក្សា (Counselling Topics)' : 'Counselling Topics'}
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="prevention"
+                checked={formData.prevention === '1'}
+                onCheckedChange={(checked) => handleInputChange('prevention', checked ? '1' : '0')}
+              />
+              <Label htmlFor="prevention" className="cursor-pointer text-sm">
+                {showKhmer ? 'ការបង្ការជំងឺកាមរោគ STI Prevention' : 'STI Prevention'}
+              </Label>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="adherence"
+                checked={formData.adherence === '1'}
+                onCheckedChange={(checked) => handleInputChange('adherence', checked ? '1' : '0')}
+              />
+              <Label htmlFor="adherence" className="cursor-pointer text-sm">
+                {showKhmer ? 'ការប្រកបដោយភាពស្មោះត្រង់ Adherence' : 'Adherence'}
+              </Label>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="spacing"
+                checked={formData.spacing === '1'}
+                onCheckedChange={(checked) => handleInputChange('spacing', checked ? '1' : '0')}
+              />
+              <Label htmlFor="spacing" className="cursor-pointer text-sm">
+                {showKhmer ? 'ការគ្រប់គ្រងចម្រុះ Family Planning' : 'Family Planning'}
+              </Label>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="tbInfect"
+                checked={formData.tbInfect === '1'}
+                onCheckedChange={(checked) => handleInputChange('tbInfect', checked ? '1' : '0')}
+              />
+              <Label htmlFor="tbInfect" className="cursor-pointer text-sm">
+                {showKhmer ? 'ការបង្ការជំងឺរបេង TB Prevention' : 'TB Prevention'}
+              </Label>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="partner"
+                checked={formData.partner === '1'}
+                onCheckedChange={(checked) => handleInputChange('partner', checked ? '1' : '0')}
+              />
+              <Label htmlFor="partner" className="cursor-pointer text-sm">
+                {showKhmer ? 'ការបង្ការបន្តជំងឺ Partner Notification' : 'Partner Notification'}
+              </Label>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="condom"
+                checked={formData.condom === '1'}
+                onCheckedChange={(checked) => handleInputChange('condom', checked ? '1' : '0')}
+              />
+              <Label htmlFor="condom" className="cursor-pointer text-sm">
+                {showKhmer ? 'ការប្រើប្រាស់កុងដូម Condom Use' : 'Condom Use'}
+              </Label>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 export default Counselling;
-

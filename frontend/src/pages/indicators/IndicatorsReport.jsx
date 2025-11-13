@@ -745,7 +745,7 @@ const IndicatorsReport = () => {
         )}
 
         {/* Main Indicators Table */}
-        <div className="bg-card rounded-lg">
+        <div className="bg-card rounded-none">
           <div className="p-0">
               <IndicatorsTable 
                 indicators={indicators} 

@@ -101,19 +101,19 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
               <thead className="bg-muted border-b-2 border-border">
                 <tr>
                   <th className="px-4 py-4 text-center text-sm font-bold text-foreground border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-32 mx-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-32 mx-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                   </th>
                   <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24">
-                    <div className="h-4 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                   </th>
                 </tr>
               </thead>
@@ -126,60 +126,60 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     <tr className="border-b border-border">
                       {/* Indicator Name - spans 3 rows */}
                       <td className="px-4 py-4 text-sm text-foreground align-middle text-left border-r border-border" rowSpan="3">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-48 mb-2 animate-pulse"></div>
-                        <div className="h-3 bg-muted-foreground/20 rounded w-32 animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-48 mb-2 animate-pulse"></div>
+                        <div className="h-3 bg-muted-foreground/20 rounded-none w-32 animate-pulse"></div>
                       </td>
 
                       {/* Age 0-14 */}
                       <td className="px-3 py-4 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-8 mx-auto animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-8 mx-auto animate-pulse"></div>
                       </td>
 
                       {/* Male 0-14 */}
                       <td className="px-3 py-4 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                       </td>
 
                       {/* Female 0-14 */}
                       <td className="px-3 py-4 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                       </td>
 
                       {/* Total 0-14 */}
                       <td className="px-3 py-4 text-right">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-12 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
                       </td>
                     </tr>
 
                     {/* 15+ Age Group Row Skeleton */}
                     <tr className="bg-muted border-b border-border">
                       <td className="px-3 py-3 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-8 mx-auto animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-8 mx-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                     </tr>
 
                     {/* Sub-Total Row Skeleton */}
                     <tr className="bg-muted border-b-2 border-border font-bold">
                       <td className="px-3 py-3 text-center text-sm font-bold text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded w-12 mx-auto animate-pulse"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded-none w-12 mx-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded w-16 ml-auto animate-pulse"></div>
+                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
                       </td>
                       <td className="px-3 py-3 text-right">
-                        <div className="h-7 bg-muted-foreground/20 rounded w-20 ml-auto animate-pulse"></div>
+                        <div className="h-7 bg-muted-foreground/20 rounded-none w-20 ml-auto animate-pulse"></div>
                       </td>
                     </tr>
                   </React.Fragment>
@@ -190,10 +190,10 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
         </div>
 
         {/* Report Footer Skeleton */}
-        <div className="bg-muted border border-border rounded-lg p-4 sm:p-6 mt-6 sm:mt-8">
+        <div className="bg-muted border border-border rounded-none p-4 sm:p-6 mt-6 sm:mt-8">
           <div className="text-right text-muted-foreground">
-            <div className="h-4 bg-muted-foreground/20 rounded w-3/4 ml-auto animate-pulse"></div>
-            <div className="h-3 bg-muted-foreground/20 rounded w-1/2 ml-auto mt-2 animate-pulse"></div>
+            <div className="h-4 bg-muted-foreground/20 rounded-none w-3/4 ml-auto animate-pulse"></div>
+            <div className="h-3 bg-muted-foreground/20 rounded-none w-1/2 ml-auto mt-2 animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -207,8 +207,8 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
           <div className="flex flex-col items-center gap-6">
             {/* Animated Icon Container */}
             <div className="relative">
-              <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping"></div>
-              <div className="relative p-4 sm:p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full border border-primary/20">
+              <div className="absolute inset-0  rounded-none animate-ping"></div>
+              <div className="relative p-4 sm:p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-none border border-primary/20">
                 <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-primary animate-pulse" />
               </div>
             </div>
@@ -225,19 +225,19 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
             </div>
 
             {/* Suggestions */}
-            <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-border/50 w-full max-w-md">
+            <div className="mt-4 p-4 bg-muted/50 rounded-none border border-border/50 w-full max-w-md">
               <h4 className="text-sm font-semibold text-foreground mb-2">Suggestions:</h4>
               <ul className="text-xs text-muted-foreground space-y-1 text-left">
                 <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-primary rounded-full"></div>
+                  <div className="w-1 h-1 rounded-none"></div>
                   Check if data exists for the selected period
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-primary rounded-full"></div>
+                  <div className="w-1 h-1 rounded-none"></div>
                   Verify site and filter selections
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-primary rounded-full"></div>
+                  <div className="w-1 h-1 rounded-none"></div>
                   Try expanding the date range
                 </li>
               </ul>
@@ -431,7 +431,7 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
       </div>
 
       {/* Report Footer */}
-      <div className="bg-muted border border-border rounded-lg p-4 sm:p-6 mt-6 sm:mt-8">
+      <div className="bg-muted border border-border rounded-none p-4 sm:p-6 mt-6 sm:mt-8">
         <div className="text-right text-muted-foreground">
           <p className="text-xs sm:text-sm">
             This report contains {indicators.length} indicator{indicators.length !== 1 ? 's' : ''} 

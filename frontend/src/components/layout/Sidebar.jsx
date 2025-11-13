@@ -2,26 +2,150 @@ import React, { useState, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  LayoutDashboard, 
-  Users, 
-  User, 
-  Baby, 
-  Heart, 
-  LogOut, 
-  ChevronLeft, 
-  ChevronRight,
-  X,
-  ChevronDown,
-  ChevronUp,
-  Upload,
-  BarChart3,
-  FileBarChart,
-  Shield,
-  TestTube,
-  Activity
-} from "lucide-react"
 import { useAuth } from '../../contexts/AuthContext'
+
+const IconBase = ({ children, className = "w-5 h-5" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round">
+    {children}
+  </svg>
+)
+
+const IconDashboard = ({ className }) => (
+  <IconBase className={className}>
+    <rect x="3" y="3" width="7" height="9" rx="1.5" />
+    <rect x="14" y="3" width="7" height="5" rx="1.5" />
+    <rect x="14" y="11" width="7" height="10" rx="1.5" />
+    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+  </IconBase>
+)
+
+const IconPeople = ({ className }) => (
+  <IconBase className={className}>
+    <circle cx="8" cy="8" r="3" />
+    <circle cx="16" cy="10" r="3" />
+    <path d="M4 19c0-2.5 2-4.5 4-4.5h0" />
+    <path d="M12 21c0-2.8 1.8-5 4.5-5H17" />
+  </IconBase>
+)
+
+const IconPerson = ({ className }) => (
+  <IconBase className={className}>
+    <circle cx="12" cy="7.5" r="3.5" />
+    <path d="M5 20.5c1.7-4.2 4.3-6.5 7-6.5s5.3 2.3 7 6.5" />
+  </IconBase>
+)
+
+const IconChildCare = ({ className }) => (
+  <IconBase className={className}>
+    <circle cx="12" cy="9" r="3" />
+    <path d="M6 21c1.2-3.5 3.6-5.5 6-5.5s4.8 2 6 5.5" />
+    <path d="M5 9a7 7 0 0 1 14 0" />
+  </IconBase>
+)
+
+const IconFavorite = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M12 20.5 6.5 16A5 5 0 0 1 6 8.5a4.2 4.2 0 0 1 6-0.4 4.2 4.2 0 0 1 6 0.4A5 5 0 0 1 17.5 16Z" />
+  </IconBase>
+)
+
+const IconLogout = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3" />
+    <path d="M16 17l5-5-5-5" />
+    <path d="M21 12H9" />
+  </IconBase>
+)
+
+const IconChevronLeft = ({ className = "w-4 h-4" }) => (
+  <IconBase className={className}>
+    <path d="M15 4 8 12l7 8" />
+  </IconBase>
+)
+
+const IconChevronRight = ({ className = "w-4 h-4" }) => (
+  <IconBase className={className}>
+    <path d="M9 4l7 8-7 8" />
+  </IconBase>
+)
+
+const IconClose = ({ className = "w-4 h-4" }) => (
+  <IconBase className={className}>
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </IconBase>
+)
+
+const IconExpandLess = ({ className = "w-4 h-4" }) => (
+  <IconBase className={className}>
+    <polyline points="6 14 12 8 18 14" />
+  </IconBase>
+)
+
+const IconExpandMore = ({ className = "w-4 h-4" }) => (
+  <IconBase className={className}>
+    <polyline points="6 10 12 16 18 10" />
+  </IconBase>
+)
+
+const IconUpload = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M12 3v12" />
+    <path d="m7 8 5-5 5 5" />
+    <path d="M4 16v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2" />
+  </IconBase>
+)
+
+const IconBarChart = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M4 21V10" />
+    <path d="M10 21V3" />
+    <path d="M16 21v-6" />
+    <path d="M22 21v-12" />
+  </IconBase>
+)
+
+const IconAssessment = ({ className }) => (
+  <IconBase className={className}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <path d="M8 4v-.5a2.5 2.5 0 0 1 5 0V4" />
+    <path d="M8 12h8" />
+    <path d="M8 16h5" />
+    <path d="M8 8h8" />
+  </IconBase>
+)
+
+const IconSecurity = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M12 3 4 6v5c0 5.25 3.35 10.2 8 11 4.65-.8 8-5.75 8-11V6Z" />
+    <path d="M12 11v4" />
+    <path d="M12 8h0" />
+  </IconBase>
+)
+
+const IconBiotech = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M7 3h10" />
+    <path d="M9 3v12a3 3 0 0 0 6 0V3" />
+    <path d="M5 9h4" />
+    <path d="M15 9h4" />
+    <path d="M8 21h8" />
+  </IconBase>
+)
+
+const IconMonitorHeart = ({ className }) => (
+  <IconBase className={className}>
+    <rect x="3" y="4" width="18" height="14" rx="2" />
+    <path d="M3 12h3l2-3 2 6 2-4 2 3h5" />
+  </IconBase>
+)
+
+const IconSettings = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+    <circle cx="12" cy="12" r="3" />
+  </IconBase>
+)
 
 const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }) => {
   const navigate = useNavigate()
@@ -51,7 +175,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
       items.push({
         name: 'Dashboard',
         href: '/dashboard',
-        icon: LayoutDashboard,
+        icon: IconDashboard,
         current: location.pathname === '/dashboard',
         category: 'main'
       })
@@ -63,7 +187,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
         {
           name: 'Data Management',
           href: '/import-data',
-          icon: Upload,
+          icon: IconUpload,
           current: location.pathname.startsWith('/import-data'),
           category: 'data'
         }
@@ -74,13 +198,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
         {
           name: 'All Patients',
           href: '/patients',
-          icon: Users,
+          icon: IconPeople,
           current: location.pathname === '/patients',
           category: 'patients'
         },
         {
           name: 'Adult',
-          icon: User,
+          icon: IconPerson,
           current: location.pathname.startsWith('/patients/adult') || location.pathname.startsWith('/visits/adult'),
           hasSubmenu: true,
           category: 'patients',
@@ -99,7 +223,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
         },
         {
           name: 'Child',
-          icon: Heart,
+          icon: IconFavorite,
           current: location.pathname.startsWith('/patients/child') || location.pathname.startsWith('/visits/child'),
           hasSubmenu: true,
           category: 'patients',
@@ -118,7 +242,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
         },
         {
           name: 'Infant',
-          icon: Baby,
+          icon: IconChildCare,
           current: location.pathname.startsWith('/patients/infant') || location.pathname.startsWith('/visits/infant'),
           hasSubmenu: true,
           category: 'patients',
@@ -138,22 +262,29 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
         {
           name: 'Import Data',
           href: '/import-data',
-          icon: Upload,
+          icon: IconUpload,
           current: location.pathname.startsWith('/import-data'),
           category: 'data'
         },
         {
           name: 'Lab Test Results',
           href: '/lab-tests',
-          icon: TestTube,
+          icon: IconBiotech,
           current: location.pathname.startsWith('/lab-tests'),
           category: 'data'
         },
         {
           name: 'Patient Tests',
           href: '/patient-tests',
-          icon: Activity,
+          icon: IconMonitorHeart,
           current: location.pathname.startsWith('/patient-tests'),
+          category: 'data'
+        },
+        {
+          name: 'Infant Tests',
+          href: '/infant-tests',
+          icon: IconChildCare,
+          current: location.pathname.startsWith('/infant-tests'),
           category: 'data'
         }
       )
@@ -164,7 +295,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
       items.push({
         name: 'Role Management',
         href: '/role-management',
-        icon: Shield,
+        icon: IconSecurity,
         current: location.pathname.startsWith('/role-management'),
         category: 'admin'
       })
@@ -173,29 +304,42 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
     // Analytics & Reports - always show
     items.push({
       name: 'Analytics & Reports',
-      icon: BarChart3,
-      current: location.pathname.startsWith('/analytics') || location.pathname.startsWith('/indicators'),
+      icon: IconBarChart,
+      current: location.pathname.startsWith('/analytics') || location.pathname.startsWith('/indicators') || location.pathname.startsWith('/mortality-retention-indicators'),
       hasSubmenu: true,
       category: 'reports',
       submenu: [
         {
           name: 'Indicators Report',
           href: '/indicators',
-          icon: FileBarChart,
+          icon: IconAssessment,
           current: location.pathname === '/indicators'
+        },
+        {
+          name: 'CQI',
+          href: '/mortality-retention-indicators',
+          icon: IconMonitorHeart,
+          current: location.pathname === '/mortality-retention-indicators'
         },
         // Analytics Admin - only for admin and super_admin
         ...(isAdmin ? [{
           name: 'Analytics Admin',
           href: '/analytics-admin',
-          icon: BarChart3,
+          icon: IconBarChart,
           current: location.pathname === '/analytics-admin'
+        }] : []),
+        // Indicator Management - only for admin and super_admin
+        ...(isAdmin ? [{
+          name: 'Indicator Control',
+          href: '/indicator-management',
+          icon: IconSettings,
+          current: location.pathname === '/indicator-management'
         }] : []),
         // Indicators Dashboard - hide for viewers and data managers
         ...(isViewer || isDataManager ? [] : [{
           name: 'Visualization',
           href: '/indicators/dashboard',
-          icon: BarChart3,
+          icon: IconBarChart,
           current: location.pathname === '/indicators/dashboard'
         }]),
       ]
@@ -279,7 +423,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
           <div className="flex items-center justify-between p-4 bg-card/50">
             {!isCollapsed ? (
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                <div className="w-8 h-8 bg-primary rounded-none flex items-center justify-center shadow-sm">
                   <span className="text-primary-foreground font-bold text-sm">P</span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -289,7 +433,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
               </div>
             ) : (
               <div className="flex items-center justify-center w-full">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                <div className="w-8 h-8 bg-primary rounded-none flex items-center justify-center shadow-sm">
                   <span className="text-primary-foreground font-bold text-sm">P</span>
                 </div>
               </div>
@@ -300,13 +444,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
               variant="ghost"
               size="sm"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden lg:flex w-8 h-8 p-0 rounded-full hover:bg-accent/50"
+              className="hidden lg:flex w-8 h-8 p-0 rounded-none hover:bg-accent/50"
               title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {isCollapsed ? (
-                <ChevronRight className="w-4 h-4" />
+                <IconChevronRight className="w-4 h-4" />
               ) : (
-                <ChevronLeft className="w-4 h-4" />
+                <IconChevronLeft className="w-4 h-4" />
               )}
             </Button>
             
@@ -315,10 +459,10 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
               variant="ghost"
               size="sm"
               onClick={() => setIsMobileOpen(false)}
-              className="lg:hidden w-8 h-8 p-0 rounded-full hover:bg-accent/50"
+              className="lg:hidden w-8 h-8 p-0 rounded-none hover:bg-accent/50"
               title="Close sidebar"
             >
-              <X className="w-4 h-4" />
+              <IconClose className="w-4 h-4" />
             </Button>
           </div>
 
@@ -326,8 +470,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
           {/* <div className="p-4 border-b border-border bg-muted/20">
             {!isCollapsed ? (
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center ring-2 ring-border">
-                  <User className="w-5 h-5 text-muted-foreground" />
+                <div className="w-10 h-10 bg-muted rounded-none flex items-center justify-center ring-2 ring-border">
+                  <MdPerson className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-card-foreground truncate">
@@ -337,7 +481,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                     {user?.username || 'admin'}
                   </p>
                   {isViewer && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 mt-1">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 mt-1">
                       View Only
                     </span>
                   )}
@@ -345,18 +489,18 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
               </div>
             ) : (
               <div className="flex flex-col items-center space-y-2">
-                <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center ring-2 ring-border">
-                  <User className="w-5 h-5 text-muted-foreground" />
+                <div className="w-10 h-10 bg-muted rounded-none flex items-center justify-center ring-2 ring-border">
+                  <MdPerson className="w-5 h-5 text-muted-foreground" />
                 </div>
                 {isViewer && (
-                  <div className="w-2 h-2 bg-blue-500 rounded-full" title="View Only Access" />
+                  <div className="w-2 h-2 bg-blue-500 rounded-none" title="View Only Access" />
                 )}
               </div>
             )}
           </div> */}
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto overflow-x-hidden">
+          <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-hide">
             {navigationItems.map((item) => {
               const Icon = item.icon
               const isExpanded = expandedMenus[item.name]
@@ -367,7 +511,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                     <Button
                       variant={item.current ? "default" : "ghost"}
                       className={`
-                        w-full justify-start text-left h-11 px-3 rounded-lg transition-all duration-200
+                        w-full justify-start text-left h-11 px-3 rounded-none transition-all duration-200
                         ${isCollapsed ? 'px-2' : 'px-3'}
                         ${item.current 
                           ? 'bg-primary text-primary-foreground shadow-sm' 
@@ -387,9 +531,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                             </Badge>
                           )}
                           {isExpanded ? (
-                            <ChevronUp className="w-4 h-4 ml-2 flex-shrink-0" />
+                            <IconExpandLess className="w-4 h-4 ml-2 flex-shrink-0" />
                           ) : (
-                            <ChevronDown className="w-4 h-4 ml-2 flex-shrink-0" />
+                            <IconExpandMore className="w-4 h-4 ml-2 flex-shrink-0" />
                           )}
                         </>
                       )}
@@ -405,9 +549,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                               key={subItem.name}
                               variant={subItem.current ? "default" : "ghost"}
                               className={`
-                                w-full justify-start text-left h-9 px-3 text-sm rounded-md transition-all duration-200
+                                w-full justify-start text-left h-9 px-3 text-sm rounded-none transition-all duration-200
                                 ${subItem.current 
-                                  ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm' 
+                                  ? ' text-primary border border-primary/20 shadow-sm' 
                                   : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                                 }
                               `}
@@ -416,7 +560,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                               {SubIcon ? (
                                 <SubIcon className="w-4 h-4 mr-3 flex-shrink-0" />
                               ) : (
-                                <div className="w-2 h-2 rounded-full bg-current opacity-40 mr-3 flex-shrink-0"></div>
+                                <div className="w-2 h-2 rounded-none bg-current opacity-40 mr-3 flex-shrink-0"></div>
                               )}
                               <span className="flex-1 text-left">{subItem.name}</span>
                               {subItem.badge && (
@@ -438,7 +582,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                   key={item.name}
                   variant={item.current ? "default" : "ghost"}
                   className={`
-                    w-full justify-start text-left h-11 px-3 rounded-lg transition-all duration-200
+                    w-full justify-start text-left h-11 px-3 rounded-none transition-all duration-200
                     ${isCollapsed ? 'px-2' : 'px-3'}
                     ${item.current 
                       ? 'bg-primary text-primary-foreground shadow-sm' 
@@ -469,13 +613,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
             <Button
               variant="ghost"
               className={`
-                w-full justify-start text-left h-11 px-3 rounded-lg text-card-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200
+                w-full justify-start text-left h-11 px-3 rounded-none text-card-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200
                 ${isCollapsed ? 'px-2' : 'px-3'}
               `}
               onClick={handleLogout}
               title={isCollapsed ? 'Logout' : undefined}
             >
-              <LogOut className={`w-5 h-5 flex-shrink-0 ${isCollapsed ? 'mx-auto' : 'mr-3'}`} />
+              <IconLogout className={`w-5 h-5 flex-shrink-0 ${isCollapsed ? 'mx-auto' : 'mr-3'}`} />
               {!isCollapsed && <span className="font-medium">Logout</span>}
             </Button>
           </div>

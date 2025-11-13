@@ -1,153 +1,123 @@
 import { Card, CardContent, CardHeader, CardTitle, Input, Label, RadioGroup, RadioGroupItem } from "@/components/ui";
 import React from 'react';
-import { User, Calendar, Hash, FileText, Clock, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 
-function PatientInformation({ formData, handleInputChange }) {
-  console.log('PatientInformation - visitStatus value:', formData.visitStatus, 'type:', typeof formData.visitStatus);
+function PatientInformation({ formData, handleInputChange, showKhmer = false }) {
   return (
-    <div className="space-y-6">
-      {/* Section Header */}
-      <div className="bg-gradient-to-r from-muted to-muted border border-border rounded-xl p-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-            <User className="w-6 h-6 text-muted-foreground" />
-          </div>
+    <div className="space-y-8">
+      {/* Simple Section Header */}
+      <div className="border-b border-gray-300 pb-4">
+        <h3 className="text-lg font-medium text-gray-900">
+          {showKhmer ? 'ព័ត៌មានអ្នកជំងឺ (Patient Information)' : 'Patient Information'}
+        </h3>
+        <p className="text-sm text-gray-600 mt-1">
+          {showKhmer ? 'ព័ត៌មានមូលដ្ឋាន និងព័ត៌មានការពិនិត្យ' : 'Basic information and visit details'}
+        </p>
+      </div>
+
+      {/* Patient Name */}
+      <div className="space-y-4">
+        <h4 className="text-md font-medium text-gray-900">
+          {showKhmer ? 'ឈ្មោះអ្នកជំងឺ (Patient Name)' : 'Patient Name'}
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-xl font-bold text-foreground">
-              ព័ត៌មានអ្នកជំងឺ (Patient Information)
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              ព័ត៌មានមូលដ្ឋាន និងព័ត៌មានការពិនិត្យ
-            </p>
+            <Label htmlFor="name" className="text-sm text-gray-700">
+              {showKhmer ? 'ឈ្មោះអ្នកជំងឺ Patient Name' : 'Patient Name'}
+            </Label>
+            <Input
+              id="name"
+              value={formData.name || ''}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder="Enter patient name"
+              className="mt-1 border-gray-300"
+            />
           </div>
         </div>
       </div>
 
-      {/* Form Content */}
-      <div className="space-y-6">
-        {/* Patient Name */}
-        <Card className="border border-gray-200 hover:shadow-md transition-shadow">
-          <CardHeader className="medical-card-header">
-            <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg status-active flex items-center justify-center">
-                <User className="w-4 h-4 text-foreground" />
-              </div>
-              ឈ្មោះអ្នកជំងឺ (Patient Name)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-3">
-              <Label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <User className="w-4 h-4 text-blue-600" />
-                ឈ្មោះអ្នកជំងឺ Patient Name
-              </Label>
-              <Input
-                id="name"
-                value={formData.name || ''}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                placeholder="Enter patient name"
-                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Basic Information */}
+      <div className="space-y-4">
+        <h4 className="text-md font-medium text-gray-900">
+          {showKhmer ? 'ព័ត៌មានមូលដ្ឋាន (Basic Information)' : 'Basic Information'}
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <Label htmlFor="clinicId" className="text-sm text-gray-700">
+              {showKhmer ? 'លេខកូដអ្នកជំងឺ Clinic ID' : 'Clinic ID'}
+            </Label>
+            <Input
+              id="clinicId"
+              value={formData.clinicId || ''}
+              onChange={(e) => handleInputChange('clinicId', e.target.value)}
+              placeholder="Enter Clinic ID"
+              className="mt-1 border-gray-300"
+            />
+          </div>
+          <div>
+            <Label htmlFor="artNumber" className="text-sm text-gray-700">
+              {showKhmer ? 'លេខ ART ART Number' : 'ART Number'}
+            </Label>
+            <Input
+              id="artNumber"
+              value={formData.artNumber || ''}
+              onChange={(e) => handleInputChange('artNumber', e.target.value)}
+              placeholder="Enter ART Number"
+              className="mt-1 border-gray-300"
+            />
+          </div>
+          <div>
+            <Label htmlFor="visitDate" className="text-sm text-gray-700">
+              {showKhmer ? 'កាលបរិច្ឆេទពិនិត្យ Visit Date' : 'Visit Date'}
+            </Label>
+            <Input
+              id="visitDate"
+              type="date"
+              value={formData.visitDate || ''}
+              onChange={(e) => handleInputChange('visitDate', e.target.value)}
+              className="mt-1 border-gray-300"
+            />
+          </div>
+        </div>
+      </div>
 
-        {/* Basic Information */}
-        <Card className="border border-gray-200 hover:shadow-md transition-shadow">
-          <CardHeader className="medical-card-header">
-            <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg viral-load-low flex items-center justify-center">
-                <FileText className="w-4 h-4 text-foreground" />
-              </div>
-              ព័ត៌មានមូលដ្ឋាន (Basic Information)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-3">
-                <Label htmlFor="clinicId" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  <Hash className="w-4 h-4 text-green-600" />
-                  លេខកូដអ្នកជំងឺ Clinic ID Number
-                </Label>
-                <Input
-                  id="clinicId"
-                  value={formData.clinicId}
-                  onChange={(e) => handleInputChange('clinicId', e.target.value)}
-                  placeholder="Enter Clinic ID"
-                  className="border-gray-300 focus:border-green-500 focus:ring-green-500"
-                />
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="artNumber" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-green-600" />
-                  លេខកូដ ART (ART Number)
-                </Label>
-                <Input
-                  id="artNumber"
-                  value={formData.artNumber}
-                  onChange={(e) => handleInputChange('artNumber', e.target.value)}
-                  placeholder="Enter ART Number"
-                  className="border-gray-300 focus:border-green-500 focus:ring-green-500"
-                />
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="visitDate" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-green-600" />
-                  ថ្ងៃខែឆ្នាំ មកពិនិត្យ Date of visit
-                </Label>
-                <Input
-                  id="visitDate"
-                  type="date"
-                  value={formData.visitDate}
-                  onChange={(e) => handleInputChange('visitDate', e.target.value)}
-                  className="border-gray-300 focus:border-green-500 focus:ring-green-500"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Visit Status */}
-        <Card className="border border-gray-200 hover:shadow-md transition-shadow">
-          <CardHeader className="medical-card-header">
-            <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg viral-load-undetectable flex items-center justify-center">
-                <Clock className="w-4 h-4 text-foreground" />
-              </div>
-              ប្រភេទមកពិនិត្យ (Visit Status)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <RadioGroup
-              value={formData.visitStatus?.toString() || '0'}
-              onValueChange={(value) => handleInputChange('visitStatus', value)}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-            >
-              {[
-                { value: "0", label: "មកពិនិត្យដំបូង (First Visit)", color: "blue", icon: CheckCircle },
-                { value: "1", label: "មកមុនពេលកំណត់ (Early Visit)", color: "green", icon: Clock },
-                { value: "2", label: "មកពិនិត្យតាមការកំណត់ (Scheduled Visit)", color: "purple", icon: CheckCircle },
-                { value: "3", label: "មកពិនិត្យយឺត (Late Visit)", color: "red", icon: AlertTriangle }
-              ].map((status) => (
-                <div key={status.value} className={`flex items-center space-x-3 p-4 border-2 rounded-lg hover:shadow-sm transition-all cursor-pointer ${
-                  formData.visitStatus?.toString() === status.value 
-                    ? `border-${status.color}-300 bg-${status.color}-50` 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}>
-                  <RadioGroupItem value={status.value} id={`visit-${status.value}`} className={`text-${status.color}-600`} />
-                  <Label htmlFor={`visit-${status.value}`} className="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2 flex-1">
-                    <status.icon className={`w-4 h-4 text-${status.color}-600`} />
-                    {status.label}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </CardContent>
-        </Card>
+      {/* Visit Status */}
+      <div className="space-y-4">
+        <h4 className="text-md font-medium text-gray-900">
+          {showKhmer ? 'ប្រភេទមកពិនិត្យ (Visit Status)' : 'Visit Status'}
+        </h4>
+        <RadioGroup
+          value={formData.visitStatus?.toString() || '0'}
+          onValueChange={(value) => handleInputChange('visitStatus', value)}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        >
+          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
+            <RadioGroupItem value="0" id="visit-0" />
+            <Label htmlFor="visit-0" className="cursor-pointer text-sm">
+              {showKhmer ? 'មកពិនិត្យដំបូង (First Visit)' : 'First Visit'}
+            </Label>
+          </div>
+          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
+            <RadioGroupItem value="1" id="visit-1" />
+            <Label htmlFor="visit-1" className="cursor-pointer text-sm">
+              {showKhmer ? 'មកមុនពេលកំណត់ (Early Visit)' : 'Early Visit'}
+            </Label>
+          </div>
+          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
+            <RadioGroupItem value="2" id="visit-2" />
+            <Label htmlFor="visit-2" className="cursor-pointer text-sm">
+              {showKhmer ? 'មកពិនិត្យតាមការកំណត់ (Scheduled Visit)' : 'Scheduled Visit'}
+            </Label>
+          </div>
+          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
+            <RadioGroupItem value="3" id="visit-3" />
+            <Label htmlFor="visit-3" className="cursor-pointer text-sm">
+              {showKhmer ? 'មកពិនិត្យយឺត (Late Visit)' : 'Late Visit'}
+            </Label>
+          </div>
+        </RadioGroup>
       </div>
     </div>
   );
 }
 
 export default PatientInformation;
-

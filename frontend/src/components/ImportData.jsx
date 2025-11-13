@@ -313,7 +313,7 @@ const ImportData = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
+    <div className="max-w-2xl mx-auto  space-y-6">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-2xl font-semibold text-gray-900 mb-2">Import Data</h1>
@@ -345,7 +345,7 @@ const ImportData = () => {
         
         {/* Status Indicator */}
         <div className="mt-2">
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+          <span className={`inline-flex items-center px-3 py-1 rounded-none text-sm font-medium ${
             isActive 
               ? 'bg-green-100 text-green-800 border border-green-200' 
               : 'bg-red-100 text-red-800 border border-red-200'
@@ -367,7 +367,7 @@ const ImportData = () => {
         </CardHeader>
         <CardContent>
           <div
-            className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+            className="border-2 border-dashed border-gray-300 rounded-none p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onClick={() => fileInputRef.current?.click()}
