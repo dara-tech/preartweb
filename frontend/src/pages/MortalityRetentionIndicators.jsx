@@ -461,6 +461,39 @@ const MortalityRetentionIndicators = () => {
       return 'TLD';
     }
     
+    // Make TPT indicators more clear
+    if (formatted.includes('received TPT') || formatted.includes('TPT Start')) {
+      return 'TPT Received';
+    }
+    if (formatted.includes('completed TPT') || formatted.includes('TPT Complete')) {
+      return 'TPT Completed';
+    }
+    if (formatted.includes('TPT')) {
+      return 'TPT';
+    }
+    
+    // Make VL indicators more clear
+    // Check for 12e first (most specific)
+    if (formatted.includes('VL test results received within 10 days') || formatted.includes('VL results within 10 days') || formatted.includes('12e')) {
+      return 'VL Results Within 10 Days';
+    }
+    // Check for 12a (VL Testing Coverage)
+    if (formatted.includes('VL test in past 12 months') || (formatted.includes('VL test') && formatted.includes('coverage'))) {
+      return 'VL Testing Coverage';
+    }
+    if (formatted.includes('VL monitored at six months') || formatted.includes('VL monitored')) {
+      return 'VL Monitored at 6 Months';
+    }
+    if (formatted.includes('VL <1000 copies/mL at 12 months') || formatted.includes('suppression at 12 months')) {
+      return 'VL Suppression at 12 Months';
+    }
+    if (formatted.includes('suppressed viral load') || formatted.includes('VL suppression')) {
+      return 'VL Suppression Overall';
+    }
+    if (formatted.includes('VL')) {
+      return 'VL';
+    }
+    
     if (formatted.includes('same-day') || formatted.includes('initiating ART')) {
       return 'Same-Day ART Initiation';
     }
@@ -670,6 +703,21 @@ const MortalityRetentionIndicators = () => {
                         indicator.Indicator.includes('TLD') || 
                         indicator.Indicator.includes('tld')
                       );
+                      const isTPTIndicator = indicator.Indicator && (
+                        indicator.Indicator.includes('TPT') || 
+                        indicator.Indicator.includes('tpt') ||
+                        indicator.Indicator.includes('received TPT') ||
+                        indicator.Indicator.includes('completed TPT')
+                      );
+                      const isVLIndicator = indicator.Indicator && (
+                        indicator.Indicator.includes('VL') || 
+                        indicator.Indicator.includes('viral load') ||
+                        indicator.Indicator.includes('VL test') ||
+                        indicator.Indicator.includes('VL tested') ||
+                        indicator.Indicator.includes('VL monitored') ||
+                        indicator.Indicator.includes('VL suppression') ||
+                        indicator.Indicator.includes('VL results')
+                      );
                   
                       // For MMD indicators, get totals first (denominator for percentage)
                       const male014TotalMMD = isMMDIndicator ? getAgeGenderValue(indicator, 'Male_0_14') : null;
@@ -722,13 +770,81 @@ const MortalityRetentionIndicators = () => {
                       const male15PlusTotalTLD = isTLDIndicator ? getAgeGenderValue(indicator, 'Male_over_14') : null;
                       const female15PlusTotalTLD = isTLDIndicator ? getAgeGenderValue(indicator, 'Female_over_14') : null;
                       
-                      // For non-MMD, non-TLD indicators, use the regular values
+                      // For TPT indicators, get TPT-specific counts and totals
+                      const isTPTReceivedIndicator = isTPTIndicator && indicator.Indicator && indicator.Indicator.includes('received TPT');
+                      const isTPTCompletedIndicator = isTPTIndicator && indicator.Indicator && indicator.Indicator.includes('completed TPT');
+                      const male014TPT = isTPTIndicator ? (
+                        indicator.Male_0_14_TPT_Received || 
+                        indicator.Male_0_14_TPT_Completed || 
+                        0
+                      ) : null;
+                      const female014TPT = isTPTIndicator ? (
+                        indicator.Female_0_14_TPT_Received || 
+                        indicator.Female_0_14_TPT_Completed || 
+                        0
+                      ) : null;
+                      const male15PlusTPT = isTPTIndicator ? (
+                        indicator.Male_over_14_TPT_Received || 
+                        indicator.Male_over_14_TPT_Completed || 
+                        0
+                      ) : null;
+                      const female15PlusTPT = isTPTIndicator ? (
+                        indicator.Female_over_14_TPT_Received || 
+                        indicator.Female_over_14_TPT_Completed || 
+                        0
+                      ) : null;
+                      const male014TotalTPT = isTPTIndicator ? getAgeGenderValue(indicator, 'Male_0_14') : null;
+                      const female014TotalTPT = isTPTIndicator ? getAgeGenderValue(indicator, 'Female_0_14') : null;
+                      const male15PlusTotalTPT = isTPTIndicator ? getAgeGenderValue(indicator, 'Male_over_14') : null;
+                      const female15PlusTotalTPT = isTPTIndicator ? getAgeGenderValue(indicator, 'Female_over_14') : null;
+                      
+                      // For VL indicators, get VL-specific counts and totals
+                      const isVLTestingCoverageIndicator = isVLIndicator && indicator.Indicator && indicator.Indicator.includes('VL test in past 12 months');
+                      const isVLMonitoredIndicator = isVLIndicator && indicator.Indicator && indicator.Indicator.includes('VL monitored at six months');
+                      const isVLSuppression12MIndicator = isVLIndicator && indicator.Indicator && indicator.Indicator.includes('VL <1000 copies/mL at 12 months');
+                      const isVLSuppressionOverallIndicator = isVLIndicator && indicator.Indicator && indicator.Indicator.includes('suppressed viral load');
+                      const isVLResults10DaysIndicator = isVLIndicator && indicator.Indicator && indicator.Indicator.includes('VL test results received within 10 days');
+                      
+                      // Extract VL-specific counts based on indicator type
+                      // Priority order: Suppressed (12c, 12d) > Monitored (12b) > Tested (12a) > Within_10_Days (12e)
+                      const male014VL = isVLIndicator ? (
+                        (isVLSuppression12MIndicator || isVLSuppressionOverallIndicator) ? (indicator.Male_0_14_Suppressed || 0) :
+                        isVLMonitoredIndicator ? (indicator.Male_0_14_Monitored || 0) :
+                        isVLResults10DaysIndicator ? (indicator.Male_0_14_Within_10_Days || 0) :
+                        (indicator.Male_0_14_Tested || 0)
+                      ) : null;
+                      const female014VL = isVLIndicator ? (
+                        (isVLSuppression12MIndicator || isVLSuppressionOverallIndicator) ? (indicator.Female_0_14_Suppressed || 0) :
+                        isVLMonitoredIndicator ? (indicator.Female_0_14_Monitored || 0) :
+                        isVLResults10DaysIndicator ? (indicator.Female_0_14_Within_10_Days || 0) :
+                        (indicator.Female_0_14_Tested || 0)
+                      ) : null;
+                      const male15PlusVL = isVLIndicator ? (
+                        (isVLSuppression12MIndicator || isVLSuppressionOverallIndicator) ? (indicator.Male_over_14_Suppressed || 0) :
+                        isVLMonitoredIndicator ? (indicator.Male_over_14_Monitored || 0) :
+                        isVLResults10DaysIndicator ? (indicator.Male_over_14_Within_10_Days || 0) :
+                        (indicator.Male_over_14_Tested || 0)
+                      ) : null;
+                      const female15PlusVL = isVLIndicator ? (
+                        (isVLSuppression12MIndicator || isVLSuppressionOverallIndicator) ? (indicator.Female_over_14_Suppressed || 0) :
+                        isVLMonitoredIndicator ? (indicator.Female_over_14_Monitored || 0) :
+                        isVLResults10DaysIndicator ? (indicator.Female_over_14_Within_10_Days || 0) :
+                        (indicator.Female_over_14_Tested || 0)
+                      ) : null;
+                      const male014TotalVL = isVLIndicator ? getAgeGenderValue(indicator, 'Male_0_14') : null;
+                      const female014TotalVL = isVLIndicator ? getAgeGenderValue(indicator, 'Female_0_14') : null;
+                      const male15PlusTotalVL = isVLIndicator ? getAgeGenderValue(indicator, 'Male_over_14') : null;
+                      const female15PlusTotalVL = isVLIndicator ? getAgeGenderValue(indicator, 'Female_over_14') : null;
+                      
+                      // For non-MMD, non-TLD, non-TPT, non-VL indicators, use the regular values
                       // For TLD indicators, display TLD counts (numerator)
                       // For MMD indicators, display category counts
-                      const male014 = isTLDIndicator ? (male014TLD || 0) : (isMMDIndicator ? (male014Category || 0) : getAgeGenderValue(indicator, 'Male_0_14'));
-                      const female014 = isTLDIndicator ? (female014TLD || 0) : (isMMDIndicator ? (female014Category || 0) : getAgeGenderValue(indicator, 'Female_0_14'));
-                      const male15Plus = isTLDIndicator ? (male15PlusTLD || 0) : (isMMDIndicator ? (male15PlusCategory || 0) : getAgeGenderValue(indicator, 'Male_over_14'));
-                      const female15Plus = isTLDIndicator ? (female15PlusTLD || 0) : (isMMDIndicator ? (female15PlusCategory || 0) : getAgeGenderValue(indicator, 'Female_over_14'));
+                      // For TPT indicators, display TPT counts (numerator)
+                      // For VL indicators, display VL counts (numerator)
+                      const male014 = isVLIndicator ? (male014VL || 0) : (isTPTIndicator ? (male014TPT || 0) : (isTLDIndicator ? (male014TLD || 0) : (isMMDIndicator ? (male014Category || 0) : getAgeGenderValue(indicator, 'Male_0_14'))));
+                      const female014 = isVLIndicator ? (female014VL || 0) : (isTPTIndicator ? (female014TPT || 0) : (isTLDIndicator ? (female014TLD || 0) : (isMMDIndicator ? (female014Category || 0) : getAgeGenderValue(indicator, 'Female_0_14'))));
+                      const male15Plus = isVLIndicator ? (male15PlusVL || 0) : (isTPTIndicator ? (male15PlusTPT || 0) : (isTLDIndicator ? (male15PlusTLD || 0) : (isMMDIndicator ? (male15PlusCategory || 0) : getAgeGenderValue(indicator, 'Male_over_14'))));
+                      const female15Plus = isVLIndicator ? (female15PlusVL || 0) : (isTPTIndicator ? (female15PlusTPT || 0) : (isTLDIndicator ? (female15PlusTLD || 0) : (isMMDIndicator ? (female15PlusCategory || 0) : getAgeGenderValue(indicator, 'Female_over_14'))));
                       
                       // For reengagement indicator, get reengaged counts
                       const male014Reengaged = isReengagementIndicator ? getAgeGenderReengaged(indicator, 'Male_0_14') : null;
@@ -793,27 +909,89 @@ const MortalityRetentionIndicators = () => {
                         ? (total014MMD + total15PlusMMD) 
                         : null;
                       
-                      // For TLD indicators, calculate totals for percentage calculation
-                      // Total counts (Male_0_14, etc.) are the denominator (all ART patients)
-                      // TLD counts (Male_0_14_TLD, etc.) are the numerator (patients on TLD)
-                      const total014TLD = isTLDIndicator && male014TLD !== null && female014TLD !== null 
-                        ? (Number(male014TLD) + Number(female014TLD)) 
+                      // For TLD Initiation indicator (10a), use Total_Newly_Initiated as denominator
+                      // For TLD Cumulative indicator (10b), use Total_ART_Patients as denominator
+                      const isTLDInitiationIndicator = isTLDIndicator && indicator.Indicator && indicator.Indicator.includes('newly initiating');
+                      const isTLDCumulativeIndicator = isTLDIndicator && indicator.Indicator && indicator.Indicator.includes('cumulative');
+                      
+                      // For TLD Initiation: denominator is Total_Newly_Initiated from the same indicator
+                      // For TLD Cumulative: denominator is Total_ART_Patients (all active ART patients)
+                      const total014TLDInitiationDenominator = isTLDInitiationIndicator && indicator.Total_Newly_Initiated 
+                        ? (Number(male014TotalTLD || 0) + Number(female014TotalTLD || 0))
                         : null;
-                      const total15PlusTLD = isTLDIndicator && male15PlusTLD !== null && female15PlusTLD !== null 
-                        ? (Number(male15PlusTLD) + Number(female15PlusTLD)) 
+                      const total15PlusTLDInitiationDenominator = isTLDInitiationIndicator && indicator.Total_Newly_Initiated
+                        ? (Number(male15PlusTotalTLD || 0) + Number(female15PlusTotalTLD || 0))
                         : null;
-                      const grandTotalTLD = isTLDIndicator && total014TLD !== null && total15PlusTLD !== null 
-                        ? (total014TLD + total15PlusTLD) 
+                      const grandTotalTLDInitiationDenominator = isTLDInitiationIndicator && indicator.Total_Newly_Initiated
+                        ? Number(indicator.Total_Newly_Initiated || 0)
                         : null;
-                      const total014TLDDenominator = isTLDIndicator && male014TotalTLD !== null && female014TotalTLD !== null 
-                        ? (Number(male014TotalTLD) + Number(female014TotalTLD)) 
+                      
+                      // For TLD Cumulative: use Total_ART_Patients as denominator
+                      const total014TLDCumulativeDenominator = isTLDCumulativeIndicator && indicator.Total_ART_Patients
+                        ? (Number(male014TotalTLD || 0) + Number(female014TotalTLD || 0))
                         : null;
-                      const total15PlusTLDDenominator = isTLDIndicator && male15PlusTotalTLD !== null && female15PlusTotalTLD !== null 
-                        ? (Number(male15PlusTotalTLD) + Number(female15PlusTotalTLD)) 
+                      const total15PlusTLDCumulativeDenominator = isTLDCumulativeIndicator && indicator.Total_ART_Patients
+                        ? (Number(male15PlusTotalTLD || 0) + Number(female15PlusTotalTLD || 0))
                         : null;
-                      const grandTotalTLDDenominator = isTLDIndicator && total014TLDDenominator !== null && total15PlusTLDDenominator !== null 
-                        ? (total014TLDDenominator + total15PlusTLDDenominator) 
+                      const grandTotalTLDCumulativeDenominator = isTLDCumulativeIndicator && indicator.Total_ART_Patients
+                        ? Number(indicator.Total_ART_Patients || 0)
                         : null;
+                      
+                      // For TPT indicators, use Total_ART_Patients as denominator
+                      const total014TPTDenominator = isTPTIndicator && indicator.Total_ART_Patients
+                        ? (Number(male014TotalTPT || 0) + Number(female014TotalTPT || 0))
+                        : null;
+                      const total15PlusTPTDenominator = isTPTIndicator && indicator.Total_ART_Patients
+                        ? (Number(male15PlusTotalTPT || 0) + Number(female15PlusTotalTPT || 0))
+                        : null;
+                      const grandTotalTPTDenominator = isTPTIndicator && indicator.Total_ART_Patients
+                        ? Number(indicator.Total_ART_Patients || 0)
+                        : null;
+                      
+                      // For VL indicators, determine denominator based on indicator type
+                      // 12a: Total_ART_Patients (all ART patients)
+                      // 12b: Total_ART_Patients (all ART patients on ART >= 6 months)
+                      // 12c: VL_Tested_12M (tested patients, not all eligible - use Male_0_14_Tested + Female_0_14_Tested)
+                      // 12d: Total_ART_Patients (all ART patients on ART >= 6 months)
+                      // 12e: Total_With_Dates (patients with VL test dates)
+                      
+                      // For 12c, extract tested counts for denominator
+                      const male014Tested = isVLSuppression12MIndicator ? (indicator.Male_0_14_Tested || 0) : null;
+                      const female014Tested = isVLSuppression12MIndicator ? (indicator.Female_0_14_Tested || 0) : null;
+                      const male15PlusTested = isVLSuppression12MIndicator ? (indicator.Male_over_14_Tested || 0) : null;
+                      const female15PlusTested = isVLSuppression12MIndicator ? (indicator.Female_over_14_Tested || 0) : null;
+                      
+                      const total014VLDenominator = isVLIndicator ? (
+                        isVLSuppression12MIndicator ? (
+                          // For 12c, use tested counts as denominator
+                          (Number(male014Tested || 0) + Number(female014Tested || 0))
+                        ) : (
+                          // For other VL indicators, use total counts
+                          (indicator.Total_ART_Patients || indicator.Total_Eligible_Patients || indicator.VL_Tested_12M || indicator.Total_With_Dates)
+                            ? (Number(male014TotalVL || 0) + Number(female014TotalVL || 0))
+                            : null
+                        )
+                      ) : null;
+                      const total15PlusVLDenominator = isVLIndicator ? (
+                        isVLSuppression12MIndicator ? (
+                          // For 12c, use tested counts as denominator
+                          (Number(male15PlusTested || 0) + Number(female15PlusTested || 0))
+                        ) : (
+                          // For other VL indicators, use total counts
+                          (indicator.Total_ART_Patients || indicator.Total_Eligible_Patients || indicator.VL_Tested_12M || indicator.Total_With_Dates)
+                            ? (Number(male15PlusTotalVL || 0) + Number(female15PlusTotalVL || 0))
+                            : null
+                        )
+                      ) : null;
+                      const grandTotalVLDenominator = isVLIndicator ? (
+                        isVLSuppression12MIndicator ? (
+                          // For 12c, use VL_Tested_12M as grand total denominator
+                          Number(indicator.VL_Tested_12M || 0)
+                        ) : (
+                          // For other VL indicators, use the standard denominator
+                          Number(indicator.Total_ART_Patients || indicator.Total_Eligible_Patients || indicator.VL_Tested_12M || indicator.Total_With_Dates || 0)
+                        )
+                      ) : null;
                       
                       // For reengagement, calculate totals
                       const total014Reengaged = isReengagementIndicator ? (Number(male014Reengaged || 0) + Number(female014Reengaged || 0)) : null;
@@ -856,7 +1034,7 @@ const MortalityRetentionIndicators = () => {
                                   Total Missed: {formatNumber(indicator.Total_Lost || 0)}
                                 </div>
                               )}
-                              {(isSameDayIndicator || isArtInitiationIndicator) && indicator.Total_Newly_Initiated !== undefined && (
+                              {(isSameDayIndicator || isArtInitiationIndicator || isTLDIndicator) && indicator.Total_Newly_Initiated !== undefined && (
                                 <div className="mt-2 text-xs text-muted-foreground">
                                   Total Initiated: {formatNumber(indicator.Total_Newly_Initiated || 0)}
                                 </div>
@@ -869,6 +1047,31 @@ const MortalityRetentionIndicators = () => {
                               {isBaselineCD4Indicator && indicator.Total_Newly_Initiated !== undefined && (
                                 <div className="mt-2 text-xs text-muted-foreground">
                                   Total Initiated: {formatNumber(indicator.Total_Newly_Initiated || 0)}
+                                </div>
+                              )}
+                              {isTPTIndicator && indicator.Total_ART_Patients !== undefined && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                  Total ART Patients: {formatNumber(indicator.Total_ART_Patients || 0)}
+                                </div>
+                              )}
+                              {isVLSuppression12MIndicator && indicator.VL_Tested_12M !== undefined && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                  VL Tested 12M: {formatNumber(indicator.VL_Tested_12M || 0)}
+                                </div>
+                              )}
+                              {isVLIndicator && !isVLSuppression12MIndicator && indicator.Total_ART_Patients !== undefined && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                  Total ART Patients: {formatNumber(indicator.Total_ART_Patients || 0)}
+                                </div>
+                              )}
+                              {isVLIndicator && indicator.Total_Eligible_Patients !== undefined && indicator.Total_ART_Patients === undefined && !isVLSuppression12MIndicator && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                  Total Eligible: {formatNumber(indicator.Total_Eligible_Patients || 0)}
+                                </div>
+                              )}
+                              {isVLIndicator && indicator.Total_With_Dates !== undefined && indicator.Total_ART_Patients === undefined && indicator.Total_Eligible_Patients === undefined && !isVLSuppression12MIndicator && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                  Total With Dates: {formatNumber(indicator.Total_With_Dates || 0)}
                                 </div>
                               )}
                               {percentage !== undefined && percentage !== null && (
@@ -885,7 +1088,7 @@ const MortalityRetentionIndicators = () => {
 
                             {/* Male 0-14 */}
                             <td className="px-3 py-4 text-right border-r border-border">
-                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : 'text-blue-600 dark:text-blue-400'}`}>
+                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : (isVLIndicator || isTPTIndicator ? 'text-blue-600 dark:text-blue-400' : 'text-blue-600 dark:text-blue-400')}`}>
                                 {formatNumber(male014)}
                                 {isReengagementIndicator && male014Reengaged !== null && male014 > 0 && (
                                   <div className="text-xs text-blue-600 dark:text-blue-400">
@@ -897,7 +1100,7 @@ const MortalityRetentionIndicators = () => {
 
                             {/* Female 0-14 */}
                             <td className="px-3 py-4 text-right border-r border-border">
-                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : 'text-pink-600 dark:text-pink-400'}`}>
+                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : (isVLIndicator || isTPTIndicator ? 'text-pink-600 dark:text-pink-400' : 'text-pink-600 dark:text-pink-400')}`}>
                                 {formatNumber(female014)}
                                 {isReengagementIndicator && female014Reengaged !== null && female014 > 0 && (
                                   <div className="text-xs text-pink-600 dark:text-pink-400">
@@ -919,7 +1122,7 @@ const MortalityRetentionIndicators = () => {
                           </div>
                             </td>
 
-                            {/* Percentage column for reengagement, ART initiation, and baseline CD4 indicators */}
+                            {/* Percentage column for reengagement, ART initiation, baseline CD4, prophylaxis, MMD, TLD, TPT, and VL indicators */}
                             {indicators.some(ind => 
                               ind.Indicator?.includes('reengaged') || 
                               ind.Indicator?.includes('same-day') || 
@@ -930,7 +1133,9 @@ const MortalityRetentionIndicators = () => {
                               ind.Indicator?.includes('Cotrimoxazole') ||
                               ind.Indicator?.includes('Fluconazole') ||
                               ind.Indicator?.includes('MMD') ||
-                              ind.Indicator?.includes('TLD')
+                              ind.Indicator?.includes('TLD') ||
+                              ind.Indicator?.includes('TPT') ||
+                              ind.Indicator?.includes('VL')
                             ) && (
                               <td className="px-3 py-4 text-right">
                                 {isReengagementIndicator && total014 > 0 && total014Reengaged !== null ? (
@@ -957,13 +1162,35 @@ const MortalityRetentionIndicators = () => {
                                   <div className="text-sm font-semibold text-green-600">0%</div>
                                 ) : isMMDIndicator && total014 > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">0%</div>
-                                ) : isTLDIndicator && total014TLDDenominator !== null && total014TLDDenominator > 0 && total014 > 0 ? (
+                                ) : isTLDInitiationIndicator && total014TLDInitiationDenominator !== null && total014TLDInitiationDenominator > 0 && total014 > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">
-                                    {Math.round((total014 / total014TLDDenominator) * 100)}%
+                                    {Math.round((total014 / total014TLDInitiationDenominator) * 100)}%
                                   </div>
-                                ) : isTLDIndicator && total014TLDDenominator !== null && total014TLDDenominator > 0 ? (
+                                ) : isTLDInitiationIndicator && total014TLDInitiationDenominator !== null && total014TLDInitiationDenominator > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                ) : isTLDCumulativeIndicator && total014TLDCumulativeDenominator !== null && total014TLDCumulativeDenominator > 0 && total014 > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">
+                                    {Math.round((total014 / total014TLDCumulativeDenominator) * 100)}%
+                                  </div>
+                                ) : isTLDCumulativeIndicator && total014TLDCumulativeDenominator !== null && total014TLDCumulativeDenominator > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">0%</div>
                                 ) : isTLDIndicator && total014 > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                ) : isTPTIndicator && total014TPTDenominator !== null && total014TPTDenominator > 0 && total014 > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">
+                                    {Math.round((total014 / total014TPTDenominator) * 100)}%
+                                  </div>
+                                ) : isTPTIndicator && total014TPTDenominator !== null && total014TPTDenominator > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                ) : isTPTIndicator && total014 > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                ) : isVLIndicator && total014VLDenominator !== null && total014VLDenominator > 0 && total014 > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">
+                                    {Math.round((total014 / total014VLDenominator) * 100)}%
+                                  </div>
+                                ) : isVLIndicator && total014VLDenominator !== null && total014VLDenominator > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                ) : isVLIndicator && total014 > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">0%</div>
                                 ) : isArtInitiationIndicator && total014NewlyInitiated > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">
@@ -1022,7 +1249,10 @@ const MortalityRetentionIndicators = () => {
                                 ind.Indicator?.includes('baseline CD4') ||
                                 ind.Indicator?.includes('Cotrimoxazole') ||
                                 ind.Indicator?.includes('Fluconazole') ||
-                                ind.Indicator?.includes('MMD')
+                                ind.Indicator?.includes('MMD') ||
+                                ind.Indicator?.includes('TLD') ||
+                                ind.Indicator?.includes('TPT') ||
+                                ind.Indicator?.includes('VL')
                               ) && (
                                 <td className="px-3 py-3 text-right">
                                   {isReengagementIndicator && total15Plus > 0 && total15PlusReengaged !== null ? (
@@ -1049,13 +1279,35 @@ const MortalityRetentionIndicators = () => {
                                     <div className="text-sm font-semibold text-green-600">0%</div>
                                   ) : isMMDIndicator && total15Plus > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">0%</div>
-                                  ) : isTLDIndicator && total15PlusTLDDenominator !== null && total15PlusTLDDenominator > 0 && total15Plus > 0 ? (
+                                  ) : isTLDInitiationIndicator && total15PlusTLDInitiationDenominator !== null && total15PlusTLDInitiationDenominator > 0 && total15Plus > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">
-                                      {Math.round((total15Plus / total15PlusTLDDenominator) * 100)}%
+                                      {Math.round((total15Plus / total15PlusTLDInitiationDenominator) * 100)}%
                                     </div>
-                                  ) : isTLDIndicator && total15PlusTLDDenominator !== null && total15PlusTLDDenominator > 0 ? (
+                                  ) : isTLDInitiationIndicator && total15PlusTLDInitiationDenominator !== null && total15PlusTLDInitiationDenominator > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                  ) : isTLDCumulativeIndicator && total15PlusTLDCumulativeDenominator !== null && total15PlusTLDCumulativeDenominator > 0 && total15Plus > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">
+                                      {Math.round((total15Plus / total15PlusTLDCumulativeDenominator) * 100)}%
+                                    </div>
+                                  ) : isTLDCumulativeIndicator && total15PlusTLDCumulativeDenominator !== null && total15PlusTLDCumulativeDenominator > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">0%</div>
                                   ) : isTLDIndicator && total15Plus > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                  ) : isTPTIndicator && total15PlusTPTDenominator !== null && total15PlusTPTDenominator > 0 && total15Plus > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">
+                                      {Math.round((total15Plus / total15PlusTPTDenominator) * 100)}%
+                                    </div>
+                                  ) : isTPTIndicator && total15PlusTPTDenominator !== null && total15PlusTPTDenominator > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                  ) : isTPTIndicator && total15Plus > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                  ) : isVLIndicator && total15PlusVLDenominator !== null && total15PlusVLDenominator > 0 && total15Plus > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">
+                                      {Math.round((total15Plus / total15PlusVLDenominator) * 100)}%
+                                    </div>
+                                  ) : isVLIndicator && total15PlusVLDenominator !== null && total15PlusVLDenominator > 0 ? (
+                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                  ) : isVLIndicator && total15Plus > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">0%</div>
                                   ) : isArtInitiationIndicator && total15PlusNewlyInitiated > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">
@@ -1068,7 +1320,7 @@ const MortalityRetentionIndicators = () => {
                                   )}
                                 </td>
                               )}
-                          </tr>
+                            </tr>
 
                           {/* Sub-Total Row for this indicator */}
                           <tr className="bg-muted border-b-2 border-border font-bold">
@@ -1114,7 +1366,10 @@ const MortalityRetentionIndicators = () => {
                                 ind.Indicator?.includes('baseline CD4') ||
                                 ind.Indicator?.includes('Cotrimoxazole') ||
                                 ind.Indicator?.includes('Fluconazole') ||
-                                ind.Indicator?.includes('MMD')
+                                ind.Indicator?.includes('MMD') ||
+                                ind.Indicator?.includes('TLD') ||
+                                ind.Indicator?.includes('TPT') ||
+                                ind.Indicator?.includes('VL')
                               ) && (
                                 <td className="px-3 py-3 text-right">
                                   {isReengagementIndicator && grandTotal > 0 && grandTotalReengaged !== null ? (
@@ -1141,13 +1396,35 @@ const MortalityRetentionIndicators = () => {
                                     <div className="text-lg font-bold text-green-700">0%</div>
                                   ) : isMMDIndicator && grandTotal > 0 ? (
                                     <div className="text-lg font-bold text-green-700">0%</div>
-                                  ) : isTLDIndicator && grandTotalTLDDenominator !== null && grandTotalTLDDenominator > 0 && grandTotal > 0 ? (
+                                  ) : isTLDInitiationIndicator && grandTotalTLDInitiationDenominator !== null && grandTotalTLDInitiationDenominator > 0 && grandTotal > 0 ? (
                                     <div className="text-lg font-bold text-green-700">
-                                      {Math.round((grandTotal / grandTotalTLDDenominator) * 100)}%
+                                      {Math.round((grandTotal / grandTotalTLDInitiationDenominator) * 100)}%
                                     </div>
-                                  ) : isTLDIndicator && grandTotalTLDDenominator !== null && grandTotalTLDDenominator > 0 ? (
+                                  ) : isTLDInitiationIndicator && grandTotalTLDInitiationDenominator !== null && grandTotalTLDInitiationDenominator > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">0%</div>
+                                  ) : isTLDCumulativeIndicator && grandTotalTLDCumulativeDenominator !== null && grandTotalTLDCumulativeDenominator > 0 && grandTotal > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">
+                                      {Math.round((grandTotal / grandTotalTLDCumulativeDenominator) * 100)}%
+                                    </div>
+                                  ) : isTLDCumulativeIndicator && grandTotalTLDCumulativeDenominator !== null && grandTotalTLDCumulativeDenominator > 0 ? (
                                     <div className="text-lg font-bold text-green-700">0%</div>
                                   ) : isTLDIndicator && grandTotal > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">0%</div>
+                                  ) : isTPTIndicator && grandTotalTPTDenominator !== null && grandTotalTPTDenominator > 0 && grandTotal > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">
+                                      {Math.round((grandTotal / grandTotalTPTDenominator) * 100)}%
+                                    </div>
+                                  ) : isTPTIndicator && grandTotalTPTDenominator !== null && grandTotalTPTDenominator > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">0%</div>
+                                  ) : isTPTIndicator && grandTotal > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">0%</div>
+                                  ) : isVLIndicator && grandTotalVLDenominator !== null && grandTotalVLDenominator > 0 && grandTotal > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">
+                                      {Math.round((grandTotal / grandTotalVLDenominator) * 100)}%
+                                    </div>
+                                  ) : isVLIndicator && grandTotalVLDenominator !== null && grandTotalVLDenominator > 0 ? (
+                                    <div className="text-lg font-bold text-green-700">0%</div>
+                                  ) : isVLIndicator && grandTotal > 0 ? (
                                     <div className="text-lg font-bold text-green-700">0%</div>
                                   ) : isArtInitiationIndicator && totalNewlyInitiated > 0 ? (
                                     <div className="text-lg font-bold text-green-700">
@@ -1158,7 +1435,7 @@ const MortalityRetentionIndicators = () => {
                                   )}
                                 </td>
                               )}
-                          </tr>
+                            </tr>
                         </React.Fragment>
                   );
                 })}

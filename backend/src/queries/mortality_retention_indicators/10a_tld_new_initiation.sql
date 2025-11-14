@@ -1,161 +1,154 @@
 -- ===================================================================
 -- Indicator 10a: Percentage of patients newly initiating ART with TLD as 1st line regimen
+-- This must include ALL newly initiated patients (same as 6a + 6b + 6c combined)
 -- ===================================================================
 
-WITH tblactive AS (
-    WITH tblvisit AS (
-        SELECT 
-            clinicid,
-            DatVisit,
-            ARTnum,
-            DaApp,
-            vid,
-            ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS id 
-        FROM tblavmain 
-        WHERE DatVisit <= :EndDate
-        
-        UNION ALL 
-        
-        SELECT 
-            clinicid,
-            DatVisit,
-            ARTnum,
-            DaApp,
-            vid,
-            ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS id 
-        FROM tblcvmain 
-        WHERE DatVisit <= :EndDate
-    ),
-    
-    tblimain AS (
-        SELECT 
-            ClinicID,
-            DafirstVisit,
-            "15+" AS typepatients,
-            TypeofReturn,
-            LClinicID,
-            SiteNameold,
-            DaBirth,
-            TIMESTAMPDIFF(YEAR, DaBirth, :EndDate) AS age,
-            Sex,
-            DaHIV,
-            OffIn 
-        FROM tblaimain 
-        WHERE DafirstVisit <= :EndDate
-        
-        UNION ALL 
-        
-        SELECT 
-            ClinicID,
-            DafirstVisit,
-            "≤14" AS typepatients,
-            '' AS TypeofReturn,
-            LClinicID,
-            SiteNameold,
-            DaBirth,
-            TIMESTAMPDIFF(YEAR, DaBirth, :EndDate) AS age,
-            Sex,
-            DaTest AS DaHIV,
-            OffIn 
-        FROM tblcimain 
-        WHERE DafirstVisit <= :EndDate
-    ),
-    
-    tblart AS (
-        SELECT 
-            *,
-            TIMESTAMPDIFF(MONTH, DaArt, :EndDate) AS nmonthART 
-        FROM tblaart 
-        WHERE DaArt <= :EndDate
-        
-        UNION ALL 
-        
-        SELECT 
-            *,
-            TIMESTAMPDIFF(MONTH, DaArt, :EndDate) AS nmonthART 
-        FROM tblcart 
-        WHERE DaArt <= :EndDate
-    ),
-    
-    tblexit AS (
-        SELECT * 
-        FROM tblavpatientstatus 
-        WHERE da <= :EndDate
-        
-        UNION ALL 
-        
-        SELECT * 
-        FROM tblcvpatientstatus  
-        WHERE da <= :EndDate
-    ),
-    
-    tblarvdrug AS ( 
-        WITH tbldrug AS (
-            SELECT 
-                vid,
-                GROUP_CONCAT(DISTINCT DrugName ORDER BY DrugName ASC SEPARATOR '+') AS drugname 
-            FROM tblavarvdrug 
-            WHERE status <> 1
-            GROUP BY vid 
-            
-            UNION ALL 
-            
-            SELECT 
-                vid,
-                GROUP_CONCAT(DISTINCT DrugName ORDER BY DrugName ASC SEPARATOR '+') AS drugname 
-            FROM tblcvarvdrug 
-            WHERE status <> 1
-            GROUP BY vid
-        )
-        SELECT 
-            vid,
-            drugname,
-            IF(LOCATE('3TC+DTG+TDF', drugname) > 0, "TLD", "Not-TLD") AS TLDStatus 
-        FROM tbldrug
-    )
-
+WITH newly_initiated_patients AS (
+    -- Adults: Same-day initiation (0 day) - matches 6a
     SELECT 
-        i.clinicid, 
-        i.DafirstVisit,
-        i.typepatients, 
-        i.TypeofReturn, 
-        i.LClinicID, 
-        i.SiteNameold, 
-        i.DaBirth,
-        i.age, 
-        i.Sex, 
-        i.DaHIV, 
-        i.OffIn, 
-        a.ART, 
-        a.DaArt,
-        v.DatVisit, 
-        v.ARTnum, 
-        v.DaApp,
-        a.nmonthART,
-        IF(a.nmonthART >= 6, ">6M", "<6M") AS Startartstatus,
-        DATEDIFF(v.DaApp, v.DatVisit) AS ndays,
-        IF(DATEDIFF(v.DaApp, v.DatVisit) > 80, "MMD", "Not-MMD") AS MMDStatus,
-        rd.drugname,
-        IF(LEFT(i.clinicid, 1) = "P" AND rd.TLDStatus != "TLD" AND LOCATE('DTG', drugname) > 0, "TLD", rd.TLDStatus) AS TLDStatus
-    FROM tblvisit v
-    LEFT JOIN tblimain i ON i.clinicid = v.clinicid
-    LEFT JOIN tblart a ON a.clinicid = v.clinicid
-    LEFT JOIN tblexit e ON v.clinicid = e.clinicid
-    LEFT JOIN tblarvdrug rd ON rd.vid = v.vid
-    WHERE id = 1 AND e.status IS NULL AND a.ART IS NOT NULL
+        'Adult' as type,
+        IF(p.Sex=0, "Female", "Male") as Sex,
+        p.ClinicID,
+        art.DaArt as ARTStartDate
+    FROM tblaimain p 
+    JOIN tblaart art ON p.ClinicID = art.ClinicID
+    WHERE 
+        art.DaArt BETWEEN :StartDate AND :EndDate
+        AND DATEDIFF(art.DaArt, p.DafirstVisit) = 0
+        AND (p.OffIn IS NULL OR p.OffIn <> :transfer_in_code)
+        AND (p.TypeofReturn IS NULL OR p.TypeofReturn = -1)
+    
+    UNION ALL
+    
+    -- Adults: Initiation 1-7 days - matches 6b (note: 6b doesn't check OffIn)
+    SELECT 
+        'Adult' as type,
+        IF(p.Sex=0, "Female", "Male") as Sex,
+        p.ClinicID,
+        art.DaArt as ARTStartDate
+    FROM tblaimain p 
+    JOIN tblaart art ON p.ClinicID = art.ClinicID
+    WHERE 
+        art.DaArt BETWEEN :StartDate AND :EndDate
+        AND DATEDIFF(art.DaArt, p.DafirstVisit) BETWEEN 1 AND 7
+        AND (p.TypeofReturn IS NULL OR p.TypeofReturn = -1)
+        -- Note: 6b doesn't filter by OffIn, so we match that
+    
+    UNION ALL
+    
+    -- Adults: Initiation >7 days - matches 6c
+    SELECT 
+        'Adult' as type,
+        IF(p.Sex=0, "Female", "Male") as Sex,
+        p.ClinicID,
+        art.DaArt as ARTStartDate
+    FROM tblaimain p 
+    JOIN tblaart art ON p.ClinicID = art.ClinicID
+    WHERE 
+        art.DaArt BETWEEN :StartDate AND :EndDate
+        AND DATEDIFF(art.DaArt, p.DafirstVisit) > 7
+        AND (p.OffIn IS NULL OR p.OffIn <> :transfer_in_code)
+        AND (p.TypeofReturn IS NULL OR p.TypeofReturn = -1)
+    
+    UNION ALL
+    
+    -- Children: Same-day initiation (0 day)
+    SELECT 
+        'Child' as type,
+        IF(p.Sex=0, "Female", "Male") as Sex,
+        p.ClinicID,
+        art.DaArt as ARTStartDate
+    FROM tblcimain p 
+    JOIN tblcart art ON p.ClinicID = art.ClinicID
+    WHERE 
+        art.DaArt BETWEEN :StartDate AND :EndDate
+        AND DATEDIFF(art.DaArt, p.DafirstVisit) = 0
+    
+    UNION ALL
+    
+    -- Children: Initiation 1-7 days
+    SELECT 
+        'Child' as type,
+        IF(p.Sex=0, "Female", "Male") as Sex,
+        p.ClinicID,
+        art.DaArt as ARTStartDate
+    FROM tblcimain p 
+    JOIN tblcart art ON p.ClinicID = art.ClinicID
+    WHERE 
+        art.DaArt BETWEEN :StartDate AND :EndDate
+        AND DATEDIFF(art.DaArt, p.DafirstVisit) BETWEEN 1 AND 7
+    
+    UNION ALL
+    
+    -- Children: Initiation >7 days
+    SELECT 
+        'Child' as type,
+        IF(p.Sex=0, "Female", "Male") as Sex,
+        p.ClinicID,
+        art.DaArt as ARTStartDate
+    FROM tblcimain p 
+    JOIN tblcart art ON p.ClinicID = art.ClinicID
+    WHERE 
+        art.DaArt BETWEEN :StartDate AND :EndDate
+        AND DATEDIFF(art.DaArt, p.DafirstVisit) > 7
 ),
 
--- Newly initiated patients
-newly_initiated AS (
+-- Get drug information from the visit on ART start date
+art_initiation_drugs AS (
+    -- Adults: Get drugs from visit on ART start date
     SELECT 
-        clinicid,
-        typepatients,
-        Sex,
-        DaArt,
-        TLDStatus
-    FROM tblactive
-    WHERE DaArt BETWEEN :StartDate AND :EndDate
-        AND (OffIn IS NULL OR OffIn <> 1)
+        nip.ClinicID,
+        nip.ARTStartDate,
+        GROUP_CONCAT(DISTINCT ard.DrugName ORDER BY ard.DrugName ASC SEPARATOR '+') AS drugname
+    FROM newly_initiated_patients nip
+    LEFT JOIN tblavmain v ON nip.ClinicID = v.ClinicID 
+        AND v.DatVisit = nip.ARTStartDate
+        AND v.DatVisit IS NOT NULL
+        AND v.DatVisit <> '0000-00-00'
+    LEFT JOIN tblavarvdrug ard ON v.Vid = ard.Vid
+        AND ard.status <> 1
+    WHERE nip.type = 'Adult'
+    GROUP BY nip.ClinicID, nip.ARTStartDate
+    
+    UNION ALL
+    
+    -- Children: Get drugs from visit on ART start date
+    SELECT 
+        nip.ClinicID,
+        nip.ARTStartDate,
+        GROUP_CONCAT(DISTINCT crd.DrugName ORDER BY crd.DrugName ASC SEPARATOR '+') AS drugname
+    FROM newly_initiated_patients nip
+    LEFT JOIN tblcvmain v ON nip.ClinicID = v.ClinicID 
+        AND v.DatVisit = nip.ARTStartDate
+        AND v.DatVisit IS NOT NULL
+        AND v.DatVisit <> '0000-00-00'
+    LEFT JOIN tblcvarvdrug crd ON v.Vid = crd.Vid
+        AND crd.status <> 1
+    WHERE nip.type = 'Child'
+    GROUP BY nip.ClinicID, nip.ARTStartDate
+),
+
+-- Determine TLD status
+tld_status AS (
+    SELECT 
+        nip.ClinicID,
+        nip.type,
+        nip.Sex,
+        nip.ARTStartDate,
+        aid.drugname,
+        CASE 
+            WHEN aid.drugname IS NOT NULL 
+                AND aid.drugname <> '' 
+                AND LOCATE('3TC+DTG+TDF', aid.drugname) > 0 THEN 'TLD'
+            WHEN aid.drugname IS NOT NULL 
+                AND aid.drugname <> '' 
+                AND LEFT(nip.ClinicID, 1) = 'P' 
+                AND LOCATE('DTG', aid.drugname) > 0 THEN 'TLD'
+            ELSE 'Not-TLD'
+        END AS TLDStatus
+    FROM newly_initiated_patients nip
+    LEFT JOIN art_initiation_drugs aid ON nip.ClinicID = aid.ClinicID 
+        AND nip.ARTStartDate = aid.ARTStartDate
 ),
 
 -- Statistics
@@ -163,15 +156,15 @@ tld_stats AS (
     SELECT
         COUNT(*) AS Total_Newly_Initiated,
         SUM(CASE WHEN TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS TLD_New_Initiation,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '≤14' THEN 1 ELSE 0 END) AS Male_0_14_Total,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '≤14' THEN 1 ELSE 0 END) AS Female_0_14_Total,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '15+' THEN 1 ELSE 0 END) AS Male_over_14_Total,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '15+' THEN 1 ELSE 0 END) AS Female_over_14_Total,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '≤14' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_0_14_TLD,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '≤14' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_0_14_TLD,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '15+' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_over_14_TLD,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '15+' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_over_14_TLD
-    FROM newly_initiated
+        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_0_14_Total,
+        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_0_14_Total,
+        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_over_14_Total,
+        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_over_14_Total,
+        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_0_14_TLD,
+        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_0_14_TLD,
+        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_over_14_TLD,
+        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_over_14_TLD
+    FROM tld_status
 )
 
 SELECT

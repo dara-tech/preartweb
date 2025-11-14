@@ -1,144 +1,278 @@
 -- ===================================================================
--- Indicator 11b: Percentage of ART patients completed the TPT course (cumulative)
+-- Indicator 11b: Percentage of ART patients completed TPT (TPT Complete)
+-- Follows the same structure as 10.5_tpt_complete.sql
 -- ===================================================================
 
-WITH tbltpt_completed AS (
-    -- Get TPT start and stop data for adults
-    WITH tbltptstart_adult AS (
+WITH tblactive AS (
+    WITH tblvisit AS (
         SELECT 
-            p.ClinicID,
-            v.DatVisit as dateStart,
-            tpt.DrugName as Tptdrugname,
-            ROW_NUMBER() OVER(PARTITION BY p.ClinicID ORDER BY v.DatVisit ASC) as id
-        FROM tblaimain p 
-        JOIN tblaart art ON p.ClinicID = art.ClinicID
-        JOIN tblavmain v ON p.ClinicID = v.ClinicID 
-        JOIN tblavtptdrug tpt ON v.vid = tpt.Vid
-        WHERE 
-            art.DaArt <= :EndDate
-            AND (p.OffIn IS NULL OR p.OffIn <> 1)
-            AND tpt.Status = 0 
-            AND tpt.DrugName != 'B6'
-            AND v.DatVisit <= :EndDate
+            clinicid,
+            DatVisit,
+            ARTnum,
+            DaApp,
+            vid,
+            ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS id 
+        FROM tblavmain 
+        WHERE DatVisit <= :EndDate
+        
+        UNION ALL 
+        
+        SELECT 
+            clinicid,
+            DatVisit,
+            ARTnum,
+            DaApp,
+            vid,
+            ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS id 
+        FROM tblcvmain 
+        WHERE DatVisit <= :EndDate
     ),
-    tbltptstop_adult AS (
+    
+    tblimain AS (
         SELECT 
-            p.ClinicID,
-            tpt.Da as Datestop,
-            ROW_NUMBER() OVER(PARTITION BY p.ClinicID ORDER BY tpt.Da DESC) as id
-        FROM tblaimain p 
-        JOIN tblaart art ON p.ClinicID = art.ClinicID
-        JOIN tblavmain v ON p.ClinicID = v.ClinicID 
-        JOIN tblavtptdrug tpt ON v.vid = tpt.Vid
-        WHERE 
-            art.DaArt <= :EndDate
-            AND (p.OffIn IS NULL OR p.OffIn <> 1)
-            AND tpt.Status = 1 
-            AND tpt.DrugName != 'B6'
-            AND tpt.Da <= :EndDate
+            ClinicID,
+            DafirstVisit,
+            "15+" AS typepatients,
+            TypeofReturn,
+            LClinicID,
+            SiteNameold,
+            DaBirth,
+            TIMESTAMPDIFF(YEAR, DaBirth, :EndDate) AS age,
+            Sex,
+            DaHIV,
+            OffIn 
+        FROM tblaimain 
+        WHERE DafirstVisit <= :EndDate
+        
+        UNION ALL 
+        
+        SELECT 
+            ClinicID,
+            DafirstVisit,
+            "≤14" AS typepatients,
+            '' AS TypeofReturn,
+            LClinicID,
+            SiteNameold,
+            DaBirth,
+            TIMESTAMPDIFF(YEAR, DaBirth, :EndDate) AS age,
+            Sex,
+            DaTest AS DaHIV,
+            OffIn 
+        FROM tblcimain 
+        WHERE DafirstVisit <= :EndDate
     ),
-    tbltptstart_child AS (
+    
+    tblart AS (
         SELECT 
-            p.ClinicID,
-            v.DatVisit as dateStart,
-            tpt.DrugName as Tptdrugname,
-            ROW_NUMBER() OVER(PARTITION BY p.ClinicID ORDER BY v.DatVisit ASC) as id
-        FROM tblcimain p 
-        JOIN tblcart art ON p.ClinicID = art.ClinicID
-        JOIN tblcvmain v ON p.ClinicID = v.ClinicID 
-        JOIN tblcvtptdrug tpt ON v.vid = tpt.Vid
-        WHERE 
-            art.DaArt <= :EndDate
-            AND (p.OffIn IS NULL OR p.OffIn <> 1)
-            AND tpt.Status = 0 
-            AND tpt.DrugName != 'B6'
-            AND v.DatVisit <= :EndDate
+            *,
+            TIMESTAMPDIFF(MONTH, DaArt, :EndDate) AS nmonthART 
+        FROM tblaart 
+        WHERE DaArt <= :EndDate
+        
+        UNION ALL 
+        
+        SELECT 
+            *,
+            TIMESTAMPDIFF(MONTH, DaArt, :EndDate) AS nmonthART 
+        FROM tblcart 
+        WHERE DaArt <= :EndDate
     ),
-    tbltptstop_child AS (
+    
+    tblexit AS (
+        SELECT * 
+        FROM tblavpatientstatus 
+        WHERE da <= :EndDate
+        
+        UNION ALL 
+        
+        SELECT * 
+        FROM tblcvpatientstatus  
+        WHERE da <= :EndDate
+    ),
+    
+    tblarvdrug AS ( 
+        WITH tbldrug AS (
+            SELECT 
+                vid,
+                GROUP_CONCAT(DISTINCT DrugName ORDER BY DrugName ASC SEPARATOR '+') AS drugname 
+            FROM tblavarvdrug 
+            WHERE status <> 1
+            GROUP BY vid 
+            
+            UNION ALL 
+            
+            SELECT 
+                vid,
+                GROUP_CONCAT(DISTINCT DrugName ORDER BY DrugName ASC SEPARATOR '+') AS drugname 
+            FROM tblcvarvdrug 
+            WHERE status <> 1
+            GROUP BY vid
+        )
         SELECT 
-            p.ClinicID,
-            tpt.Da as Datestop,
-            ROW_NUMBER() OVER(PARTITION BY p.ClinicID ORDER BY tpt.Da DESC) as id
-        FROM tblcimain p 
-        JOIN tblcart art ON p.ClinicID = art.ClinicID
-        JOIN tblcvmain v ON p.ClinicID = v.ClinicID 
-        JOIN tblcvtptdrug tpt ON v.vid = tpt.Vid
-        WHERE 
-            art.DaArt <= :EndDate
-            AND (p.OffIn IS NULL OR p.OffIn <> 1)
-            AND tpt.Status = 1 
-            AND tpt.DrugName != 'B6'
-            AND tpt.Da <= :EndDate
+            vid,
+            drugname,
+            IF(LOCATE('3TC+DTG+TDF', drugname) > 0, "TLD", "Not-TLD") AS TLDStatus 
+        FROM tbldrug
+    ),
+    
+    tblvltested AS (
+        WITH tblvltest AS (
+            SELECT 
+                ClinicID,
+                IF(DaArrival < Dat, Dat, DaArrival) AS DateResult,
+                HIVLoad 
+            FROM tblpatienttest 
+            WHERE HIVLoad != ''
+            HAVING DateResult <= :EndDate
+        ) 
+        SELECT DISTINCT 
+            ClinicID,
+            DateResult,
+            HIVLoad,
+            IF(DateResult > datelast, "Do_VL_in_12M", "Do_VL_greatn_12M") AS VLdostatus,
+            IF(HIVLoad < 1000, "VL-Suppression", "Not-Suppression") AS vlresultstatus  
+        FROM (
+            SELECT 
+                ClinicID,
+                DateResult,
+                HIVLoad,
+                DATE_SUB(:EndDate, INTERVAL 1 YEAR) AS datelast, 
+                ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DateResult DESC) AS id 
+            FROM tblvltest 
+        ) pt 
+        WHERE pt.id = 1
+    ),
+    
+    tbltptdrug AS (
+        WITH tbltptdrugs AS (
+            SELECT DrugName, Status, Da, Vid 
+            FROM tblavtptdrug 
+            WHERE DrugName != "B6"
+            
+            UNION ALL 
+            
+            SELECT DrugName, Status, Da, Vid 
+            FROM tblcvtptdrug 
+            WHERE DrugName != "B6"
+        ),
+        tblvisit AS (
+            SELECT clinicid, DatVisit, vid 
+            FROM tblavmain 
+            
+            UNION ALL 
+            
+            SELECT clinicid, DatVisit, vid 
+            FROM tblcvmain
+        ),
+        tbltptall AS (
+            SELECT 
+                clinicid,
+                DatVisit,
+                DrugName, 
+                Status, 
+                Da 
+            FROM tbltptdrugs tp 
+            LEFT JOIN tblvisit v ON tp.vid = v.vid
+        ),
+        tbltptstart AS (
+            SELECT * 
+            FROM (
+                SELECT 
+                    *,
+                    ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit ASC) AS id 
+                FROM tbltptall 
+                WHERE status = 0 AND DatVisit <= :EndDate
+            ) s 
+            WHERE id = 1
+        ),
+        tbltptstope AS (
+            SELECT * 
+            FROM (
+                SELECT 
+                    *,
+                    ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY Da DESC) AS id 
+                FROM tbltptall 
+                WHERE status = 1 AND Da <= :EndDate
+            ) s 
+            WHERE id = 1
+        )
+        SELECT 
+            s.clinicid,
+            s.DatVisit AS dateStart,
+            s.DrugName AS Tptdrugname,
+            st.da AS Datestop,
+            DATEDIFF(st.da, s.DatVisit) / 30 AS duration  
+        FROM tbltptstart s
+        LEFT JOIN tbltptstope st ON s.clinicid = st.clinicid
     )
-    
-    -- Adults TPT completion data
+
     SELECT 
-        'Adult' as type,
-        IF(p.Sex=0, "Female", "Male") as Sex,
-        p.ClinicID,
-        s.dateStart,
-        s.Tptdrugname,
-        st.Datestop,
-        DATEDIFF(st.Datestop, s.dateStart) / 30 as duration,
-        CASE 
-            WHEN LEFT(s.Tptdrugname, 1) = '3' AND (DATEDIFF(st.Datestop, s.dateStart) / 30) >= 2.50 THEN 'TPT Complete'
-            WHEN LEFT(s.Tptdrugname, 1) = '6' AND (DATEDIFF(st.Datestop, s.dateStart) / 30) >= 5.50 THEN 'TPT Complete'
-            WHEN s.Tptdrugname IS NOT NULL THEN 'Not complete'
-            ELSE 'Not Start'
-        END as tptstatus
-    FROM tblaimain p 
-    JOIN tblaart art ON p.ClinicID = art.ClinicID
-    LEFT JOIN (SELECT * FROM tbltptstart_adult WHERE id = 1) s ON p.ClinicID = s.ClinicID
-    LEFT JOIN (SELECT * FROM tbltptstop_adult WHERE id = 1) st ON p.ClinicID = st.ClinicID
-    WHERE 
-        art.DaArt <= :EndDate
-        AND (p.OffIn IS NULL OR p.OffIn <> 1)
-    
-    UNION ALL
-    
-    -- Children TPT completion data
-    SELECT 
-        'Child' as type,
-        IF(p.Sex=0, "Female", "Male") as Sex,
-        p.ClinicID,
-        s.dateStart,
-        s.Tptdrugname,
-        st.Datestop,
-        DATEDIFF(st.Datestop, s.dateStart) / 30 as duration,
-        CASE 
-            WHEN LEFT(s.Tptdrugname, 1) = '3' AND (DATEDIFF(st.Datestop, s.dateStart) / 30) >= 2.50 THEN 'TPT Complete'
-            WHEN LEFT(s.Tptdrugname, 1) = '6' AND (DATEDIFF(st.Datestop, s.dateStart) / 30) >= 5.50 THEN 'TPT Complete'
-            WHEN s.Tptdrugname IS NOT NULL THEN 'Not complete'
-            ELSE 'Not Start'
-        END as tptstatus
-    FROM tblcimain p 
-    JOIN tblcart art ON p.ClinicID = art.ClinicID
-    LEFT JOIN (SELECT * FROM tbltptstart_child WHERE id = 1) s ON p.ClinicID = s.ClinicID
-    LEFT JOIN (SELECT * FROM tbltptstop_child WHERE id = 1) st ON p.ClinicID = st.ClinicID
-    WHERE 
-        art.DaArt <= :EndDate
-        AND (p.OffIn IS NULL OR p.OffIn <> 1)
+        i.clinicid, 
+        i.DafirstVisit,
+        i.typepatients, 
+        i.TypeofReturn, 
+        i.LClinicID, 
+        i.SiteNameold, 
+        i.DaBirth,
+        i.age, 
+        i.Sex, 
+        i.DaHIV, 
+        i.OffIn, 
+        a.ART, 
+        a.DaArt,
+        v.DatVisit, 
+        v.ARTnum, 
+        v.DaApp,
+        a.nmonthART,
+        IF(a.nmonthART >= 6, ">6M", "<6M") AS Startartstatus,
+        DATEDIFF(v.DaApp, v.DatVisit) AS ndays,
+        IF(DATEDIFF(v.DaApp, v.DatVisit) > 80, "MMD", "Not-MMD") AS MMDStatus,
+        rd.drugname,
+        IF(LEFT(i.clinicid, 1) = "P" AND rd.TLDStatus != "TLD" AND LOCATE('DTG', drugname) > 0, "TLD", rd.TLDStatus) AS TLDStatus,
+        vl.DateResult,
+        vl.HIVLoad,
+        vl.VLdostatus,
+        vl.vlresultstatus,
+        tp.Tptdrugname,
+        tp.dateStart,
+        tp.Datestop,
+        tp.duration,
+        IF(
+            LEFT(tp.Tptdrugname, 1) = 3 AND tp.duration >= 2.50, "TPT Complete",
+            IF(
+                LEFT(tp.Tptdrugname, 1) = 6 AND tp.duration >= 5.50, "TPT Complete",
+                IF(tp.Tptdrugname IS NULL, "Not Start", "Not complete")
+            )
+        ) AS tptstatus 
+    FROM tblvisit v
+    LEFT JOIN tblimain i ON i.clinicid = v.clinicid
+    LEFT JOIN tblart a ON a.clinicid = v.clinicid
+    LEFT JOIN tblexit e ON v.clinicid = e.clinicid
+    LEFT JOIN tblarvdrug rd ON rd.vid = v.vid
+    LEFT JOIN tblvltested vl ON vl.clinicid = v.clinicid
+    LEFT JOIN tbltptdrug tp ON tp.clinicid = v.clinicid
+    WHERE id = 1 AND e.status IS NULL AND a.ART IS NOT NULL
 )
 
 SELECT
-    '11b. Percentage of ART patients completed the TPT course (cumulative)' AS Indicator,
-    IFNULL(SUM(CASE WHEN tptstatus = 'TPT Complete' THEN 1 ELSE 0 END), 0) AS TPT_Completed,
-    IFNULL(SUM(CASE WHEN tptstatus IN ('TPT Complete', 'Not complete') THEN 1 ELSE 0 END), 0) AS TPT_Started,
-    IFNULL(COUNT(*), 0) AS Total_ART_Patients,
-    CASE 
-        WHEN SUM(CASE WHEN tptstatus IN ('TPT Complete', 'Not complete') THEN 1 ELSE 0 END) > 0 
-        THEN ROUND((SUM(CASE WHEN tptstatus = 'TPT Complete' THEN 1 ELSE 0 END) * 100.0 / SUM(CASE WHEN tptstatus IN ('TPT Complete', 'Not complete') THEN 1 ELSE 0 END)), 2)
-        ELSE 0 
-    END AS Percentage_Of_Started,
-    CASE 
+    '11b. Percentage of ART patients completed TPT (TPT Complete)' AS Indicator,
+    CAST(SUM(IF(tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS TPT_Completed,
+    CAST(SUM(IF(tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS TOTAL,
+    CAST(COUNT(*) AS UNSIGNED) AS Total_ART_Patients,
+    CAST(CASE 
         WHEN COUNT(*) > 0 
-        THEN ROUND((SUM(CASE WHEN tptstatus = 'TPT Complete' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2)
-        ELSE 0 
-    END AS Percentage_Of_Total,
-    IFNULL(SUM(CASE WHEN type = 'Child' AND Sex = 'Male' AND tptstatus = 'TPT Complete' THEN 1 ELSE 0 END), 0) AS Male_0_14_TPT_Completed,
-    IFNULL(SUM(CASE WHEN type = 'Child' AND Sex = 'Female' AND tptstatus = 'TPT Complete' THEN 1 ELSE 0 END), 0) AS Female_0_14_TPT_Completed,
-    IFNULL(SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' AND tptstatus = 'TPT Complete' THEN 1 ELSE 0 END), 0) AS Male_over_14_TPT_Completed,
-    IFNULL(SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' AND tptstatus = 'TPT Complete' THEN 1 ELSE 0 END), 0) AS Female_over_14_TPT_Completed
-FROM tbltpt_completed;
-
-
+        THEN ROUND((SUM(IF(tptstatus = 'TPT Complete', 1, 0)) * 100.0 / COUNT(*)), 2)
+        ELSE 0.00 
+    END AS DECIMAL(5,2)) AS Percentage,
+    -- Total counts by demographic (all ART patients)
+    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Male_0_14,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Female_0_14,
+    CAST(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Male_over_14,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Female_over_14,
+    -- TPT Completed counts by demographic
+    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Male_0_14_TPT_Completed,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Female_0_14_TPT_Completed,
+    CAST(SUM(IF(Sex = 1 AND typepatients = '15+' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Male_over_14_TPT_Completed,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '15+' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Female_over_14_TPT_Completed
+FROM tblactive
+WHERE ART IS NOT NULL;

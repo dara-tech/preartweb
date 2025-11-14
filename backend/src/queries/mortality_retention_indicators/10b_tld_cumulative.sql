@@ -1,5 +1,6 @@
 -- ===================================================================
 -- Indicator 10b: Percentage of ART patients using TLD as 1st line regimen (cumulative)
+-- Follows the same structure as 10.3_tld.sql
 -- ===================================================================
 
 WITH tblactive AS (
@@ -143,52 +144,27 @@ WITH tblactive AS (
     LEFT JOIN tblexit e ON v.clinicid = e.clinicid
     LEFT JOIN tblarvdrug rd ON rd.vid = v.vid
     WHERE id = 1 AND e.status IS NULL AND a.ART IS NOT NULL
-),
-
--- All active ART patients
-active_art_patients AS (
-    SELECT 
-        clinicid,
-        typepatients,
-        Sex,
-        TLDStatus
-    FROM tblactive
-    WHERE ART IS NOT NULL
-        AND (OffIn IS NULL OR OffIn <> 1)
-),
-
--- Statistics
-tld_stats AS (
-    SELECT
-        COUNT(*) AS Total_ART_Patients,
-        SUM(CASE WHEN TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS TLD_Cumulative,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '≤14' THEN 1 ELSE 0 END) AS Male_0_14_Total,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '≤14' THEN 1 ELSE 0 END) AS Female_0_14_Total,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '15+' THEN 1 ELSE 0 END) AS Male_over_14_Total,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '15+' THEN 1 ELSE 0 END) AS Female_over_14_Total,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '≤14' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_0_14_TLD,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '≤14' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_0_14_TLD,
-        SUM(CASE WHEN Sex = 1 AND typepatients = '15+' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_over_14_TLD,
-        SUM(CASE WHEN Sex = 0 AND typepatients = '15+' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_over_14_TLD
-    FROM active_art_patients
 )
 
 SELECT
     '10b. Percentage of ART patients using TLD as 1st line regimen (cumulative)' AS Indicator,
-    CAST(IFNULL(s.TLD_Cumulative, 0) AS UNSIGNED) AS TLD_Cumulative,
-    CAST(IFNULL(s.TLD_Cumulative, 0) AS UNSIGNED) AS TOTAL,
-    CAST(IFNULL(s.Total_ART_Patients, 0) AS UNSIGNED) AS Total_ART_Patients,
+    CAST(SUM(IF(TLDStatus = 'TLD', 1, 0)) AS UNSIGNED) AS TLD_Cumulative,
+    CAST(SUM(IF(TLDStatus = 'TLD', 1, 0)) AS UNSIGNED) AS TOTAL,
+    CAST(COUNT(*) AS UNSIGNED) AS Total_ART_Patients,
     CAST(CASE 
-        WHEN s.Total_ART_Patients > 0 
-        THEN ROUND((s.TLD_Cumulative * 100.0 / s.Total_ART_Patients), 2)
+        WHEN COUNT(*) > 0 
+        THEN ROUND((SUM(IF(TLDStatus = 'TLD', 1, 0)) * 100.0 / COUNT(*)), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
-    CAST(IFNULL(s.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14,
-    CAST(IFNULL(s.Male_0_14_TLD, 0) AS UNSIGNED) AS Male_0_14_TLD,
-    CAST(IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14,
-    CAST(IFNULL(s.Female_0_14_TLD, 0) AS UNSIGNED) AS Female_0_14_TLD,
-    CAST(IFNULL(s.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14,
-    CAST(IFNULL(s.Male_over_14_TLD, 0) AS UNSIGNED) AS Male_over_14_TLD,
-    CAST(IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14,
-    CAST(IFNULL(s.Female_over_14_TLD, 0) AS UNSIGNED) AS Female_over_14_TLD
-FROM tld_stats s;
+    -- Total counts by demographic (all ART patients)
+    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Male_0_14,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Female_0_14,
+    CAST(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Male_over_14,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Female_over_14,
+    -- TLD counts by demographic
+    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14' AND TLDStatus = 'TLD', 1, 0)) AS UNSIGNED) AS Male_0_14_TLD,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14' AND TLDStatus = 'TLD', 1, 0)) AS UNSIGNED) AS Female_0_14_TLD,
+    CAST(SUM(IF(Sex = 1 AND typepatients = '15+' AND TLDStatus = 'TLD', 1, 0)) AS UNSIGNED) AS Male_over_14_TLD,
+    CAST(SUM(IF(Sex = 0 AND typepatients = '15+' AND TLDStatus = 'TLD', 1, 0)) AS UNSIGNED) AS Female_over_14_TLD
+FROM tblactive
+WHERE ART IS NOT NULL;
