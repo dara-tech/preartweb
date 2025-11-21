@@ -1,6 +1,7 @@
-import { Button, Input, Badge, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Alert, AlertDescription, Skeleton } from '@/components/ui';
+import { Button, Input, Badge, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Alert, AlertDescription, Skeleton, Card, CardContent } from '@/components/ui';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Plus, RefreshCw, Search, Filter } from 'lucide-react';
 import api from "../../../../services/api";
 import { useSite } from "../../../../contexts/SiteContext";
 
@@ -28,10 +29,14 @@ function AdultVisitList() {
   // Load lookup data
   const loadLookupData = async () => {
     try {
-      const nationalitiesRes = await api.get('/apiv1/lookups/nationalities');
-      setNationalities(nationalitiesRes.data || []);
+      const siteCode = selectedSite?.code || null;
+      const siteParam = siteCode ? { params: { site: siteCode } } : {};
+      
+      const nationalitiesRes = await api.get('/apiv1/lookups/nationalities', siteParam).catch(() => ({ data: [] }));
+      setNationalities(Array.isArray(nationalitiesRes.data) ? nationalitiesRes.data : []);
     } catch (error) {
       console.error('Error loading lookup data:', error);
+      setNationalities([]);
     }
   }
 
@@ -109,8 +114,13 @@ function AdultVisitList() {
 
   useEffect(() => {
     loadSites();
-    loadLookupData();
   }, []);
+
+  useEffect(() => {
+    if (selectedSite) {
+      loadLookupData();
+    }
+  }, [selectedSite]);
 
   useEffect(() => {
     const timeoutId = setTimeout(loadVisits, 300);
@@ -158,256 +168,302 @@ function AdultVisitList() {
 
   const totalPages = Math.ceil(totalVisits / itemsPerPage);
 
-    return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <h2 className="text-lg font-semibold text-foreground">Adult Visits</h2>
-          <Badge variant="outline">{totalVisits.toLocaleString()}</Badge>
-        </div>
-        <div className="flex space-x-2">
-          <Button onClick={loadVisits} variant="outline" size="sm" disabled={loading}>
-            {loading ? 'Loading...' : 'Refresh'}
-          </Button>
-          <Button onClick={() => navigate('/visits/adult/new')} size="sm">
-            New Visit
-          </Button>
-        </div>
-          </div>
-          
-      {/* Search and Site Filter */}
-          <div className="flex gap-3">
-        <div className="flex-1">
-              <Input
-            placeholder="Search adult visits..."
-                value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+  return (
+    <div className="min-h-screen bg-muted">
+      {/* Minimalistic Header */}
+      <div className="bg-card border-b border-border">
+        <div className="px-4 sm:px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">Adult Visits</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {totalVisits.toLocaleString()} {totalVisits === 1 ? 'visit' : 'visits'} total
+              </p>
             </div>
-        <Select value={userSelectedSite?.code || 'all'} onValueChange={handleSiteChange}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="All Sites" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Sites</SelectItem>
-            {availableSites.map((site) => (
-              <SelectItem key={site.code} value={site.code}>
-                {site.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <div className="flex items-center gap-3">
+              <Button 
+                onClick={loadVisits} 
+                variant="outline" 
+                size="sm" 
+                disabled={loading}
+                className="h-9"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button 
+                onClick={() => navigate('/visits/adult/new')} 
+                size="sm"
+                className="h-9"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New Visit
+              </Button>
+            </div>
           </div>
-
-      {/* Standard Filters */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {/* Date Range Filter */}
-        <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Period" />
-                </SelectTrigger>
-                <SelectContent>
-            <SelectItem value="all">All Periods</SelectItem>
-            <SelectItem value="30days">Last 30 Days</SelectItem>
-            <SelectItem value="90days">Last 90 Days</SelectItem>
-            <SelectItem value="1year">Last Year</SelectItem>
-                </SelectContent>
-              </Select>
-
-        {/* Status Filter */}
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger>
-            <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="dead">Dead</SelectItem>
-            <SelectItem value="lost">Lost</SelectItem>
-            <SelectItem value="transferred">Transferred Out</SelectItem>
-                </SelectContent>
-              </Select>
-
-        {/* Age Range Filter */}
-        <Select value={ageRange} onValueChange={setAgeRange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Age Range" />
-                </SelectTrigger>
-                <SelectContent>
-            <SelectItem value="all">All Ages</SelectItem>
-            <SelectItem value="15-24">15-24 years</SelectItem>
-            <SelectItem value="25-49">25-49 years</SelectItem>
-            <SelectItem value="50+">50+ years</SelectItem>
-                </SelectContent>
-              </Select>
-
-        {/* Nationality Filter */}
-        <Select value={nationalityFilter} onValueChange={setNationalityFilter}>
-          <SelectTrigger>
-            <SelectValue placeholder="Nationality" />
-              </SelectTrigger>
-              <SelectContent>
-            <SelectItem value="all">All Nationalities</SelectItem>
-            {availableNationalities.map((nationality) => (
-              <SelectItem key={nationality.id} value={nationality.id.toString()}>
-                {nationality.name}
-              </SelectItem>
-            ))}
-              </SelectContent>
-            </Select>
-
-        {/* Clear Filters */}
-        <Button 
-          variant="outline" 
-          onClick={() => {
-            setDateRange('all');
-            setStatusFilter('all');
-            setAgeRange('all');
-            setNationalityFilter('all');
-          }}
-          className="w-full"
-        >
-          Clear Filters
-        </Button>
+        </div>
       </div>
 
-      {/* Error */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Visit List */}
-      {loading ? (
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="p-4 border rounded-none animate-pulse">
-              <div className="flex items-center space-x-3">
-                <Skeleton className="w-10 h-10 rounded-none" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-1/4" />
-                  <Skeleton className="h-3 w-1/2" />
+      {/* Main Content */}
+      <div className="bg-card px-4 sm:px-6 py-6">
+        {/* Search and Filters */}
+        <div className="space-y-4 mb-6">
+          {/* Search Bar */}
+          <Card className="shadow-none">
+            <CardContent className="p-4">
+              <div className="flex gap-3">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+                  <Input
+                    placeholder="Search by patient ID, ART number, or visit date..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-9 text-sm"
+                  />
                 </div>
-                <Skeleton className="h-6 w-16" />
+                <Select value={userSelectedSite?.code || 'all'} onValueChange={handleSiteChange}>
+                  <SelectTrigger className="w-48 h-9 text-sm">
+                    <SelectValue placeholder="All Sites" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Sites</SelectItem>
+                    {availableSites.map((site) => (
+                      <SelectItem key={site.code} value={site.code}>
+                        {site.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : visits.length === 0 ? (
-        <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-foreground mb-2">No visits found</h3>
-          <p className="text-muted-foreground mb-4">
-            {searchTerm ? 'Try adjusting your search' : 'No adult visits recorded yet'}
-          </p>
-          <Button onClick={() => navigate('/visits/adult/new')}>
-            Add First Visit
-              </Button>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {visits.map((visit, index) => (
-            <div key={`${visit.visitId || visit.id}-${visit.site_code || visit.siteName || index}`} className="p-4 border rounded-none hover:bg-accent transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="text-sm font-medium text-foreground truncate">
-                      Visit {visit.visitId || visit.id}
-                    </h3>
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                    <span>Site: {visit.siteName || 'N/A'}</span>
-                    <span>Date: {formatDate(visit.visitDate)}</span>
-                    <span className="font-medium text-foreground">Patient ID: {visit.patientId || 'N/A'}</span>
-                    {visit.artNumber && <span>ART: {visit.artNumber}</span>}
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm mt-1">
-                    <span className={`px-2 py-1 rounded-none text-xs font-medium ${
-                      visit.sex === 'Male' ? 'status-active' : 'status-warning'
-                    }`}>
-                      {visit.sex || 'Unknown'}
-                    </span>
-                    <span className={`px-2 py-1 rounded-none text-xs font-medium ${
-                      visit.patientStatus === 'Active' ? 'status-active' :
-                      visit.patientStatus === 'Dead' ? 'status-critical' :
-                      visit.patientStatus === 'Lost' ? 'status-warning' :
-                      visit.patientStatus === 'Transferred Out' ? 'status-inactive' :
-                      'status-inactive'
-                    }`}>
-                      {visit.patientStatus || 'Unknown'}
-                    </span>
-                    {visit.hivViral && visit.hivViral !== '0' && (
-                      <span className="px-2 py-1 rounded-none text-xs font-medium viral-load-high">
-                        VL: {visit.hivViral}
-                      </span>
-                    )}
-                    {visit.cd4 && (
-                      <span className="px-2 py-1 rounded-none text-xs font-medium cd4-high">
-                        CD4: {visit.cd4}
-                      </span>
-                    )}
-                    {visit.nationality !== null && visit.nationality !== undefined && visit.nationality !== '' && visit.nationality !== -1 && visit.nationality !== 0 && getNationalityLabel(visit.nationality) && (
-                      <span className="px-2 py-1 rounded-none text-xs font-medium cd4-low">
-                        {getNationalityLabel(visit.nationality)}
-                      </span>
-                    )}
-                  </div>
-                  {visit.notes && (
-                    <div className="mt-2 text-sm text-gray-600">
-                      <span className="font-medium">Notes: </span>
-                      {visit.notes.length > 100 ? `${visit.notes.substring(0, 100)}...` : visit.notes}
-                    </div>
-                  )}
-                  </div>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate(`/visits/adult/${visit.id}`)}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate(`/visits/adult/${visit.id}/edit`)}
-                  >
-                    Edit
-                            </Button>
-                    </div>
-              </div>
-            </div>
-          ))}
-                    </div>
-      )}
+            </CardContent>
+          </Card>
 
-      {/* Simple Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages}
-                          </div>
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-                              </Button>
-          </div>
+          {/* Filters */}
+          <Card className="shadow-none">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs font-medium text-foreground">Filters</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* Date Range Filter */}
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue placeholder="Period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Periods</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="week">Last 7 Days</SelectItem>
+                    <SelectItem value="month">Last 30 Days</SelectItem>
+                    <SelectItem value="year">Last Year</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Status Filter */}
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="lost">Lost</SelectItem>
+                    <SelectItem value="dead">Dead</SelectItem>
+                    <SelectItem value="transferred out">Transferred Out</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Age Range Filter */}
+                <Select value={ageRange} onValueChange={setAgeRange}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue placeholder="Age Range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Ages</SelectItem>
+                    <SelectItem value="18-24">18-24 years</SelectItem>
+                    <SelectItem value="25-34">25-34 years</SelectItem>
+                    <SelectItem value="35-44">35-44 years</SelectItem>
+                    <SelectItem value="45-54">45-54 years</SelectItem>
+                    <SelectItem value="55+">55+ years</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Nationality Filter */}
+                <Select value={nationalityFilter} onValueChange={setNationalityFilter}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue placeholder="Nationality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Nationalities</SelectItem>
+                    {availableNationalities.map((nationality) => (
+                      <SelectItem key={nationality.id} value={nationality.id.toString()}>
+                        {nationality.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="mt-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => {
+                    setDateRange('all');
+                    setStatusFilter('all');
+                    setAgeRange('all');
+                    setNationalityFilter('all');
+                  }}
+                  className="h-8 text-xs text-muted-foreground"
+                >
+                  Clear all filters
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      )}
+
+        {/* Error */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Visit List */}
+        {loading ? (
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <Card key={i} className="shadow-none">
+                <CardContent className="p-5">
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="h-12 w-12 rounded" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                    <Skeleton className="h-9 w-20" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : visits.length === 0 ? (
+          <Card className="shadow-none">
+            <CardContent className="p-12 text-center">
+              <h3 className="text-lg font-medium text-foreground mb-2">No visits found</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                {searchTerm ? 'Try adjusting your search or filters' : 'No adult visits recorded yet'}
+              </p>
+              <Button onClick={() => navigate('/visits/adult/new')} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add First Visit
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {visits.map((visit, index) => (
+              <Card 
+                key={`${visit.visitId || visit.id}-${visit.site_code || visit.siteName || index}`} 
+                className="shadow-none transition-colors"
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-sm font-semibold text-foreground">
+                          {visit.clinicId || visit.patientId || 'N/A'}
+                        </h3>
+                        {visit.artNumber && (
+                          <span className="text-xs text-muted-foreground">ART: {visit.artNumber}</span>
+                        )}
+                        <Badge 
+                          variant={visit.patientStatus === 'Active' ? 'default' : 'secondary'} 
+                          className="text-xs font-medium"
+                        >
+                          {visit.patientStatus || 'Active'}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+                        <span>Visit Date: <span className="font-medium text-foreground">{formatDate(visit.visitDate)}</span></span>
+                        <span>Site: <span className="font-medium text-foreground">{visit.siteName || 'N/A'}</span></span>
+                        {visit.sex && (
+                          <span>Sex: <span className="font-medium text-foreground">{visit.sex}</span></span>
+                        )}
+                        {visit.age && (
+                          <span>Age: <span className="font-medium text-foreground">{visit.age}</span></span>
+                        )}
+                      </div>
+
+                      {(visit.hivViral || visit.cd4 || visit.whoStage) && (
+                        <div className="flex items-center gap-3 text-xs flex-wrap">
+                          {visit.hivViral && visit.hivViral !== '0' && (
+                            <Badge variant="secondary" className="text-xs font-medium bg-primary/10 text-primary border-primary/20">
+                              VL: {visit.hivViral}
+                            </Badge>
+                          )}
+                          {visit.cd4 && (
+                            <Badge variant="secondary" className="text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
+                              CD4: {visit.cd4}
+                            </Badge>
+                          )}
+                          {visit.whoStage && (
+                            <Badge variant="secondary" className="text-xs font-medium">
+                              WHO Stage: {visit.whoStage}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/visits/adult/${visit.clinicId || visit.patientId}/${visit.visitId || visit.id}`)}
+                        className="h-8 text-xs"
+                      >
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Showing page {currentPage} of {totalPages} ({totalVisits.toLocaleString()} total)
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="h-9"
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="h-9"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

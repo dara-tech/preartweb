@@ -83,7 +83,7 @@ const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter }) => {
   }
 
   return (
-    <div className="bg-card shadow-sm p-6 mb-6">
+    <div className="bg-card border border-border shadow-sm p-6 mb-6">
       {/* Main Title */}
       <div className="text-center mb-1">
         <h1 className="text-2xl font-bold text-foreground mb-1">

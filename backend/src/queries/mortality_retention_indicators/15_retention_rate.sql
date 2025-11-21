@@ -1,126 +1,182 @@
 -- ===================================================================
--- Indicator 15: Retention rate (quarterly, annually)
+-- Indicator 15: Retention rate (quarterly calculation based on TX_CURR/TX_NEW)
+-- Formula: Retention = (1 - (TX_CURR_prior + TX_NEW - TX_CURR_current) / TX_CURR_prior)
 -- ===================================================================
 
-WITH tblretention_rate AS (
-    -- Adults retention calculation
+WITH tx_new_patients AS (
     SELECT 
-        'Adult' as type,
-        IF(p.Sex=0, "Female", "Male") as Sex,
-        p.ClinicID,
-        art.DaArt as ARTStartDate,
-        ps.Da as ExitDate,
-        ps.Status as ExitStatus,
-        CASE 
-            WHEN ps.Status IS NULL THEN 'Retained'
-            WHEN ps.Status = 0 THEN 'Lost_to_Followup'
-            WHEN ps.Status = 1 THEN 'Dead'
-            WHEN ps.Status = 3 THEN 'Transferred_Out'
-            ELSE 'Other'
-        END as RetentionStatus
-    FROM tblaimain p 
-    JOIN tblaart art ON p.ClinicID = art.ClinicID
-    LEFT JOIN tblavpatientstatus ps ON p.ClinicID = ps.ClinicID
-    WHERE 
-        art.DaArt <= :EndDate
-        AND (p.OffIn IS NULL OR p.OffIn <> 1)
-        AND (ps.Da IS NULL OR ps.Da > :StartDate)
+        '≤14' AS typepatients,
+        IF(p.Sex=0, 'Female', 'Male') AS Sex
+    FROM tblcimain p
+    JOIN tblcart art ON p.ClinicID = art.ClinicID
+    WHERE art.DaArt BETWEEN :StartDate AND :EndDate
     
     UNION ALL
     
-    -- Children retention calculation
     SELECT 
-        'Child' as type,
-        IF(p.Sex=0, "Female", "Male") as Sex,
-        p.ClinicID,
-        art.DaArt as ARTStartDate,
-        ps.Da as ExitDate,
-        ps.Status as ExitStatus,
-        CASE 
-            WHEN ps.Status IS NULL THEN 'Retained'
-            WHEN ps.Status = 0 THEN 'Lost_to_Followup'
-            WHEN ps.Status = 1 THEN 'Dead'
-            WHEN ps.Status = 3 THEN 'Transferred_Out'
-            ELSE 'Other'
-        END as RetentionStatus
-    FROM tblcimain p 
-    JOIN tblcart art ON p.ClinicID = art.ClinicID
-    LEFT JOIN tblcvpatientstatus ps ON p.ClinicID = ps.ClinicID
-    WHERE 
-        art.DaArt <= :EndDate
-        AND (p.OffIn IS NULL OR p.OffIn <> 1)
-        AND (ps.Da IS NULL OR ps.Da > :StartDate)
+        '15+' AS typepatients,
+        IF(p.Sex=0, 'Female', 'Male') AS Sex
+    FROM tblaimain p
+    JOIN tblaart art ON p.ClinicID = art.ClinicID
+    WHERE art.DaArt BETWEEN :StartDate AND :EndDate
+),
+tx_new AS (
+    SELECT 
+        COUNT(*) AS Total_New,
+        SUM(CASE WHEN typepatients = '≤14' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_0_14_New,
+        SUM(CASE WHEN typepatients = '≤14' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_0_14_New,
+        SUM(CASE WHEN typepatients = '15+' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_over_14_New,
+        SUM(CASE WHEN typepatients = '15+' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_over_14_New
+    FROM tx_new_patients
 ),
 
--- Calculate retention by time periods
-tblretention_by_period AS (
+latest_visits_prior AS (
+    SELECT clinicid, DatVisit, ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS rn
+    FROM tblavmain
+    WHERE DatVisit <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+    
+    UNION ALL
+    
+    SELECT clinicid, DatVisit, ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS rn
+    FROM tblcvmain
+    WHERE DatVisit <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+),
+patient_info_prior AS (
+    SELECT ClinicID, '15+' AS typepatients, IF(Sex=0, 'Female', 'Male') AS Sex
+    FROM tblaimain
+    WHERE DafirstVisit <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+    
+    UNION ALL
+    
+    SELECT ClinicID, '≤14' AS typepatients, IF(Sex=0, 'Female', 'Male') AS Sex
+    FROM tblcimain
+    WHERE DafirstVisit <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+),
+art_start_prior AS (
+    SELECT ClinicID FROM tblaart WHERE DaArt <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+    
+    UNION ALL
+    
+    SELECT ClinicID FROM tblcart WHERE DaArt <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+),
+exit_status_prior AS (
+    SELECT ClinicID, Status FROM tblavpatientstatus WHERE Da <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+    
+    UNION ALL
+    
+    SELECT ClinicID, Status FROM tblcvpatientstatus WHERE Da <= DATE_SUB(:StartDate, INTERVAL 1 DAY)
+),
+tx_curr_prior AS (
+    SELECT DISTINCT i.ClinicID, i.typepatients, i.Sex
+    FROM latest_visits_prior v
+    JOIN patient_info_prior i ON i.ClinicID = v.ClinicID
+    LEFT JOIN art_start_prior a ON a.ClinicID = v.ClinicID
+    LEFT JOIN exit_status_prior e ON e.ClinicID = v.ClinicID
+    WHERE v.rn = 1 AND a.ClinicID IS NOT NULL AND e.Status IS NULL
+),
+tx_curr_prior_stats AS (
     SELECT 
-        type,
-        Sex,
-        ClinicID,
-        ARTStartDate,
-        RetentionStatus,
+        COUNT(DISTINCT ClinicID) AS Total_Prior,
+        SUM(CASE WHEN typepatients = '≤14' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_0_14_Prior,
+        SUM(CASE WHEN typepatients = '≤14' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_0_14_Prior,
+        SUM(CASE WHEN typepatients = '15+' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_over_14_Prior,
+        SUM(CASE WHEN typepatients = '15+' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_over_14_Prior
+    FROM tx_curr_prior
+),
+
+latest_visits_current AS (
+    SELECT clinicid, DatVisit, ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS rn
+    FROM tblavmain
+    WHERE DatVisit <= :EndDate
+    
+    UNION ALL
+    
+    SELECT clinicid, DatVisit, ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS rn
+    FROM tblcvmain
+    WHERE DatVisit <= :EndDate
+),
+patient_info_current AS (
+    SELECT ClinicID, '15+' AS typepatients, IF(Sex=0, 'Female', 'Male') AS Sex
+    FROM tblaimain
+    WHERE DafirstVisit <= :EndDate
+    
+    UNION ALL
+    
+    SELECT ClinicID, '≤14' AS typepatients, IF(Sex=0, 'Female', 'Male') AS Sex
+    FROM tblcimain
+    WHERE DafirstVisit <= :EndDate
+),
+art_start_current AS (
+    SELECT ClinicID FROM tblaart WHERE DaArt <= :EndDate
+    
+    UNION ALL
+    
+    SELECT ClinicID FROM tblcart WHERE DaArt <= :EndDate
+),
+exit_status_current AS (
+    SELECT ClinicID, Status FROM tblavpatientstatus WHERE Da <= :EndDate
+    
+    UNION ALL
+    
+    SELECT ClinicID, Status FROM tblcvpatientstatus WHERE Da <= :EndDate
+),
+tx_curr_current AS (
+    SELECT DISTINCT i.ClinicID, i.typepatients, i.Sex
+    FROM latest_visits_current v
+    JOIN patient_info_current i ON i.ClinicID = v.ClinicID
+    LEFT JOIN art_start_current a ON a.ClinicID = v.ClinicID
+    LEFT JOIN exit_status_current e ON e.ClinicID = v.ClinicID
+    WHERE v.rn = 1 AND a.ClinicID IS NOT NULL AND e.Status IS NULL
+),
+tx_curr_current_stats AS (
+    SELECT 
+        COUNT(DISTINCT ClinicID) AS Total_Current,
+        SUM(CASE WHEN typepatients = '≤14' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_0_14_Current,
+        SUM(CASE WHEN typepatients = '≤14' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_0_14_Current,
+        SUM(CASE WHEN typepatients = '15+' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_over_14_Current,
+        SUM(CASE WHEN typepatients = '15+' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_over_14_Current
+    FROM tx_curr_current
+),
+
+retention_calc AS (
+    SELECT
+        COALESCE(prior.Total_Prior, 0) AS TX_CURR_Prior,
+        COALESCE(curr.Total_Current, 0) AS TX_CURR_Current,
+        COALESCE(newstats.Total_New, 0) AS TX_NEW,
         CASE 
-            WHEN ARTStartDate >= DATE_SUB(:StartDate, INTERVAL 3 MONTH) AND ARTStartDate < :StartDate THEN '3_Month_Cohort'
-            WHEN ARTStartDate >= DATE_SUB(:StartDate, INTERVAL 6 MONTH) AND ARTStartDate < DATE_SUB(:StartDate, INTERVAL 3 MONTH) THEN '6_Month_Cohort'
-            WHEN ARTStartDate >= DATE_SUB(:StartDate, INTERVAL 12 MONTH) AND ARTStartDate < DATE_SUB(:StartDate, INTERVAL 6 MONTH) THEN '12_Month_Cohort'
-            WHEN ARTStartDate >= DATE_SUB(:StartDate, INTERVAL 24 MONTH) AND ARTStartDate < DATE_SUB(:StartDate, INTERVAL 12 MONTH) THEN '24_Month_Cohort'
-            ELSE 'Other_Cohort'
-        END as CohortPeriod
-    FROM tblretention_rate
-    WHERE ARTStartDate >= DATE_SUB(:StartDate, INTERVAL 24 MONTH)
+            WHEN COALESCE(prior.Total_Prior, 0) > 0 THEN 
+                1 - ((COALESCE(prior.Total_Prior, 0) + COALESCE(newstats.Total_New, 0) - COALESCE(curr.Total_Current, 0)) / COALESCE(prior.Total_Prior, 0))
+            ELSE 0
+        END AS Retention_Quarter_Ratio
+    FROM tx_curr_prior_stats prior
+    CROSS JOIN tx_curr_current_stats curr
+    CROSS JOIN tx_new newstats
 )
 
 SELECT
-    '15. Retention rate (quarterly, annually)' AS Indicator,
-    -- 3-month retention
-    IFNULL(SUM(CASE WHEN CohortPeriod = '3_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Retained_3_Month,
-    IFNULL(SUM(CASE WHEN CohortPeriod = '3_Month_Cohort' THEN 1 ELSE 0 END), 0) AS Total_3_Month_Cohort,
-    CASE 
-        WHEN SUM(CASE WHEN CohortPeriod = '3_Month_Cohort' THEN 1 ELSE 0 END) > 0 
-        THEN ROUND((SUM(CASE WHEN CohortPeriod = '3_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END) * 100.0 / SUM(CASE WHEN CohortPeriod = '3_Month_Cohort' THEN 1 ELSE 0 END)), 2)
-        ELSE 0 
-    END AS Retention_Rate_3_Month,
-    
-    -- 6-month retention
-    IFNULL(SUM(CASE WHEN CohortPeriod = '6_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Retained_6_Month,
-    IFNULL(SUM(CASE WHEN CohortPeriod = '6_Month_Cohort' THEN 1 ELSE 0 END), 0) AS Total_6_Month_Cohort,
-    CASE 
-        WHEN SUM(CASE WHEN CohortPeriod = '6_Month_Cohort' THEN 1 ELSE 0 END) > 0 
-        THEN ROUND((SUM(CASE WHEN CohortPeriod = '6_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END) * 100.0 / SUM(CASE WHEN CohortPeriod = '6_Month_Cohort' THEN 1 ELSE 0 END)), 2)
-        ELSE 0 
-    END AS Retention_Rate_6_Month,
-    
-    -- 12-month retention
-    IFNULL(SUM(CASE WHEN CohortPeriod = '12_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Retained_12_Month,
-    IFNULL(SUM(CASE WHEN CohortPeriod = '12_Month_Cohort' THEN 1 ELSE 0 END), 0) AS Total_12_Month_Cohort,
-    CASE 
-        WHEN SUM(CASE WHEN CohortPeriod = '12_Month_Cohort' THEN 1 ELSE 0 END) > 0 
-        THEN ROUND((SUM(CASE WHEN CohortPeriod = '12_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END) * 100.0 / SUM(CASE WHEN CohortPeriod = '12_Month_Cohort' THEN 1 ELSE 0 END)), 2)
-        ELSE 0 
-    END AS Retention_Rate_12_Month,
-    
-    -- 24-month retention
-    IFNULL(SUM(CASE WHEN CohortPeriod = '24_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Retained_24_Month,
-    IFNULL(SUM(CASE WHEN CohortPeriod = '24_Month_Cohort' THEN 1 ELSE 0 END), 0) AS Total_24_Month_Cohort,
-    CASE 
-        WHEN SUM(CASE WHEN CohortPeriod = '24_Month_Cohort' THEN 1 ELSE 0 END) > 0 
-        THEN ROUND((SUM(CASE WHEN CohortPeriod = '24_Month_Cohort' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END) * 100.0 / SUM(CASE WHEN CohortPeriod = '24_Month_Cohort' THEN 1 ELSE 0 END)), 2)
-        ELSE 0 
-    END AS Retention_Rate_24_Month,
-    
-    -- Overall retention
-    IFNULL(SUM(CASE WHEN RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Total_Retained,
-    IFNULL(COUNT(*), 0) AS Total_ART_Patients,
-    CASE 
-        WHEN COUNT(*) > 0 
-        THEN ROUND((SUM(CASE WHEN RetentionStatus = 'Retained' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2)
-        ELSE 0 
-    END AS Overall_Retention_Rate,
-    
-    -- Disaggregated by sex and age
-    IFNULL(SUM(CASE WHEN type = 'Child' AND Sex = 'Male' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Male_0_14_Retained,
-    IFNULL(SUM(CASE WHEN type = 'Child' AND Sex = 'Female' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Female_0_14_Retained,
-    IFNULL(SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Male_over_14_Retained,
-    IFNULL(SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' AND RetentionStatus = 'Retained' THEN 1 ELSE 0 END), 0) AS Female_over_14_Retained
-FROM tblretention_by_period;
+    '15. Retention rate (quarterly)' AS Indicator,
+    CAST(retention.TX_CURR_Prior AS UNSIGNED) AS TX_CURR_Prior,
+    CAST(retention.TX_NEW AS UNSIGNED) AS TX_NEW,
+    CAST(retention.TX_CURR_Current AS UNSIGNED) AS TX_CURR_Current,
+    CAST(retention.TX_CURR_Current AS UNSIGNED) AS TOTAL,
+    CAST(CASE 
+        WHEN retention.TX_CURR_Prior > 0 
+        THEN ROUND(retention.Retention_Quarter_Ratio * 100, 2)
+        ELSE 0
+    END AS DECIMAL(6,2)) AS Percentage,
+    CAST(CASE 
+        WHEN retention.TX_CURR_Prior > 0 
+        THEN ROUND(retention.Retention_Quarter_Ratio * 100, 2)
+        ELSE 0
+    END AS DECIMAL(6,2)) AS Retention_Quarter_Percentage,
+    CAST(CASE 
+        WHEN retention.TX_CURR_Prior > 0 
+        THEN ROUND(POW(GREATEST(retention.Retention_Quarter_Ratio, 0), 4) * 100, 2)
+        ELSE 0
+    END AS DECIMAL(6,2)) AS Retention_Annualized_Percentage,
+    CAST(COALESCE(curr_stats.Male_0_14_Current, 0) AS UNSIGNED) AS Male_0_14,
+    CAST(COALESCE(curr_stats.Female_0_14_Current, 0) AS UNSIGNED) AS Female_0_14,
+    CAST(COALESCE(curr_stats.Male_over_14_Current, 0) AS UNSIGNED) AS Male_over_14,
+    CAST(COALESCE(curr_stats.Female_over_14_Current, 0) AS UNSIGNED) AS Female_over_14
+FROM retention_calc retention
+CROSS JOIN tx_curr_current_stats curr_stats;

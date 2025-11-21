@@ -372,19 +372,118 @@ router.get('/:clinicId', [
     }
 
     const { clinicId } = req.params;
+    const { site } = req.query;
 
-    // Get main patient data
-    const patient = await InfantPatient.findOne({
-      where: { clinicId: clinicId }
-    });
+    console.log(`[GET /:clinicId] Looking for infant patient: ${clinicId}, site: ${site || 'all'}`);
 
-    if (!patient) {
-      return res.status(404).json({
-        error: 'Patient not found'
-      });
+    // Determine which database(s) to use
+    let siteCodes = [];
+    
+    // If site is provided, use specific site
+    if (site) {
+      // If site is provided as a name (not a code), convert it to code
+      if (!/^\d{4}$/.test(site)) {
+        const sites = await siteDatabaseManager.getAllSites();
+        const foundSite = sites.find(s => 
+          s.name.toLowerCase() === site.toLowerCase() ||
+          s.name.toLowerCase().includes(site.toLowerCase())
+        );
+        if (foundSite) {
+          siteCodes = [foundSite.code];
+          console.log(`[GET /:clinicId] Resolved site name '${site}' to code '${foundSite.code}'`);
+        } else {
+          return res.status(404).json({
+            error: 'Site not found',
+            message: `Site '${site}' not found or inactive`,
+            availableSites: sites.map(s => ({ code: s.code, name: s.name }))
+          });
+        }
+      } else {
+        siteCodes = [site];
+        console.log(`[GET /:clinicId] Using site code: ${site}`);
+      }
+    } else {
+      // If no site specified, search all available sites
+      const allSites = await siteDatabaseManager.getAllSites();
+      siteCodes = allSites.map(s => s.code);
+      console.log(`[GET /:clinicId] Searching all sites: ${siteCodes.join(', ')}`);
     }
 
-    res.json(patient.toJSON());
+    // Search for the patient in all sites
+    for (const siteCode of siteCodes) {
+      try {
+        console.log(`[GET /:clinicId] Querying site ${siteCode} for patient ${clinicId}`);
+        const siteConnection = await siteDatabaseManager.getSiteConnection(siteCode);
+        
+        // Use string comparison to handle both numeric and alphanumeric clinic IDs
+        const patient = await siteConnection.query(`
+          SELECT 
+            i.ClinicID as clinicId,
+            i.DafirstVisit as dateFirstVisit,
+            i.DaBirth as dateOfBirth,
+            i.Sex as sex,
+            i.AddGuardian as addGuardian,
+            i.Grou as \`group\`,
+            i.House as house,
+            i.Street as street,
+            i.Village as village,
+            i.Commune as commune,
+            i.District as district,
+            i.Province as province,
+            i.NameContact as nameContact,
+            i.AddContact as addressContact,
+            i.Phone as phone,
+            i.Fage as fAge,
+            i.FHIV as fHIV,
+            i.Fstatus as fStatus,
+            i.Mage as mAge,
+            i.MClinicID as mClinicId,
+            i.MArt as mArt,
+            i.HospitalName as hospitalName,
+            i.Mstatus as mStatus,
+            i.CatPlaceDelivery as catPlaceDelivery,
+            i.PlaceDelivery as placeDelivery,
+            i.PMTCT as pmtct,
+            i.DaDelivery as dateDelivery,
+            i.DeliveryStatus as deliveryStatus,
+            i.LenBaby as lenBaby,
+            i.WBaby as wBaby,
+            i.KnownHIV as knownHIV,
+            i.Received as received,
+            i.Syrup as syrup,
+            i.Cotrim as cotrim,
+            i.Offin as offIn,
+            i.SiteName as siteName,
+            i.HIVtest as hivTest,
+            i.MHIV as mHIV,
+            i.MLastvl as mLastVl,
+            i.DaMLastvl as dateMLastVl,
+            i.EOClinicID as eoClinicId
+          FROM tbleimain i
+          WHERE i.ClinicID = :clinicId
+        `, {
+          replacements: { clinicId: String(clinicId).trim() },
+          type: siteConnection.QueryTypes.SELECT
+        });
+
+        console.log(`[GET /:clinicId] Site ${siteCode} returned ${patient?.length || 0} patient(s)`);
+
+        if (patient && patient.length > 0) {
+          console.log(`[GET /:clinicId] Found patient ${clinicId} in site ${siteCode}`);
+          return res.json(patient[0]);
+        }
+      } catch (error) {
+        console.error(`[GET /:clinicId] Error querying site ${siteCode} for patient ${clinicId}:`, error.message);
+        console.error(`[GET /:clinicId] Stack:`, error.stack);
+        // Continue to next site
+      }
+    }
+
+    // Patient not found in any site
+    return res.status(404).json({
+      error: 'Patient not found',
+      message: `Infant patient with Clinic ID '${clinicId}' not found`
+    });
 
   } catch (error) {
     next(error);

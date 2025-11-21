@@ -5,23 +5,23 @@ function Demographics({ formData, handleInputChange, showKhmer = false }) {
   return (
     <div className="space-y-8">
       {/* Simple Section Header */}
-      <div className="border-b border-gray-300 pb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className="border-b border-border pb-4">
+        <h3 className="text-lg font-medium text-foreground">
           {showKhmer ? 'ព័ត៌មានបុគ្គល (Demographics)' : 'Demographics'}
         </h3>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {showKhmer ? 'ព័ត៌មានផ្ទាល់ខ្លួន និងស្ថានភាពមានផ្ទៃពោះ' : 'Personal information and pregnancy status'}
         </p>
       </div>
 
       {/* Basic Demographics */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
+        <h4 className="text-md font-medium text-foreground">
           {showKhmer ? 'ព័ត៌មានមូលដ្ឋាន (Basic Information)' : 'Basic Information'}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <Label htmlFor="name" className="text-sm text-gray-700">
+            <Label htmlFor="name" className="text-sm text-foreground">
               {showKhmer ? 'ឈ្មោះ Name' : 'Name'}
             </Label>
             <Input
@@ -29,11 +29,11 @@ function Demographics({ formData, handleInputChange, showKhmer = false }) {
               value={formData.name || ''}
               onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="Enter patient name"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
           <div>
-            <Label htmlFor="age" className="text-sm text-gray-700">
+            <Label htmlFor="age" className="text-sm text-foreground">
               {showKhmer ? 'អាយុ Age' : 'Age'}
             </Label>
             <Input
@@ -42,11 +42,11 @@ function Demographics({ formData, handleInputChange, showKhmer = false }) {
               value={formData.age || ''}
               onChange={(e) => handleInputChange('age', e.target.value)}
               placeholder="Enter age"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
           <div>
-            <Label className="text-sm text-gray-700">
+            <Label className="text-sm text-foreground">
               {showKhmer ? 'ភេទ Gender' : 'Gender'}
             </Label>
             <RadioGroup
@@ -73,12 +73,12 @@ function Demographics({ formData, handleInputChange, showKhmer = false }) {
 
       {/* Pregnancy Status */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
+        <h4 className="text-md font-medium text-foreground">
           {showKhmer ? 'ស្ថានភាពមានផ្ទៃពោះ (Pregnancy Status)' : 'Pregnancy Status'}
         </h4>
         <div className="space-y-4">
           <div>
-            <Label className="text-sm text-gray-700">
+            <Label className="text-sm text-foreground">
               {showKhmer ? 'ស្ថានភាពមានផ្ទៃពោះ Pregnancy Status' : 'Pregnancy Status'}
             </Label>
             <RadioGroup
@@ -104,7 +104,7 @@ function Demographics({ formData, handleInputChange, showKhmer = false }) {
           {formData.pregnantStatus === '1' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-sm text-gray-700">
+                <Label className="text-sm text-foreground">
                   {showKhmer ? 'ប្រភេទមានផ្ទៃពោះ Type of Pregnancy' : 'Type of Pregnancy'}
                 </Label>
                 <RadioGroup
@@ -127,7 +127,7 @@ function Demographics({ formData, handleInputChange, showKhmer = false }) {
                 </RadioGroup>
               </div>
               <div>
-                <Label htmlFor="pregnantDate" className="text-sm text-gray-700">
+                <Label htmlFor="pregnantDate" className="text-sm text-foreground">
                   {showKhmer ? 'កាលបរិច្ឆេទមានផ្ទៃពោះ Pregnancy Date' : 'Pregnancy Date'}
                 </Label>
                 <Input
@@ -135,14 +135,14 @@ function Demographics({ formData, handleInputChange, showKhmer = false }) {
                   type="date"
                   value={formData.pregnantDate || ''}
                   onChange={(e) => handleInputChange('pregnantDate', e.target.value)}
-                  className="mt-1 border-gray-300"
+                  className="mt-1 border-border"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <Label className="text-sm text-gray-700">
+            <Label className="text-sm text-foreground">
               {showKhmer ? 'ស្ថានភាព ANC ANC Status' : 'ANC Status'}
             </Label>
             <RadioGroup

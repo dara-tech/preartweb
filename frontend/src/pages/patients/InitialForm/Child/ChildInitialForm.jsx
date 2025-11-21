@@ -121,41 +121,47 @@ function ChildInitialForm() {
   })
 
   useEffect(() => {
-    loadDropdownData()
+    if (selectedSite) {
+      loadDropdownData()
+    }
     if (id) {
       loadPatientData(id)
       setActiveTab("form")
     }
-  }, [id])
+  }, [id, selectedSite])
 
   const loadDropdownData = async () => {
     try {
-      const [sites, vcctSites, drugs, clinics, reasons, allergies, nationalities, targetGroups, provinces, hospitals, drugTreatments] = await Promise.all([
-        api.get('/apiv1/lookups/sites'),
-        api.get('/apiv1/lookups/vcct-sites'),
-        api.get('/apiv1/lookups/drugs'),
-        api.get('/apiv1/lookups/clinics'),
-        api.get('/apiv1/lookups/reasons'),
-        api.get('/apiv1/lookups/allergies'),
-        api.get('/apiv1/lookups/nationalities'),
-        api.get('/apiv1/lookups/target-groups'),
-        api.get('/apiv1/lookups/provinces'),
-        api.get('/apiv1/lookups/hospitals'),
-        api.get('/apiv1/lookups/drug-treatments')
+      // Get site code from selectedSite, fallback to null if not available
+      const siteCode = selectedSite?.code || null
+      const siteParam = siteCode ? { params: { site: siteCode } } : {}
+      
+      const [sitesRes, vcctSitesRes, drugsRes, clinicsRes, reasonsRes, allergiesRes, nationalitiesRes, targetGroupsRes, provincesRes, hospitalsRes, drugTreatmentsRes] = await Promise.all([
+        api.get('/apiv1/lookups/sites', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/vcct-sites', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/drugs', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/clinics', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/reasons', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/allergies', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/nationalities', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/target-groups', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/provinces', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/hospitals', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/drug-treatments', siteParam).catch(() => ({ data: [] }))
       ])
 
       setDropdownOptions({
-        sites: sites.data || [],
-        vcctSites: vcctSites.data || [],
-        drugs: drugs.data || [],
-        clinics: clinics.data || [],
-        reasons: reasons.data || [],
-        allergies: allergies.data || [],
-        nationalities: nationalities.data || [],
-        targetGroups: targetGroups.data || [],
-        provinces: provinces.data || [],
-        hospitals: hospitals.data || [],
-        drugTreatments: drugTreatments.data || []
+        sites: Array.isArray(sitesRes.data) ? sitesRes.data : [],
+        vcctSites: Array.isArray(vcctSitesRes.data) ? vcctSitesRes.data : [],
+        drugs: Array.isArray(drugsRes.data) ? drugsRes.data : [],
+        clinics: Array.isArray(clinicsRes.data) ? clinicsRes.data : [],
+        reasons: Array.isArray(reasonsRes.data) ? reasonsRes.data : [],
+        allergies: Array.isArray(allergiesRes.data) ? allergiesRes.data : [],
+        nationalities: Array.isArray(nationalitiesRes.data) ? nationalitiesRes.data : [],
+        targetGroups: Array.isArray(targetGroupsRes.data) ? targetGroupsRes.data : [],
+        provinces: Array.isArray(provincesRes.data) ? provincesRes.data : [],
+        hospitals: Array.isArray(hospitalsRes.data) ? hospitalsRes.data : [],
+        drugTreatments: Array.isArray(drugTreatmentsRes.data) ? drugTreatmentsRes.data : []
       })
       setDropdownsLoaded(true)
     } catch (error) {
@@ -166,7 +172,10 @@ function ChildInitialForm() {
 
   const loadPatientData = async (clinicId) => {
     try {
-      const response = await api.get(`/apiv1/patients/child/${clinicId}`)
+      // Get site code from selectedSite, pass as query parameter
+      const siteCode = selectedSite?.code || null
+      const siteParam = siteCode ? `?site=${siteCode}` : ''
+      const response = await api.get(`/apiv1/patients/child/${clinicId}${siteParam}`)
       const data = response.data
       
       
@@ -430,31 +439,50 @@ function ChildInitialForm() {
       ) : (
         // Form View - Show tabs and action buttons
         <>
-          {/* Clean Header with action buttons - only when editing/adding */}
-          <div className="bg-white border border-gray-200 rounded-none shadow-sm p-6">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <Button onClick={backToList} variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to List
+          {/* Minimalistic Header */}
+          <div className="bg-card border-b border-border">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3">
+              <div className="flex items-center gap-3">
+                <Button 
+                  onClick={backToList} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0 hover:bg-muted"
+                >
+                  <ArrowLeft className="w-4 h-4" />
                 </Button>
                 <div>
-                  <h1 className="text-2xl font-semibold text-foreground">Child Patient Management</h1>
-                  <p className="text-muted-foreground text-sm">ការគ្រប់គ្រងអ្នកជំងឺកុមារ</p>
+                  <h1 className="text-lg font-semibold text-foreground">Child Patient</h1>
+                  <p className="text-xs text-muted-foreground">ការគ្រប់គ្រងអ្នកជំងឺកុមារ</p>
                 </div>
               </div>
-              <div className="flex space-x-2">
-                <Button onClick={handleClear} variant="outline">
-                  <RotateCcw className="w-4 h-4 mr-2" />
+              <div className="flex items-center gap-2">
+                <Button 
+                  onClick={handleClear} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 text-xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
                   Clear
                 </Button>
-                <Button onClick={handleSave} disabled={loading}>
-                  <Save className="w-4 h-4 mr-2" />
+                <Button 
+                  onClick={handleSave} 
+                  disabled={loading} 
+                  size="sm" 
+                  className="h-8 text-xs"
+                >
+                  <Save className="w-3.5 h-3.5 mr-1.5" />
                   {loading ? 'Saving...' : 'Save'}
                 </Button>
                 {id && (
-                  <Button onClick={handleDelete} variant="destructive">
-                    <Trash2 className="w-4 h-4 mr-2" />
+                  <Button 
+                    onClick={handleDelete} 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 text-xs text-destructive hover:text-destructive-foreground hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1.5" />
                     Delete
                   </Button>
                 )}
@@ -462,38 +490,45 @@ function ChildInitialForm() {
             </div>
           </div>
 
-          {/* Tabs - only when editing/adding */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList>
-              <TabsTrigger value="form">Patient Information</TabsTrigger>
-              <TabsTrigger value="medical">Medical & Treatment History</TabsTrigger>
-            </TabsList>
+          {/* Main Content */}
+          <div className="px-4">
+            {/* Minimalistic Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted rounded-none">
+                <TabsTrigger value="form" className="text-sm font-medium rounded-none">
+                  Information
+                </TabsTrigger>
+                <TabsTrigger value="medical" className="text-sm font-medium rounded-none">
+                  Medical History
+                </TabsTrigger>
+              </TabsList>
 
-            {/* Patient Information Tab */}
-            <TabsContent value="form" className="space-y-8">
-              <PatientInformation
-                formData={formData}
-                setFormData={setFormData}
-                handleInputChange={handleInputChange}
-                dropdownOptions={dropdownOptions}
-                familyMembers={familyMembers}
-                setFamilyMembers={setFamilyMembers}
-                newFamilyMember={newFamilyMember}
-                setNewFamilyMember={setNewFamilyMember}
-              />
-            </TabsContent>
+              {/* Patient Information Tab */}
+              <TabsContent value="form" className="space-y-6 mt-0">
+                <PatientInformation
+                  formData={formData}
+                  setFormData={setFormData}
+                  handleInputChange={handleInputChange}
+                  dropdownOptions={dropdownOptions}
+                  familyMembers={familyMembers}
+                  setFamilyMembers={setFamilyMembers}
+                  newFamilyMember={newFamilyMember}
+                  setNewFamilyMember={setNewFamilyMember}
+                />
+              </TabsContent>
 
-            {/* Medical & Treatment History Tab */}
-            <TabsContent value="medical" className="space-y-6">
-              <MedicalTreatmentHistory
-                formData={formData}
-                setFormData={setFormData}
-                treatmentHistory={treatmentHistory}
-                setTreatmentHistory={setTreatmentHistory}
-                dropdownOptions={dropdownOptions}
-              />
-            </TabsContent>
-          </Tabs>
+              {/* Medical & Treatment History Tab */}
+              <TabsContent value="medical" className="space-y-6 mt-0">
+                <MedicalTreatmentHistory
+                  formData={formData}
+                  setFormData={setFormData}
+                  treatmentHistory={treatmentHistory}
+                  setTreatmentHistory={setTreatmentHistory}
+                  dropdownOptions={dropdownOptions}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
         </>
       )}
     </div>

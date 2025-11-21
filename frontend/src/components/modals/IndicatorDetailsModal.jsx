@@ -97,12 +97,15 @@ const IndicatorDetailsModal = ({
     ];
 
     const tptColumns = [
-      { key: 'Tptdrugname', label: 'TPT Drug', type: 'text' },
-      { key: 'dateStart', label: 'TPT Start', type: 'date' },
-      { key: 'tptstatus', label: 'TPT Status', type: 'badge' }
+      { key: 'Tptdrugname', label: 'TPT Drug', type: 'text', altKey: 'tpt_drug_name' },
+      { key: 'dateStart', label: 'TPT Start', type: 'date', altKey: 'tpt_start_date' },
+      { key: 'tpt_stop_date', label: 'TPT Stop', type: 'date', altKey: 'Datestop' },
+      { key: 'tpt_duration_months', label: 'TPT Duration (Months)', type: 'number', altKey: 'duration' },
+      { key: 'tptstatus', label: 'TPT Status', type: 'badge', altKey: 'tpt_status' }
     ];
 
     let columns = [...baseColumns];
+    const indicatorNameLower = indicatorName?.toLowerCase() || '';
 
     // Add columns based on indicator type
     if (indicatorName?.includes('MMD') || indicatorName?.includes('Eligible MMD')) {
@@ -134,7 +137,20 @@ const IndicatorDetailsModal = ({
       }
     }
 
-    if (indicatorName?.includes('VL') || indicatorName?.includes('suppression')) {
+    // Check for turnaround time indicator first (12e) - different structure
+    if (indicatorName?.includes('10 days') || indicatorName?.includes('turnaround')) {
+      columns = [...columns,
+        { key: 'test_date', label: 'Test Date', type: 'date', altKey: 'TestDate' },
+        { key: 'sample_date', label: 'Sample Date', type: 'date', altKey: 'SampleDate' },
+        { key: 'result_receive_date', label: 'Result Receive Date', type: 'date', altKey: 'ResultReceiveDate' },
+        { key: 'turnaround_days', label: 'Turnaround Days', type: 'number', altKey: 'TurnaroundDays' },
+        { key: 'turnaround_status', label: 'Turnaround Status', type: 'text', altKey: 'TurnaroundStatus' }
+      ];
+    } else if ((indicatorName?.includes('VL') || indicatorName?.includes('suppression')) && 
+               !indicatorName?.includes('adherence counselling') && 
+               !indicatorName?.includes('adherence counseling') && 
+               !indicatorName?.includes('enhanced adherence')) {
+      // Add VL columns for VL indicators, but exclude EAC indicators (13a, 13b, 13c) which have their own columns
       columns = [...columns, ...vlColumns];
       
       // Add VL-specific columns for eligible VL test indicator
@@ -144,19 +160,96 @@ const IndicatorDetailsModal = ({
           { key: 'MonthsSinceLastVL', label: 'Months Since Last VL', type: 'number' }
         ];
       }
+      
+      // Add VL DO status for indicators 12a-12d
+      if (indicatorName?.includes('VL test') || indicatorName?.includes('VL monitored') || indicatorName?.includes('VL suppression')) {
+        columns = [...columns,
+          { key: 'vl_do_status', label: 'VL DO Status', type: 'text', altKey: 'VLdostatus' },
+          // { key: 'Status', label: 'Status', type: 'badge' },
+          // { key: 'exit_date', label: 'Exit Date', type: 'date' }
+        ];
+      }
     }
 
     if (indicatorName?.includes('TPT')) {
       columns = [...columns, ...tptColumns];
     }
 
-    if (indicatorName?.includes('Lost and Return')) {
+    // Enhanced adherence counseling indicators (13a, 13b, 13c)
+    if (indicatorName?.includes('adherence counselling') || indicatorName?.includes('adherence counseling') || indicatorName?.includes('enhanced adherence')) {
+      columns = [...columns,
+        { key: 'high_vl_date', label: 'High VL Date', type: 'date', altKey: 'VLDate' },
+        { key: 'high_vl_value', label: 'High VL Value', type: 'number', altKey: 'VLValue' },
+        { key: 'eac_date', label: 'EAC Date', type: 'date', altKey: 'EACDate' },
+        { key: 'received_counseling', label: 'Received Counseling', type: 'text' }
+      ];
+      
+      // Add follow-up VL fields for 13b and 13c
+      if (indicatorName?.includes('follow-up') || indicatorName?.includes('followup') || indicatorName?.includes('suppression after')) {
+        columns = [...columns,
+          { key: 'followup_vl_date', label: 'Follow-up VL Date', type: 'date', altKey: 'FollowupDate' },
+          { key: 'followup_vl_value', label: 'Follow-up VL Value', type: 'number', altKey: 'FollowupValue' }
+        ];
+      }
+      
+      // Add Status field for EAC indicators
+      columns = [...columns,
+        { key: 'Status', label: 'Status', type: 'badge' },
+        { key: 'exit_date', label: 'Exit Date', type: 'date' }
+      ];
+      
+      // Add suppression status for 13c
+      if (indicatorName?.includes('suppression after')) {
+        columns = [...columns,
+          { key: 'suppression_status', label: 'Suppression Status', type: 'text' }
+        ];
+      }
+    }
+
+    // ART line switching indicators (14a, 14b)
+    if (indicatorName?.includes('first line') || indicatorName?.includes('second line') || indicatorName?.includes('third line') || indicatorName?.includes('switching to')) {
+      columns = [...columns,
+        { key: 'first_vl_date', label: 'First VL Date', type: 'date' },
+        { key: 'first_vl_value', label: 'First VL Value', type: 'number' },
+        { key: 'second_vl_date', label: 'Second VL Date', type: 'date' },
+        { key: 'second_vl_value', label: 'Second VL Value', type: 'number' },
+        { key: 'days_between_vl', label: 'Days Between VL', type: 'number' },
+        { key: 'switch_status', label: 'Switch Status', type: 'text' },
+        { key: 'Status', label: 'Status', type: 'badge' },
+        { key: 'exit_date', label: 'Exit Date', type: 'date' }
+      ];
+    }
+
+    // Retention rate indicator (15)
+    if (indicatorName?.includes('retention rate') || indicatorName?.includes('retention')) {
+      columns = [...columns,
+        { key: 'art_start_date', label: 'ART Start Date', type: 'date' },
+        { key: 'last_visit_date', label: 'Last Visit Date', type: 'date' },
+        { key: 'months_on_art', label: 'Months on ART', type: 'number' },
+        { key: 'Status', label: 'Status', type: 'badge' },
+        { key: 'exit_date', label: 'Exit Date', type: 'date' }
+      ];
+    }
+
+    // Newly initiated indicators - add Status field to show patient status
+    if (indicatorName?.includes('Breakdown') || 
+        indicatorName?.includes('Newly Initiated vs Active') ||
+        indicatorName?.includes('newly initiating ART') ||
+        indicatorName?.includes('same-day') ||
+        indicatorName?.includes('initiation')) {
+      columns = [...columns,
+        { key: 'Status', label: 'Status', type: 'badge' },
+        { key: 'exit_date', label: 'Exit Date', type: 'date' }
+      ];
+    }
+
+    if (indicatorNameLower.includes('lost and return')) {
       columns = [...columns, 
         { key: 'return_type', label: 'Return Type', type: 'text' }
       ];
     }
 
-    if (indicatorName?.includes('Dead')) {
+    if (indicatorNameLower.includes('dead') || indicatorNameLower.includes('died')) {
       columns = [...columns, 
         { key: 'death_date', label: 'Death Date', type: 'date' },
         { key: 'death_place', label: 'Death Place', type: 'text' },
@@ -164,16 +257,129 @@ const IndicatorDetailsModal = ({
       ];
     }
 
+    // Baseline CD4 indicator (7)
+    if (indicatorNameLower.includes('baseline cd4') || indicatorNameLower.includes('baseline cd4 count')) {
+      columns = [...columns,
+        { key: 'art_start_date', label: 'ART Start Date', type: 'date' },
+        { key: 'baseline_cd4', label: 'Baseline CD4', type: 'number' },
+        { key: 'cd4_test_date', label: 'CD4 Test Date', type: 'date' },
+        { key: 'has_baseline_cd4', label: 'Has Baseline CD4', type: 'text' },
+        { key: 'days_between_cd4_and_art', label: 'Days Between CD4 and ART', type: 'number' }
+      ];
+    }
+
+    // Cotrimoxazole prophylaxis indicator (8a)
+    if (indicatorNameLower.includes('cotrimoxazole') || indicatorName?.includes('CD4 < 350')) {
+      columns = [...columns,
+        { key: 'latest_cd4', label: 'Latest CD4', type: 'number' },
+        { key: 'cd4_test_date', label: 'CD4 Test Date', type: 'date' },
+        { key: 'receiving_cotrimoxazole', label: 'Receiving Cotrimoxazole', type: 'text' }
+      ];
+    }
+
+    // Fluconazole prophylaxis indicator (8b)
+    if (indicatorNameLower.includes('fluconazole') || (indicatorName?.includes('CD4 < 100') && !indicatorNameLower.includes('cotrimoxazole'))) {
+      columns = [...columns,
+        { key: 'latest_cd4', label: 'Latest CD4', type: 'number' },
+        { key: 'cd4_test_date', label: 'CD4 Test Date', type: 'date' },
+        { key: 'receiving_fluconazole', label: 'Receiving Fluconazole', type: 'text' }
+      ];
+    }
+
+    if (indicatorNameLower.includes('reengaged')) {
+      columns = [...columns,
+        { key: 'miss_day', label: 'Miss Day', type: 'number' },
+        { key: 'miss_date', label: 'Miss Date', type: 'date' },
+        { key: 'reengage_date', label: 'Return Date', type: 'date' },
+        { key: 'return_status', label: 'Status', type: 'text' },
+        { key: 'days_to_reengage', label: 'Days to Return', type: 'number' }
+      ];
+    }
+
+    // Visit status indicators (5a, 5b, 5c, 5d)
+    if (indicatorName?.includes('late visits beyond') || indicatorName?.includes('Late Visits Beyond Buffer')) {
+      columns = [...columns,
+        { key: 'visit_date', label: 'Visit Date', type: 'date' },
+        { key: 'previous_appointment_date', label: 'Previous Appointment', type: 'date' },
+        { key: 'current_appointment_date', label: 'Current Appointment', type: 'date' },
+        { key: 'days_late', label: 'Days Late', type: 'number' },
+        { key: 'visit_status', label: 'Visit Status', type: 'text' }
+      ];
+    }
+
+    if (indicatorName?.includes('late visits within') || indicatorName?.includes('Late Visits Within Buffer')) {
+      columns = [...columns,
+        { key: 'visit_date', label: 'Visit Date', type: 'date' },
+        { key: 'previous_appointment_date', label: 'Previous Appointment', type: 'date' },
+        { key: 'current_appointment_date', label: 'Current Appointment', type: 'date' },
+        { key: 'days_late', label: 'Days Late', type: 'number' },
+        { key: 'visit_status', label: 'Visit Status', type: 'text' }
+      ];
+    }
+
+    if (indicatorName?.includes('visits on schedule') || indicatorName?.includes('Visits On Schedule')) {
+      columns = [...columns,
+        { key: 'visit_date', label: 'Visit Date', type: 'date' },
+        { key: 'previous_appointment_date', label: 'Previous Appointment', type: 'date' },
+        { key: 'current_appointment_date', label: 'Current Appointment', type: 'date' },
+        { key: 'days_difference', label: 'Days Difference', type: 'number' },
+        { key: 'visit_status', label: 'Visit Status', type: 'text' }
+      ];
+    }
+
+    if (indicatorName?.includes('early visits') || indicatorName?.includes('Early Visits')) {
+      columns = [...columns,
+        { key: 'visit_date', label: 'Visit Date', type: 'date' },
+        { key: 'previous_appointment_date', label: 'Previous Appointment', type: 'date' },
+        { key: 'current_appointment_date', label: 'Current Appointment', type: 'date' },
+        { key: 'days_early', label: 'Days Early', type: 'number' },
+        { key: 'visit_status', label: 'Visit Status', type: 'text' }
+      ];
+    }
+
+    // ART initiation indicators (6a, 6b, 6c)
+    if (indicatorName?.includes('same-day') || indicatorName?.includes('Same Day') || indicatorName?.includes('same day')) {
+      columns = [...columns,
+        { key: 'diagnosis_date', label: 'Diagnosis Date', type: 'date' },
+        { key: 'art_start_date', label: 'ART Start Date', type: 'date' },
+        { key: 'days_to_initiation', label: 'Days to Initiation', type: 'number' },
+        { key: 'initiation_status', label: 'Initiation Status', type: 'text' }
+      ];
+    }
+
+    if (indicatorName?.includes('initiation') && (indicatorName?.includes('1-7') || indicatorName?.includes('1_7'))) {
+      columns = [...columns,
+        { key: 'diagnosis_date', label: 'Diagnosis Date', type: 'date' },
+        { key: 'art_start_date', label: 'ART Start Date', type: 'date' },
+        { key: 'days_to_initiation', label: 'Days to Initiation', type: 'number' },
+        { key: 'initiation_status', label: 'Initiation Status', type: 'text' }
+      ];
+    }
+
+    if (indicatorName?.includes('initiation') && (indicatorName?.includes('>7') || indicatorName?.includes('over 7') || indicatorName?.includes('Over 7'))) {
+      columns = [...columns,
+        { key: 'diagnosis_date', label: 'Diagnosis Date', type: 'date' },
+        { key: 'art_start_date', label: 'ART Start Date', type: 'date' },
+        { key: 'days_to_initiation', label: 'Days to Initiation', type: 'number' },
+        { key: 'initiation_status', label: 'Initiation Status', type: 'text' }
+      ];
+    }
+
     if (indicatorName?.includes('MMD')) {
       columns = [...columns, 
-        { key: 'datevisit', label: 'Visit Date', type: 'date' },
-        { key: 'MMDStatus', label: 'MMD Status', type: 'badge' }
+        { key: 'art_start_date', label: 'ART Start Date', type: 'date' },
+        { key: 'months_on_art', label: 'Months on ART', type: 'number' },
+        { key: 'visit_date', label: 'Visit Date', type: 'date', altKey: 'datevisit' },
+        { key: 'appointment_date', label: 'Appointment Date', type: 'date' },
+        { key: 'days_difference', label: 'Days Difference', type: 'number' },
+        { key: 'mmd_status', label: 'MMD Status', type: 'text', altKey: 'MMDStatus' }
       ];
     }
 
     if (indicatorName?.includes('TLD')) {
       columns = [...columns, 
-        { key: 'TLDStatus', label: 'TLD Status', type: 'badge' }
+        { key: 'drug_name', label: 'Drug Name', type: 'text', altKey: 'drugname' },
+        { key: 'tld_status', label: 'TLD Status', type: 'text', altKey: 'TLDStatus' }
       ];
     }
 
@@ -190,12 +396,160 @@ const IndicatorDetailsModal = ({
     sex_display: record.sex_display || (record.Sex === 1 ? 'Male' : record.Sex === 0 ? 'Female' : 'Unknown'),
     patient_type: record.patient_type || getCorrectPatientType(record),
     // Handle VL field name variations (10.6 uses LastVLDate/LastVLLoad/StatusVL, 10.7 uses DateResult/HIVLoad/vlresultstatus)
-    LastVLDate: record.LastVLDate || record.DateResult,
-    LastVLLoad: record.LastVLLoad || record.HIVLoad,
-    StatusVL: record.StatusVL || record.vlresultstatus,
+    LastVLDate: record.LastVLDate || record.DateResult || record.last_vl_date,
+    LastVLLoad: record.LastVLLoad || record.HIVLoad || record.last_vl_load,
+    StatusVL: record.StatusVL || record.vlresultstatus || record.vl_status,
+    vl_do_status: record.vl_do_status || record.VLdostatus || 'N/A',
+    // Handle VL turnaround time fields (12e)
+    test_date: record.test_date || record.TestDate,
+    sample_date: record.sample_date || record.SampleDate,
+    result_receive_date: record.result_receive_date || record.ResultReceiveDate,
+    turnaround_days: record.turnaround_days || record.TurnaroundDays,
+    turnaround_status: record.turnaround_status || record.TurnaroundStatus || 'N/A',
     // Handle Lost and Return fields
     return_type: record.return_type || record.TypeofReturn || 'N/A',
-    art_number: record.art_number || record.Artnum || record.ART || 'N/A'
+    art_number: record.art_number || record.Artnum || record.ART || 'N/A',
+    // Handle visit status fields (5a, 5b, 5c, 5d)
+    visit_date: record.visit_date || record.DatVisit,
+    previous_appointment_date: record.previous_appointment_date || record.PreviousVisitAppointment,
+    current_appointment_date: record.current_appointment_date || record.CurrentAppointment,
+    days_late: record.days_late || record.DaysFromPreviousApp,
+    days_early: record.days_early || (record.DaysFromPreviousApp && record.DaysFromPreviousApp < 0 ? Math.abs(record.DaysFromPreviousApp) : null),
+    days_difference: record.days_difference || record.DaysFromPreviousApp,
+    visit_status: record.visit_status || 'N/A',
+    // Handle ART initiation fields (6a, 6b, 6c)
+    diagnosis_date: record.diagnosis_date || record.DafirstVisit,
+    art_start_date: record.art_start_date || record.DaArt,
+    days_to_initiation: record.days_to_initiation !== null && record.days_to_initiation !== undefined 
+      ? record.days_to_initiation 
+      : (record.diagnosis_date && record.art_start_date 
+          ? Math.floor((new Date(record.art_start_date) - new Date(record.diagnosis_date)) / (1000 * 60 * 60 * 24))
+          : null),
+    initiation_status: record.initiation_status || 'N/A',
+    // Handle baseline CD4 fields (7)
+    baseline_cd4: record.baseline_cd4 || record.BaselineCD4,
+    cd4_test_date: record.cd4_test_date || record.CD4TestDate,
+    has_baseline_cd4: record.has_baseline_cd4 || record.HasBaselineCD4 || 'No',
+    days_between_cd4_and_art: record.days_between_cd4_and_art !== null && record.days_between_cd4_and_art !== undefined
+      ? record.days_between_cd4_and_art
+      : (record.cd4_test_date && record.art_start_date
+          ? Math.floor((new Date(record.art_start_date) - new Date(record.cd4_test_date)) / (1000 * 60 * 60 * 24))
+          : null),
+    // Handle reengagement fields (3, 4)
+    miss_date: record.miss_date || record.MissDate,
+    miss_day: (() => {
+      // If patient has returned, don't display miss day
+      const returnDate = record.reengage_date || record.ReengageDate;
+      if (returnDate) return null;
+      
+      const dateValue = record.miss_date || record.MissDate;
+      if (!dateValue) return null;
+      
+      // Get end date from dateRange prop
+      const endDateValue = dateRange?.endDate;
+      if (!endDateValue) return null;
+      
+      try {
+        // Parse miss date
+        let missDate = new Date(dateValue);
+        if (isNaN(missDate.getTime())) {
+          // Try parsing as DD/MM/YYYY format
+          if (typeof dateValue === 'string' && dateValue.includes('/')) {
+            const parts = dateValue.split('/');
+            if (parts.length === 3) {
+              missDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+          }
+          // Try parsing as YYYY-MM-DD format
+          if (isNaN(missDate.getTime()) && typeof dateValue === 'string' && dateValue.includes('-')) {
+            const parts = dateValue.split('-');
+            if (parts.length === 3) {
+              missDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+          }
+        }
+        
+        // Parse end date
+        let endDate = new Date(endDateValue);
+        if (isNaN(endDate.getTime())) {
+          // Try parsing as DD/MM/YYYY format
+          if (typeof endDateValue === 'string' && endDateValue.includes('/')) {
+            const parts = endDateValue.split('/');
+            if (parts.length === 3) {
+              endDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+          }
+          // Try parsing as YYYY-MM-DD format
+          if (isNaN(endDate.getTime()) && typeof endDateValue === 'string' && endDateValue.includes('-')) {
+            const parts = endDateValue.split('-');
+            if (parts.length === 3) {
+              endDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+          }
+        }
+        
+        // Calculate difference in days: EndDate - MissDate
+        if (!isNaN(missDate.getTime()) && !isNaN(endDate.getTime())) {
+          const diffTime = endDate.getTime() - missDate.getTime();
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 ? diffDays : null;
+        }
+        
+        return null;
+      } catch (error) {
+        return null;
+      }
+    })(),
+    reengage_date: record.reengage_date || record.ReengageDate,
+    return_status: record.return_status || record.ReturnStatus || 'N/A',
+    days_to_reengage: record.days_to_reengage !== null && record.days_to_reengage !== undefined
+      ? record.days_to_reengage
+      : (record.miss_date && record.reengage_date
+          ? Math.floor((new Date(record.reengage_date) - new Date(record.miss_date)) / (1000 * 60 * 60 * 24))
+          : null),
+    // Handle prophylaxis fields (8a, 8b)
+    latest_cd4: record.latest_cd4 || record.LatestCD4,
+    receiving_cotrimoxazole: record.receiving_cotrimoxazole || record.ReceivingCotrimoxazole || 'No',
+    receiving_fluconazole: record.receiving_fluconazole || record.ReceivingFluconazole || 'No',
+    // Handle MMD fields (9a, 9b, 9c, 9d, 9e)
+    months_on_art: record.months_on_art,
+    appointment_date: record.appointment_date || record.DaApp,
+    mmd_status: record.mmd_status || record.MMDStatus || 'N/A',
+    datevisit: record.datevisit || record.visit_date || record.DatVisit,
+    // Handle TLD fields (10a, 10b)
+    drug_name: record.drug_name || record.drugname || 'N/A',
+    tld_status: record.tld_status || record.TLDStatus || 'Not-TLD',
+    // Handle TPT fields (11a, 11b)
+    Tptdrugname: record.Tptdrugname || record.tpt_drug_name || 'N/A',
+    dateStart: record.dateStart || record.tpt_start_date,
+    tpt_stop_date: record.tpt_stop_date || record.Datestop,
+    tpt_duration_months: record.tpt_duration_months || record.duration,
+    tptstatus: record.tptstatus || record.tpt_status || 'Not Start',
+    // Status field for newly initiated breakdown
+    Status: record.Status || 'Unknown',
+    exit_date: record.exit_date || null,
+    // Handle EAC/counseling fields (13a, 13b, 13c)
+    high_vl_date: record.high_vl_date || record.VLDate,
+    high_vl_value: record.high_vl_value || record.VLValue,
+    eac_date: record.eac_date || record.EACDate,
+    received_counseling: record.received_counseling || (record.eac_date || record.EACDate ? 'Yes' : 'No'),
+    followup_vl_date: record.followup_vl_date || record.FollowupDate,
+    followup_vl_value: record.followup_vl_value || record.FollowupValue,
+    suppression_status: record.suppression_status || 
+      (record.followup_vl_value !== null && record.followup_vl_value !== undefined
+        ? (record.followup_vl_value < 1000 ? 'Suppressed' : 'Not Suppressed')
+        : 'No Followup'),
+    // Handle ART line switching fields (14a, 14b)
+    first_vl_date: record.first_vl_date || record.FirstVLDate,
+    first_vl_value: record.first_vl_value || record.FirstVLValue,
+    second_vl_date: record.second_vl_date || record.SecondVLDate,
+    second_vl_value: record.second_vl_value || record.SecondVLValue,
+    days_between_vl: record.days_between_vl || record.DaysBetweenVL,
+    switch_status: record.switch_status || record.SwitchStatus || 'N/A',
+    // Handle retention rate fields (15)
+    art_start_date: record.art_start_date || record.DaArt || record.ARTStartDate,
+    last_visit_date: record.last_visit_date || record.LastVisitDate || record.DatVisit,
+    months_on_art: record.months_on_art || record.MonthsOnART
   }));
 
   // Sorting functionality
@@ -852,6 +1206,16 @@ const IndicatorDetailsModal = ({
                                             ? 'badge-success'
                                             : displayValue === 'Not complete'
                                             ? 'badge-warning'
+                                            : 'badge-muted'
+                                          : column.key === 'Status'
+                                          ? displayValue === 'Active'
+                                            ? 'badge-success'
+                                            : displayValue === 'Dead'
+                                            ? 'badge-destructive'
+                                            : displayValue === 'Transfer Out'
+                                            ? 'badge-warning'
+                                            : displayValue === 'Lost to Follow-up'
+                                            ? 'badge-secondary'
                                             : 'badge-muted'
                                           : 'badge-muted'
                                       }`}

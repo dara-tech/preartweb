@@ -212,7 +212,7 @@ WITH tblactive AS (
         LEFT JOIN tbltptstope st ON s.clinicid = st.clinicid
     )
 
-    SELECT 
+    SELECT DISTINCT
         i.clinicid,
         i.DafirstVisit,
         i.typepatients,
@@ -258,24 +258,31 @@ WITH tblactive AS (
 
 SELECT
     '12a. Percentage of ART patients receiving VL test in past 12 months' AS Indicator,
-    CAST(SUM(IF(VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL, 1, 0)) AS UNSIGNED) AS VL_Tested_12M,
-    CAST(SUM(IF(VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL, 1, 0)) AS UNSIGNED) AS TOTAL,
-    CAST(COUNT(*) AS UNSIGNED) AS Total_ART_Patients,
+    CAST(COUNT(DISTINCT CASE WHEN VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS VL_Tested_12M,
+    CAST(COUNT(DISTINCT CASE WHEN VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS TOTAL,
+    CAST(COUNT(DISTINCT clinicid) AS UNSIGNED) AS Total_ART_Patients,
     CAST(CASE 
-        WHEN COUNT(*) > 0 
-        THEN ROUND((SUM(IF(VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL, 1, 0)) * 100.0 / COUNT(*)), 2)
+        WHEN COUNT(DISTINCT clinicid) > 0 
+        THEN ROUND((COUNT(DISTINCT CASE WHEN VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) * 100.0 / COUNT(DISTINCT clinicid)), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
-    -- Total counts by demographic (all ART patients on ART >= 6 months)
-    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Male_0_14,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Female_0_14,
-    CAST(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Male_over_14,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Female_over_14,
-    -- VL Tested counts by demographic
-    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL, 1, 0)) AS UNSIGNED) AS Male_0_14_Tested,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL, 1, 0)) AS UNSIGNED) AS Female_0_14_Tested,
-    CAST(SUM(IF(Sex = 1 AND typepatients = '15+' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL, 1, 0)) AS UNSIGNED) AS Male_over_14_Tested,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '15+' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL, 1, 0)) AS UNSIGNED) AS Female_over_14_Tested
+    -- Numerators: patients with VL test in past 12 months
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '≤14' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Male_0_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '≤14' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Male_0_14_Tested,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '≤14' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Female_0_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '≤14' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Female_0_14_Tested,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '15+' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Male_over_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '15+' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Male_over_14_Tested,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '15+' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Female_over_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '15+' AND VLdostatus = 'Do_VL_in_12M' AND DateResult IS NOT NULL THEN clinicid END) AS UNSIGNED) AS Female_over_14_Tested,
+    -- Denominators: total ART patients on ART >= 6 months by demographic
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '≤14' THEN clinicid END) AS UNSIGNED) AS Male_0_14_Total,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '≤14' THEN clinicid END) AS UNSIGNED) AS Female_0_14_Total,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '15+' THEN clinicid END) AS UNSIGNED) AS Male_over_14_Total,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '15+' THEN clinicid END) AS UNSIGNED) AS Female_over_14_Total,
+    -- Aggregated totals for easier frontend access
+    CAST(COUNT(DISTINCT CASE WHEN typepatients = '≤14' THEN clinicid END) AS UNSIGNED) AS Children_Total,
+    CAST(COUNT(DISTINCT CASE WHEN typepatients = '15+' THEN clinicid END) AS UNSIGNED) AS Adults_Total
 FROM tblactive
 WHERE ART IS NOT NULL
     AND Startartstatus = '>6M';

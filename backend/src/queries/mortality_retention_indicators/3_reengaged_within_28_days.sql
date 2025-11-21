@@ -155,6 +155,9 @@ SELECT
     CAST(IFNULL(ms.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14,
     CAST(IFNULL(rs.Male_over_14_Reengaged, 0) AS UNSIGNED) AS Male_over_14_Reengaged,
     CAST(IFNULL(ms.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14,
-    CAST(IFNULL(rs.Female_over_14_Reengaged, 0) AS UNSIGNED) AS Female_over_14_Reengaged
+    CAST(IFNULL(rs.Female_over_14_Reengaged, 0) AS UNSIGNED) AS Female_over_14_Reengaged,
+    -- Aggregated totals for easier frontend access
+    CAST(IFNULL(ms.Male_0_14_Total, 0) + IFNULL(ms.Female_0_14_Total, 0) AS UNSIGNED) AS Children_Total,
+    CAST(IFNULL(ms.Male_over_14_Total, 0) + IFNULL(ms.Female_over_14_Total, 0) AS UNSIGNED) AS Adults_Total
 FROM missed_stats ms
 LEFT JOIN reengaged_stats rs ON 1 = 1;

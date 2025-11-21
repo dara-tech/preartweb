@@ -5,23 +5,23 @@ function Hospitalization({ formData, handleInputChange, showKhmer = false }) {
   return (
     <div className="space-y-8">
       {/* Simple Section Header */}
-      <div className="border-b border-gray-300 pb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className="border-b border-border pb-4">
+        <h3 className="text-lg font-medium text-foreground">
           {showKhmer ? 'ការសម្រាកពេទ្យ (Hospitalization)' : 'Hospitalization'}
         </h3>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {showKhmer ? 'ព័ត៌មានអំពីការសម្រាកពេទ្យ' : 'Information about hospitalization'}
         </p>
       </div>
 
       {/* Hospitalization Status */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
+        <h4 className="text-md font-medium text-foreground">
           {showKhmer ? 'ស្ថានភាពសម្រាកពេទ្យ (Hospitalization Status)' : 'Hospitalization Status'}
         </h4>
         <div className="space-y-4">
           <div>
-            <Label className="text-sm text-gray-700">
+            <Label className="text-sm text-foreground">
               {showKhmer ? 'តើធ្លាប់សម្រាកពេទ្យមកឬទេ? Have you been hospitalized?' : 'Have you been hospitalized?'}
             </Label>
             <RadioGroup
@@ -47,7 +47,7 @@ function Hospitalization({ formData, handleInputChange, showKhmer = false }) {
           {formData.hospital === '1' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="numHospital" className="text-sm text-gray-700">
+                <Label htmlFor="numHospital" className="text-sm text-foreground">
                   {showKhmer ? 'ចំនួនដងសម្រាកពេទ្យ Number of Hospitalizations' : 'Number of Hospitalizations'}
                 </Label>
                 <Input
@@ -56,11 +56,11 @@ function Hospitalization({ formData, handleInputChange, showKhmer = false }) {
                   value={formData.numHospital || ''}
                   onChange={(e) => handleInputChange('numHospital', e.target.value)}
                   placeholder="Enter number of hospitalizations"
-                  className="mt-1 border-gray-300"
+                  className="mt-1 border-border"
                 />
               </div>
               <div>
-                <Label htmlFor="reasonHospital" className="text-sm text-gray-700">
+                <Label htmlFor="reasonHospital" className="text-sm text-foreground">
                   {showKhmer ? 'មូលហេតុសម្រាកពេទ្យ Reason for Hospitalization' : 'Reason for Hospitalization'}
                 </Label>
                 <Input
@@ -68,7 +68,7 @@ function Hospitalization({ formData, handleInputChange, showKhmer = false }) {
                   value={formData.reasonHospital || ''}
                   onChange={(e) => handleInputChange('reasonHospital', e.target.value)}
                   placeholder="Enter reason for hospitalization"
-                  className="mt-1 border-gray-300"
+                  className="mt-1 border-border"
                 />
               </div>
             </div>

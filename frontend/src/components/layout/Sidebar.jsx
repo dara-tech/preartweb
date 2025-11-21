@@ -147,6 +147,14 @@ const IconSettings = ({ className }) => (
   </IconBase>
 )
 
+const IconDatabase = ({ className }) => (
+  <IconBase className={className}>
+    <ellipse cx="12" cy="5" rx="9" ry="3" />
+    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+    <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3" />
+  </IconBase>
+)
+
 const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -305,7 +313,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
     items.push({
       name: 'Analytics & Reports',
       icon: IconBarChart,
-      current: location.pathname.startsWith('/analytics') || location.pathname.startsWith('/indicators') || location.pathname.startsWith('/mortality-retention-indicators'),
+      current: location.pathname.startsWith('/analytics') || location.pathname.startsWith('/indicators') || location.pathname.startsWith('/mortality-retention-indicators') || location.pathname.startsWith('/cqi-admin') || location.pathname.startsWith('/query-editor-admin'),
       hasSubmenu: true,
       category: 'reports',
       submenu: [
@@ -316,7 +324,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
           current: location.pathname === '/indicators'
         },
         {
-          name: 'CQI',
+          name: 'Mortality & Retention',
           href: '/mortality-retention-indicators',
           icon: IconMonitorHeart,
           current: location.pathname === '/mortality-retention-indicators'
@@ -328,12 +336,20 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
           icon: IconBarChart,
           current: location.pathname === '/analytics-admin'
         }] : []),
+        // CQI Admin removed
         // Indicator Management - only for admin and super_admin
         ...(isAdmin ? [{
           name: 'Indicator Control',
           href: '/indicator-management',
           icon: IconSettings,
           current: location.pathname === '/indicator-management'
+        }] : []),
+        // Query Editor Admin - only for admin and super_admin
+        ...(isAdmin ? [{
+          name: 'Query Editor',
+          href: '/query-editor-admin',
+          icon: IconDatabase,
+          current: location.pathname === '/query-editor-admin'
         }] : []),
         // Indicators Dashboard - hide for viewers and data managers
         ...(isViewer || isDataManager ? [] : [{
@@ -509,7 +525,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                 return (
                   <div key={item.name} className="space-y-1">
                     <Button
-                      variant={item.current ? "default" : "ghost"}
+                      variant={item.current ? "primary" : "ghost"}
                       className={`
                         w-full justify-start text-left h-11 px-3 rounded-none transition-all duration-200
                         ${isCollapsed ? 'px-2' : 'px-3'}
@@ -547,7 +563,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen })
                           return (
                             <Button
                               key={subItem.name}
-                              variant={subItem.current ? "default" : "ghost"}
+                              variant={subItem.current ? "primary" : "ghost"}
                               className={`
                                 w-full justify-start text-left h-9 px-3 text-sm rounded-none transition-all duration-200
                                 ${subItem.current 

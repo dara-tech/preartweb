@@ -43,26 +43,26 @@ function Symptoms({ formData, handleInputChange, showKhmer = false }) {
   return (
     <div className="space-y-8">
       {/* Simple Section Header */}
-      <div className="border-b border-gray-300 pb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className="border-b border-border pb-4">
+        <h3 className="text-lg font-medium text-foreground">
           {showKhmer ? 'រោគសញ្ញា (Symptoms)' : 'Symptoms'}
         </h3>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {showKhmer ? 'រោគសញ្ញាក្នុងរយៈពេល 4 សប្តាហ៍ចុងក្រោយ' : 'Symptoms experienced in the last 4 weeks'}
         </p>
       </div>
 
       {/* Symptoms List */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
+        <h4 className="text-md font-medium text-foreground">
           {showKhmer ? 'រោគសញ្ញាផ្សេងៗ (Various Symptoms)' : 'Various Symptoms'}
         </h4>
         <div className="space-y-6">
           {symptoms.map((symptom) => (
-            <div key={symptom.key} className="border border-gray-300 rounded-none p-4">
+            <div key={symptom.key} className="border border-border rounded-none p-4">
               <div className="space-y-3">
-                <h5 className="font-medium text-gray-900">{symptom.title}</h5>
-                <p className="text-sm text-gray-600">{symptom.description}</p>
+                <h5 className="font-medium text-foreground">{symptom.title}</h5>
+                <p className="text-sm text-muted-foreground">{symptom.description}</p>
                 <RadioGroup
                   value={formData[symptom.key]?.toString() || '0'}
                   onValueChange={(value) => handleInputChange(symptom.key, value)}

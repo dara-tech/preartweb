@@ -1,121 +1,104 @@
-import { Card, CardContent, CardHeader, CardTitle, Input, Label, RadioGroup, RadioGroupItem } from "@/components/ui";
+import { Card, CardContent } from "@/components/ui";
 import React from 'react';
+import BasicInformationSection from '../sections/BasicInformationSection';
+import DemographicsSection from '../sections/DemographicsSection';
+import HIVTestingSection from '../sections/HIVTestingSection';
+import TransferInSection from '../sections/TransferInSection';
+import RefugeeStatusSection from '../sections/RefugeeStatusSection';
 
-function PatientInformation({ formData, handleInputChange, showKhmer = false }) {
+function PatientInformation({ formData, setFormData, handleInputChange, dropdownOptions }) {
+  // Calculate age from DOB and first visit date
+  const calculateAge = () => {
+    if (!formData.dateOfBirth || !formData.dateFirstVisit) return ''
+    const dob = new Date(formData.dateOfBirth)
+    const firstVisit = new Date(formData.dateFirstVisit)
+    if (isNaN(dob.getTime()) || isNaN(firstVisit.getTime())) return ''
+    const age = firstVisit.getFullYear() - dob.getFullYear()
+    const monthDiff = firstVisit.getMonth() - dob.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && firstVisit.getDate() < dob.getDate())) {
+      return age - 1
+    }
+    return age
+  }
+
+  // Enhanced handleInputChange with age calculation
+  const enhancedHandleInputChange = (field, value) => {
+    handleInputChange(field, value)
+    
+    // Auto-calculate age when DOB or first visit changes
+    if (field === 'dateOfBirth' || field === 'dateFirstVisit') {
+      const dob = field === 'dateOfBirth' ? value : formData.dateOfBirth
+      const firstVisit = field === 'dateFirstVisit' ? value : formData.dateFirstVisit
+      if (dob && firstVisit) {
+        const age = calculateAge()
+        if (age >= 15 && age <= 100) {
+          handleInputChange('age', age.toString())
+        }
+      }
+    }
+    
+    // Calculate DOB when age changes
+    if (field === 'age' && value && formData.dateFirstVisit) {
+      const firstVisit = new Date(formData.dateFirstVisit)
+      if (!isNaN(firstVisit.getTime())) {
+        const dob = new Date(firstVisit)
+        dob.setFullYear(dob.getFullYear() - parseInt(value))
+        handleInputChange('dateOfBirth', dob.toISOString().split('T')[0])
+      }
+    }
+  }
+
   return (
-    <div className="space-y-8">
-      {/* Simple Section Header */}
-      <div className="border-b border-gray-300 pb-4">
-        <h3 className="text-lg font-medium text-gray-900">
-          {showKhmer ? 'ព័ត៌មានអ្នកជំងឺ (Patient Information)' : 'Patient Information'}
-        </h3>
-        <p className="text-sm text-gray-600 mt-1">
-          {showKhmer ? 'ព័ត៌មានមូលដ្ឋាន និងព័ត៌មានការពិនិត្យ' : 'Basic information and visit details'}
-        </p>
-      </div>
+    <div className="space-y-5">
+      <Card className="border border-border shadow-none bg-card">
+        <CardContent className="p-5 sm:p-6">
+          <BasicInformationSection
+            formData={formData}
+            handleInputChange={enhancedHandleInputChange}
+            dropdownOptions={dropdownOptions}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Patient Name */}
-      <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
-          {showKhmer ? 'ឈ្មោះអ្នកជំងឺ (Patient Name)' : 'Patient Name'}
-        </h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <Label htmlFor="name" className="text-sm text-gray-700">
-              {showKhmer ? 'ឈ្មោះអ្នកជំងឺ Patient Name' : 'Patient Name'}
-            </Label>
-            <Input
-              id="name"
-              value={formData.name || ''}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              placeholder="Enter patient name"
-              className="mt-1 border-gray-300"
-            />
-          </div>
-        </div>
-      </div>
+      <Card className="border border-border shadow-none bg-card">
+        <CardContent className="p-5 sm:p-6">
+          <DemographicsSection
+            formData={formData}
+            handleInputChange={enhancedHandleInputChange}
+            dropdownOptions={dropdownOptions}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Basic Information */}
-      <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
-          {showKhmer ? 'ព័ត៌មានមូលដ្ឋាន (Basic Information)' : 'Basic Information'}
-        </h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <Label htmlFor="clinicId" className="text-sm text-gray-700">
-              {showKhmer ? 'លេខកូដអ្នកជំងឺ Clinic ID' : 'Clinic ID'}
-            </Label>
-            <Input
-              id="clinicId"
-              value={formData.clinicId || ''}
-              onChange={(e) => handleInputChange('clinicId', e.target.value)}
-              placeholder="Enter Clinic ID"
-              className="mt-1 border-gray-300"
-            />
-          </div>
-          <div>
-            <Label htmlFor="artNumber" className="text-sm text-gray-700">
-              {showKhmer ? 'លេខ ART ART Number' : 'ART Number'}
-            </Label>
-            <Input
-              id="artNumber"
-              value={formData.artNumber || ''}
-              onChange={(e) => handleInputChange('artNumber', e.target.value)}
-              placeholder="Enter ART Number"
-              className="mt-1 border-gray-300"
-            />
-          </div>
-          <div>
-            <Label htmlFor="visitDate" className="text-sm text-gray-700">
-              {showKhmer ? 'កាលបរិច្ឆេទពិនិត្យ Visit Date' : 'Visit Date'}
-            </Label>
-            <Input
-              id="visitDate"
-              type="date"
-              value={formData.visitDate || ''}
-              onChange={(e) => handleInputChange('visitDate', e.target.value)}
-              className="mt-1 border-gray-300"
-            />
-          </div>
-        </div>
-      </div>
+      <Card className="border border-border shadow-none bg-card">
+        <CardContent className="p-5 sm:p-6">
+          <HIVTestingSection
+            formData={formData}
+            handleInputChange={enhancedHandleInputChange}
+            dropdownOptions={dropdownOptions}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Visit Status */}
-      <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
-          {showKhmer ? 'ប្រភេទមកពិនិត្យ (Visit Status)' : 'Visit Status'}
-        </h4>
-        <RadioGroup
-          value={formData.visitStatus?.toString() || '0'}
-          onValueChange={(value) => handleInputChange('visitStatus', value)}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-        >
-          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
-            <RadioGroupItem value="0" id="visit-0" />
-            <Label htmlFor="visit-0" className="cursor-pointer text-sm">
-              {showKhmer ? 'មកពិនិត្យដំបូង (First Visit)' : 'First Visit'}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
-            <RadioGroupItem value="1" id="visit-1" />
-            <Label htmlFor="visit-1" className="cursor-pointer text-sm">
-              {showKhmer ? 'មកមុនពេលកំណត់ (Early Visit)' : 'Early Visit'}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
-            <RadioGroupItem value="2" id="visit-2" />
-            <Label htmlFor="visit-2" className="cursor-pointer text-sm">
-              {showKhmer ? 'មកពិនិត្យតាមការកំណត់ (Scheduled Visit)' : 'Scheduled Visit'}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-none">
-            <RadioGroupItem value="3" id="visit-3" />
-            <Label htmlFor="visit-3" className="cursor-pointer text-sm">
-              {showKhmer ? 'មកពិនិត្យយឺត (Late Visit)' : 'Late Visit'}
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
+      <Card className="border border-border shadow-none bg-card">
+        <CardContent className="p-5 sm:p-6">
+          <TransferInSection
+            formData={formData}
+            handleInputChange={enhancedHandleInputChange}
+            dropdownOptions={dropdownOptions}
+          />
+        </CardContent>
+      </Card>
+
+      <Card className="border border-border shadow-none bg-card">
+        <CardContent className="p-5 sm:p-6">
+          <RefugeeStatusSection
+            formData={formData}
+            handleInputChange={enhancedHandleInputChange}
+            dropdownOptions={dropdownOptions}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

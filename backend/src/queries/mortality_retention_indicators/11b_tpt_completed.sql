@@ -256,23 +256,30 @@ WITH tblactive AS (
 
 SELECT
     '11b. Percentage of ART patients completed TPT (TPT Complete)' AS Indicator,
-    CAST(SUM(IF(tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS TPT_Completed,
-    CAST(SUM(IF(tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS TOTAL,
-    CAST(COUNT(*) AS UNSIGNED) AS Total_ART_Patients,
+    CAST(COUNT(DISTINCT CASE WHEN tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS TPT_Completed,
+    CAST(COUNT(DISTINCT CASE WHEN tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS TOTAL,
+    CAST(COUNT(DISTINCT clinicid) AS UNSIGNED) AS Total_ART_Patients,
     CAST(CASE 
-        WHEN COUNT(*) > 0 
-        THEN ROUND((SUM(IF(tptstatus = 'TPT Complete', 1, 0)) * 100.0 / COUNT(*)), 2)
+        WHEN COUNT(DISTINCT clinicid) > 0 
+        THEN ROUND((COUNT(DISTINCT CASE WHEN tptstatus = 'TPT Complete' THEN clinicid END) * 100.0 / COUNT(DISTINCT clinicid)), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
-    -- Total counts by demographic (all ART patients)
-    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Male_0_14,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14', 1, 0)) AS UNSIGNED) AS Female_0_14,
-    CAST(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Male_over_14,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '15+', 1, 0)) AS UNSIGNED) AS Female_over_14,
-    -- TPT Completed counts by demographic
-    CAST(SUM(IF(Sex = 1 AND typepatients = '≤14' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Male_0_14_TPT_Completed,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '≤14' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Female_0_14_TPT_Completed,
-    CAST(SUM(IF(Sex = 1 AND typepatients = '15+' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Male_over_14_TPT_Completed,
-    CAST(SUM(IF(Sex = 0 AND typepatients = '15+' AND tptstatus = 'TPT Complete', 1, 0)) AS UNSIGNED) AS Female_over_14_TPT_Completed
+    -- Numerators: patients who completed TPT
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '≤14' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Male_0_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '≤14' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Male_0_14_TPT_Completed,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '≤14' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Female_0_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '≤14' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Female_0_14_TPT_Completed,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '15+' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Male_over_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '15+' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Male_over_14_TPT_Completed,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '15+' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Female_over_14,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '15+' AND tptstatus = 'TPT Complete' THEN clinicid END) AS UNSIGNED) AS Female_over_14_TPT_Completed,
+    -- Denominators: total ART patients by demographic
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '≤14' THEN clinicid END) AS UNSIGNED) AS Male_0_14_Total,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '≤14' THEN clinicid END) AS UNSIGNED) AS Female_0_14_Total,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 1 AND typepatients = '15+' THEN clinicid END) AS UNSIGNED) AS Male_over_14_Total,
+    CAST(COUNT(DISTINCT CASE WHEN Sex = 0 AND typepatients = '15+' THEN clinicid END) AS UNSIGNED) AS Female_over_14_Total,
+    -- Aggregated totals for easier frontend access
+    CAST(COUNT(DISTINCT CASE WHEN typepatients = '≤14' THEN clinicid END) AS UNSIGNED) AS Children_Total,
+    CAST(COUNT(DISTINCT CASE WHEN typepatients = '15+' THEN clinicid END) AS UNSIGNED) AS Adults_Total
 FROM tblactive
 WHERE ART IS NOT NULL;

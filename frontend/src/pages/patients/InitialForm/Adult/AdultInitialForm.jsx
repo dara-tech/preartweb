@@ -31,16 +31,15 @@ function AdultInitialForm() {
   })
   const [dropdownsLoaded, setDropdownsLoaded] = useState(false)
 
-  // Form data matching VB.NET frmAdultIn fields
+  // Form data matching VB.NET frmAdultIn fields - Complete structure
   const [formData, setFormData] = useState({
     // Basic Information
     clinicId: '',
     dateFirstVisit: '',
     lostReturn: false,
-    typeOfReturn: -1,
+    typeOfReturn: -1, // 0=In, 1=Out
     returnClinicId: '',
     oldSiteName: '',
-    patientName: '',
     
     // Demographics  
     dateOfBirth: '',
@@ -50,6 +49,7 @@ function AdultInitialForm() {
     canRead: -1,
     canWrite: -1,
     nationality: '',
+    targetGroup: '',
     
     // HIV Testing & Referral
     referred: -1, // 0=Self, 1=Community, 2=VCCT, 3=PMTCT, 4=TB, 5=Blood Bank, 6=Other
@@ -59,32 +59,30 @@ function AdultInitialForm() {
     vcctId: '',
     previousClinicId: '',
     
-    // Target Group and Transfer Information
-    targetGroup: -1,
-    refugeeStatus: -1,
-    childrenClinicId: '',
-    
-    // ART Information
-    artNumber: '',
-    dateART: '',
+    // Transfer In Information
     transferIn: -1, // 0=No, 1=Yes
     transferFrom: '',
-    transferDate: '',
+    dateStartART: '',
+    artNumber: '',
     
     // TB Past Medical History
-    tbPast: -1, // 0=No, 1=Yes, 2=Unknown
+    tbPast: -1, // 0=No, 1=Yes
     tptHistory: -1, // 0=No, 1=Completed, 2=On treatment
     tptRegimen: -1, // 0=3HP, 1=6H, 2=3RH
     tptDateStart: '',
     tptDateEnd: '',
     tbType: -1, // 0=Pulmonary, 1=Extra-pulmonary
-    tbResult: -1, // 0=BK+, 1=BK-
+    tbResultTest: -1, // 0=BK+, 1=BK-
     tbDateOnset: '',
-    tbTreatment: -1, // 0=Cat1, 1=Cat2, 2=Cat3, 3=Cat4, 4=Unknown
+    tbTreatmentCategory: -1, // 0=Cat1, 1=Cat2, 2=Cat3, 3=Cat4, 4=Unknown
     tbDateTreatment: '',
+    tbResultTreatment: -1,
     tbDateComplete: '',
     
-    // Other Medical History
+    // ARV History
+    arvHistory: -1, // 0=No, 1=Yes
+    
+    // Other Medical History - Checkboxes
     diabetes: false,
     hypertension: false,
     abnormal: false,
@@ -93,43 +91,14 @@ function AdultInitialForm() {
     liver: false,
     hepatitis: false,
     other: false,
-    otherIllness: '',
     
     // Allergies
-    allergy: -1,
-    allergyDetails: '',
+    allergy: -1, // 0=No, 1=Yes
     
-    // Family Information
-    familyMembers: [],
-    
-    // Treatment History
-    treatmentHistory: {
-      drugTreatments: Array(6).fill().map(() => ({
-        drugDetails: '',
-        clinic: '',
-        startDate: '',
-        stopDate: '',
-        remarks: ''
-      })),
-      arvMedication: -1,
-      arvDrugs: ['', '', ''],
-      otherTreatments: Array(8).fill().map(() => ({
-        drugDetails: '',
-        clinic: '',
-        startDate: '',
-        stopDate: '',
-        remarks: ''
-      })),
-      drugReactions: Array(3).fill().map(() => ({
-        drug1: '',
-        reaction1: '',
-        date1: '',
-        drug2: '',
-        reaction2: '',
-        date2: ''
-      })),
-      hasDrugReaction: -1
-    }
+    // Refugee Status
+    refugeeStatus: -1,
+    refugeeART: '',
+    refugeeSite: ''
   })
 
   // Family members array
@@ -147,77 +116,102 @@ function AdultInitialForm() {
     tbHistory: ''
   })
 
-  // Treatment history data
-  const [treatmentHistory, setTreatmentHistory] = useState({
-    drugTreatments: Array(6).fill().map(() => ({
-      drugDetails: '',
+  // ARV Treatment History - Up to 6 ARV drugs
+  const [arvTreatmentHistory, setArvTreatmentHistory] = useState(
+    Array(6).fill().map(() => ({
+      drug: '',
       clinic: '',
       startDate: '',
       stopDate: '',
-      remarks: ''
-    })),
-    arvMedication: -1,
-    arvDrugs: ['', '', ''],
-    otherTreatments: Array(8).fill().map(() => ({
-      drugDetails: '',
-      clinic: '',
-      startDate: '',
-      stopDate: '',
-      remarks: ''
-    })),
-    drugReactions: Array(3).fill().map(() => ({
-      drug1: '',
-      reaction1: '',
-      date1: '',
-      drug2: '',
-      reaction2: '',
-      date2: ''
-    })),
-    hasDrugReaction: -1
+      note: ''
+    }))
+  )
+  
+  // Other Medical Treatments - One per condition
+  const [otherMedicalTreatments, setOtherMedicalTreatments] = useState({
+    diabetes: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+    hypertension: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+    abnormal: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+    renal: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+    anemia: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+    liver: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+    hepatitis: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+    other: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' }
   })
+  
+  // Allergies - Up to 6 entries
+  const [allergies, setAllergies] = useState(
+    Array(6).fill().map(() => ({
+      drug: '',
+      reaction: '',
+      date: ''
+    }))
+  )
 
   useEffect(() => {
     console.log('AdultInitialForm useEffect triggered', { id, selectedSite })
-    loadDropdownData()
+    if (selectedSite) {
+      loadDropdownData()
+    }
     if (id) {
       loadPatientData(id)
       setActiveTab("form")
     }
-  }, [id])
+  }, [id, selectedSite])
 
   const loadDropdownData = async () => {
     try {
-      const [sites, vcctSites, drugs, clinics, reasons, allergies, nationalities, targetGroups, provinces, hospitals, drugTreatments] = await Promise.all([
-        api.get('/apiv1/lookups/sites'),
-        api.get('/apiv1/lookups/vcct-sites'),
-        api.get('/apiv1/lookups/drugs'),
-        api.get('/apiv1/lookups/clinics'),
-        api.get('/apiv1/lookups/reasons'),
-        api.get('/apiv1/lookups/allergies'),
-        api.get('/apiv1/lookups/nationalities'),
-        api.get('/apiv1/lookups/target-groups'),
-        api.get('/apiv1/lookups/provinces'),
-        api.get('/apiv1/lookups/hospitals'),
-        api.get('/apiv1/lookups/drug-treatments')
-      ])
+      // Get site code from selectedSite, fallback to null if not available
+      const siteCode = selectedSite?.code || null
+      const siteParam = siteCode ? { params: { site: siteCode } } : {}
+      
+      const requests = [
+        api.get('/apiv1/lookups/sites', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/vcct-sites', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/drugs', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/clinics', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/reasons', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/allergies', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/nationalities', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/target-groups', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/provinces', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/hospitals', siteParam).catch(() => ({ data: [] })),
+        api.get('/apiv1/lookups/drug-treatments', siteParam).catch(() => ({ data: [] }))
+      ]
+
+      const [sites, vcctSites, drugs, clinics, reasons, allergies, nationalities, targetGroups, provinces, hospitals, drugTreatments] = await Promise.all(requests)
 
       setDropdownOptions({
-        sites: sites.data || [],
-        vcctSites: vcctSites.data || [],
-        drugs: drugs.data || [],
-        clinics: clinics.data || [],
-        reasons: reasons.data || [],
-        allergies: allergies.data || [],
-        nationalities: nationalities.data || [],
-        targetGroups: targetGroups.data || [],
-        provinces: provinces.data || [],
-        hospitals: hospitals.data || [],
-        drugTreatments: drugTreatments.data || []
+        sites: Array.isArray(sites.data) ? sites.data : [],
+        vcctSites: Array.isArray(vcctSites.data) ? vcctSites.data : [],
+        drugs: Array.isArray(drugs.data) ? drugs.data : [],
+        clinics: Array.isArray(clinics.data) ? clinics.data : [],
+        reasons: Array.isArray(reasons.data) ? reasons.data : [],
+        allergies: Array.isArray(allergies.data) ? allergies.data : [],
+        nationalities: Array.isArray(nationalities.data) ? nationalities.data : [],
+        targetGroups: Array.isArray(targetGroups.data) ? targetGroups.data : [],
+        provinces: Array.isArray(provinces.data) ? provinces.data : [],
+        hospitals: Array.isArray(hospitals.data) ? hospitals.data : [],
+        drugTreatments: Array.isArray(drugTreatments.data) ? drugTreatments.data : []
       })
       
       setDropdownsLoaded(true)
     } catch (error) {
       console.error('Error loading dropdown data:', error)
+      // Set empty arrays as fallback
+      setDropdownOptions({
+        sites: [],
+        vcctSites: [],
+        drugs: [],
+        clinics: [],
+        reasons: [],
+        allergies: [],
+        nationalities: [],
+        targetGroups: [],
+        provinces: [],
+        hospitals: [],
+        drugTreatments: []
+      })
       setDropdownsLoaded(true)
     }
   }
@@ -226,116 +220,104 @@ function AdultInitialForm() {
   const loadPatientData = async (clinicId) => {
     try {
       setLoading(true)
-      const response = await api.get(`/apiv1/patients/adult/${clinicId}`)
+      // Get site code from selectedSite, pass as query parameter
+      const siteCode = selectedSite?.code || null
+      const siteParam = siteCode ? `?site=${siteCode}` : ''
+      const response = await api.get(`/apiv1/patients/adult/${clinicId}${siteParam}`)
       const data = response.data
       
       setFormData({
-        // Basic Information
         clinicId: data.clinicId || '',
         dateFirstVisit: data.dateFirstVisit || '',
         lostReturn: data.lostReturn || false,
         typeOfReturn: data.typeOfReturn !== null && data.typeOfReturn !== undefined ? data.typeOfReturn : -1,
-        returnClinicId: data.returnClinicId || '',
-        oldSiteName: data.oldSiteName || '',
-        
-        // Demographics  
-        dateOfBirth: data.dateOfBirth || '',
-        age: data.age !== null && data.age !== undefined ? data.age : '',
+        returnClinicId: data.returnClinicId || data.lClinicId || '',
+        oldSiteName: data.oldSiteName || data.siteNameOld || '',
+        dateOfBirth: data.dateOfBirth || data.daBirth || '',
+        age: data.age !== null && data.age !== undefined ? data.age.toString() : '',
         sex: data.sex !== null && data.sex !== undefined ? data.sex : -1,
         education: data.education !== null && data.education !== undefined ? data.education : -1,
         canRead: data.canRead !== null && data.canRead !== undefined ? data.canRead : -1,
         canWrite: data.canWrite !== null && data.canWrite !== undefined ? data.canWrite : -1,
-        
-        // HIV Testing & Referral
+        nationality: data.nationality || '',
+        targetGroup: data.targetGroup || '',
         referred: data.referred !== null && data.referred !== undefined ? data.referred : -1,
-        referredOther: data.referredOther || '',
-        dateTestHIV: data.dateTestHIV || '',
-        vcctSite: data.vcctSite || '',
-        vcctId: data.vcctId || '',
-        previousClinicId: data.previousClinicId || '',
-        
-        // ART Information
-        artNumber: data.artNumber || '',
-        dateART: data.dateART || '',
+        referredOther: data.referredOther || data.orefferred || '',
+        dateTestHIV: data.dateTestHIV || data.daHIV || '',
+        vcctSite: data.vcctSite || data.vcctcode || '',
+        vcctId: data.vcctId || data.vcctID || '',
+        previousClinicId: data.previousClinicId || data.pclinicID || '',
         transferIn: data.transferIn !== null && data.transferIn !== undefined ? data.transferIn : -1,
-        transferFrom: data.transferFrom || '',
-        transferDate: data.transferDate || '',
-        
-        // Medical History
+        transferFrom: data.transferFrom || data.siteName || '',
+        dateStartART: data.dateStartART || data.daART || '',
+        artNumber: data.artNumber || data.artnum || '',
         tbPast: data.tbPast !== null && data.tbPast !== undefined ? data.tbPast : -1,
+        tptHistory: data.tptHistory !== null && data.tptHistory !== undefined ? data.tptHistory : (data.tpt !== null && data.tpt !== undefined ? data.tpt : -1),
+        tptRegimen: data.tptRegimen !== null && data.tptRegimen !== undefined ? data.tptRegimen : (data.tptDrug !== null && data.tptDrug !== undefined ? data.tptDrug : -1),
+        tptDateStart: data.tptDateStart || data.daStartTPT || '',
+        tptDateEnd: data.tptDateEnd || data.daEndTPT || '',
         tbType: data.tbType !== null && data.tbType !== undefined ? data.tbType : -1,
-        tbResult: data.tbResult !== null && data.tbResult !== undefined ? data.tbResult : -1,
-        tbDateOnset: data.tbDateOnset || '',
-        tbTreatment: data.tbTreatment !== null && data.tbTreatment !== undefined ? data.tbTreatment : -1,
-        tbDateTreatment: data.tbDateTreatment || '',
-        tbResultTreatment: data.tbResultTreatment !== null && data.tbResultTreatment !== undefined ? data.tbResultTreatment : -1,
-        tbDateResultTreatment: data.tbDateResultTreatment || '',
-        
-        // TPT Treatment
-        inh: data.inh !== null && data.inh !== undefined ? data.inh : -1,
-        tptDrug: data.tptDrug !== null && data.tptDrug !== undefined ? data.tptDrug : -1,
-        tptDateStart: data.tptDateStart || '',
-        tptDateEnd: data.tptDateEnd || '',
-        
-        // Other Medical History
-        otherPast: data.otherPast !== null && data.otherPast !== undefined ? data.otherPast : -1,
-        otherPastDetails: data.otherPastDetails || '',
-        
-        // Current Medications
-        cotrimoxazole: data.cotrimoxazole !== null && data.cotrimoxazole !== undefined ? data.cotrimoxazole : -1,
-        fluconazole: data.fluconazole !== null && data.fluconazole !== undefined ? data.fluconazole : -1,
-        
-        // Allergies
+        tbResultTest: data.tbResultTest !== null && data.tbResultTest !== undefined ? data.tbResultTest : (data.resultTB !== null && data.resultTB !== undefined ? data.resultTB : -1),
+        tbDateOnset: data.tbDateOnset || data.daonset || '',
+        tbTreatmentCategory: data.tbTreatmentCategory !== null && data.tbTreatmentCategory !== undefined ? data.tbTreatmentCategory : (data.tbtreat !== null && data.tbtreat !== undefined ? data.tbtreat : -1),
+        tbDateTreatment: data.tbDateTreatment || data.datreat || '',
+        tbResultTreatment: data.tbResultTreatment !== null && data.tbResultTreatment !== undefined ? data.tbResultTreatment : (data.resultTreat !== null && data.resultTreat !== undefined ? data.resultTreat : -1),
+        tbDateComplete: data.tbDateComplete || data.daResultTreat || '',
+        arvHistory: data.arvHistory !== null && data.arvHistory !== undefined ? data.arvHistory : (data.arVTreatHis !== null && data.arVTreatHis !== undefined ? data.arVTreatHis : -1),
+        diabetes: data.diabetes || false,
+        hypertension: data.hypertension || data.hyper || false,
+        abnormal: data.abnormal || false,
+        renal: data.renal || false,
+        anemia: data.anemia || false,
+        liver: data.liver || false,
+        hepatitis: data.hepatitis || data.hepBC || false,
+        other: data.other || data.medOther || false,
         allergy: data.allergy !== null && data.allergy !== undefined ? data.allergy : -1,
-        allergyDetails: data.allergyDetails || ''
+        refugeeStatus: data.refugeeStatus !== null && data.refugeeStatus !== undefined ? data.refugeeStatus : (data.refugstatus !== null && data.refugstatus !== undefined ? data.refugstatus : -1),
+        refugeeART: data.refugeeART || data.refugART || '',
+        refugeeSite: data.refugeeSite || data.refugsite || ''
       })
 
-      if (data.familyMembers) {
-        setFamilyMembers(data.familyMembers)
+      // Load ARV treatment history
+      if (data.arvTreatmentHistory && Array.isArray(data.arvTreatmentHistory)) {
+        const arvHistory = [...data.arvTreatmentHistory]
+        while (arvHistory.length < 6) {
+          arvHistory.push({ drug: '', clinic: '', startDate: '', stopDate: '', note: '' })
+        }
+        setArvTreatmentHistory(arvHistory.slice(0, 6).map(arv => ({
+          drug: arv.drug || arv.drugDetails || '',
+          clinic: arv.clinic || '',
+          startDate: arv.startDate || '',
+          stopDate: arv.stopDate || '',
+          note: arv.note || arv.remarks || ''
+        })))
       }
 
-      // Set treatment history with proper structure
-      if (data.arvHistory || data.allergies || data.medicalTreatments) {
-        setTreatmentHistory({
-          drugTreatments: data.arvHistory ? data.arvHistory.map(arv => ({
-            drugDetails: arv.drugDetails || '',
-            clinic: arv.clinic || '',
-            startDate: arv.startDate || '',
-            stopDate: arv.stopDate || '',
-            remarks: arv.remarks || ''
-          })) : Array(6).fill().map(() => ({
-            drugDetails: '',
-            clinic: '',
-            startDate: '',
-            stopDate: '',
-            remarks: ''
-          })),
-          arvMedication: -1,
-          arvDrugs: ['', '', ''],
-          otherTreatments: Array(8).fill().map(() => ({
-            drugDetails: '',
-            clinic: '',
-            startDate: '',
-            stopDate: '',
-            remarks: ''
-          })),
-          drugReactions: data.allergies ? data.allergies.map(allergy => ({
-            drug1: allergy.drug1 || '',
-            reaction1: allergy.reaction1 || '',
-            date1: allergy.date1 || '',
-            drug2: allergy.drug2 || '',
-            reaction2: allergy.reaction2 || '',
-            date2: allergy.date2 || ''
-          })) : Array(3).fill().map(() => ({
-            drug1: '',
-            reaction1: '',
-            date1: '',
-            drug2: '',
-            reaction2: '',
-            date2: ''
-          })),
-          hasDrugReaction: data.allergies && data.allergies.length > 0 ? 1 : -1
+      // Load other medical treatments
+      if (data.otherMedicalTreatments) {
+        setOtherMedicalTreatments({
+          diabetes: data.otherMedicalTreatments.diabetes || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+          hypertension: data.otherMedicalTreatments.hypertension || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+          abnormal: data.otherMedicalTreatments.abnormal || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+          renal: data.otherMedicalTreatments.renal || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+          anemia: data.otherMedicalTreatments.anemia || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+          liver: data.otherMedicalTreatments.liver || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+          hepatitis: data.otherMedicalTreatments.hepatitis || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+          other: data.otherMedicalTreatments.other || { drug: '', clinic: '', startDate: '', stopDate: '', note: '' }
         })
+      }
+
+      // Load allergies
+      if (data.allergies && Array.isArray(data.allergies)) {
+        const allergyList = [...data.allergies]
+        while (allergyList.length < 6) {
+          allergyList.push({ drug: '', reaction: '', date: '' })
+        }
+        setAllergies(allergyList.slice(0, 6).map(a => ({
+          drug: a.drug || a.drug1 || '',
+          reaction: a.reaction || a.reaction1 || '',
+          date: a.date || a.date1 || ''
+        })))
       }
 
       setError('')
@@ -365,16 +347,12 @@ function AdultInitialForm() {
 
   const handleClear = () => {
     setFormData({
-      // Basic Information
       clinicId: '',
       dateFirstVisit: '',
       lostReturn: false,
       typeOfReturn: -1,
       returnClinicId: '',
       oldSiteName: '',
-      patientName: '',
-      
-      // Demographics  
       dateOfBirth: '',
       age: '',
       sex: -1,
@@ -382,41 +360,30 @@ function AdultInitialForm() {
       canRead: -1,
       canWrite: -1,
       nationality: '',
-      
-      // HIV Testing & Referral
+      targetGroup: '',
       referred: -1,
       referredOther: '',
       dateTestHIV: '',
       vcctSite: '',
       vcctId: '',
       previousClinicId: '',
-      
-      // Target Group and Transfer Information
-      targetGroup: -1,
-      refugeeStatus: -1,
-      childrenClinicId: '',
-      
-      // ART Information
-      artNumber: '',
-      dateART: '',
       transferIn: -1,
       transferFrom: '',
-      transferDate: '',
-      
-      // TB Past Medical History
+      dateStartART: '',
+      artNumber: '',
       tbPast: -1,
       tptHistory: -1,
       tptRegimen: -1,
       tptDateStart: '',
       tptDateEnd: '',
       tbType: -1,
-      tbResult: -1,
+      tbResultTest: -1,
       tbDateOnset: '',
-      tbTreatment: -1,
+      tbTreatmentCategory: -1,
       tbDateTreatment: '',
+      tbResultTreatment: -1,
       tbDateComplete: '',
-      
-      // Other Medical History
+      arvHistory: -1,
       diabetes: false,
       hypertension: false,
       abnormal: false,
@@ -425,50 +392,33 @@ function AdultInitialForm() {
       liver: false,
       hepatitis: false,
       other: false,
-      otherIllness: '',
-      
-      // Allergies
       allergy: -1,
-      allergyDetails: ''
+      refugeeStatus: -1,
+      refugeeART: '',
+      refugeeSite: ''
     })
-    setFamilyMembers([])
-    setNewFamilyMember({
-      familyType: '',
-      age: '',
-      hivStatus: '',
-      status: '',
-      startingArt: null,
-      pregnantStatus: null,
-      siteName: '',
-      tbHistory: ''
+    setArvTreatmentHistory(Array(6).fill().map(() => ({
+      drug: '',
+      clinic: '',
+      startDate: '',
+      stopDate: '',
+      note: ''
+    })))
+    setOtherMedicalTreatments({
+      diabetes: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+      hypertension: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+      abnormal: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+      renal: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+      anemia: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+      liver: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+      hepatitis: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' },
+      other: { drug: '', clinic: '', startDate: '', stopDate: '', note: '' }
     })
-    setTreatmentHistory({
-      drugTreatments: Array(6).fill().map(() => ({
-        drugDetails: '',
-        clinic: '',
-        startDate: '',
-        stopDate: '',
-        remarks: ''
-      })),
-      arvMedication: -1,
-      arvDrugs: ['', '', ''],
-      otherTreatments: Array(8).fill().map(() => ({
-        drugDetails: '',
-        clinic: '',
-        startDate: '',
-        stopDate: '',
-        remarks: ''
-      })),
-      drugReactions: Array(3).fill().map(() => ({
-        drug1: '',
-        reaction1: '',
-        date1: '',
-        drug2: '',
-        reaction2: '',
-        date2: ''
-      })),
-      hasDrugReaction: -1
-    })
+    setAllergies(Array(6).fill().map(() => ({
+      drug: '',
+      reaction: '',
+      date: ''
+    })))
     setError('')
   }
 
@@ -477,28 +427,63 @@ function AdultInitialForm() {
       setLoading(true)
       setError('')
       
-      // Validation
+      // Validation matching VB.NET form
       if (!formData.clinicId.trim()) {
         setError('Please input Clinic ID')
         return
       }
-      if (!formData.dateFirstVisit) {
-        setError('Please input Date First Visit')
+      
+      const firstVisitDate = new Date(formData.dateFirstVisit)
+      const minDate = new Date('2000-01-01')
+      if (!formData.dateFirstVisit || firstVisitDate < minDate) {
+        setError('Please input Date First Visit (must be after 2000)')
         return
       }
-      if (parseInt(formData.age) < 15 || parseInt(formData.age) > 120) {
-        setError('Invalid Patient Age! Must be 15+ years for adult patients')
+      
+      const age = parseInt(formData.age)
+      if (isNaN(age) || age < 15 || age > 100) {
+        setError('Invalid Patient Age! Must be between 15 and 100 years for adult patients')
         return
       }
+      
       if (formData.sex === -1) {
         setError('Please select Patient Sex!')
+        return
+      }
+      
+      // VCCT validation for dates after 2023-09-18
+      const validationDate = new Date('2023-09-18')
+      if (firstVisitDate >= validationDate && 
+          formData.typeOfReturn !== 1 && 
+          formData.transferIn !== 1 && 
+          formData.refugeeStatus !== 0) {
+        const testDate = new Date(formData.dateTestHIV)
+        const minTestDate = new Date('1990-01-01')
+        if (!formData.dateTestHIV || testDate < minTestDate) {
+          setError('Please input VCCT Test Date (must be after 1990)')
+          return
+        }
+        if (!formData.vcctSite || formData.vcctSite.trim() === '') {
+          setError('Please select VCCT site name!')
+          return
+        }
+        if (!formData.vcctId || formData.vcctId.trim() === '' || formData.vcctId === '0') {
+          setError('Please input VCCT client code')
+          return
+        }
+      }
+      
+      // Transfer In validation
+      if (formData.transferIn === 1 && (!formData.artNumber || formData.artNumber.trim() === '')) {
+        setError('Please input ART Number!')
         return
       }
 
       const payload = {
         ...formData,
-        familyMembers: familyMembers.filter(fm => fm.familyType.trim()),
-        treatmentHistory: treatmentHistory
+        arvTreatmentHistory: arvTreatmentHistory.filter(arv => arv.drug.trim()),
+        otherMedicalTreatments: otherMedicalTreatments,
+        allergies: allergies.filter(a => a.drug.trim())
       }
 
       if (id) {
@@ -587,70 +572,96 @@ function AdultInitialForm() {
       ) : (
         // Form View - Show tabs and action buttons
         <>
-          {/* Clean Header with action buttons - only when editing/adding */}
-          <div className="bg-white border border-gray-200 rounded-none shadow-sm p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-              <div className="flex items-center space-x-3 sm:space-x-4 order-2 sm:order-1">
-                <Button onClick={backToList} variant="outline" size="sm" className="flex-shrink-0">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Back</span>
+          {/* Minimalistic Header */}
+          <div className="bg-card border-b border-border">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3">
+              <div className="flex items-center gap-3">
+                <Button 
+                  onClick={backToList} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0 hover:bg-muted"
+                >
+                  <ArrowLeft className="w-4 h-4" />
                 </Button>
-                <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-semibold text-foreground truncate">Adult Patient Management</h1>
-                  <p className="text-muted-foreground text-xs sm:text-sm">ការគ្រប់គ្រងអ្នកជំងឺពេញវ័យ</p>
+                <div>
+                  <h1 className="text-lg font-semibold text-foreground">Adult Patient</h1>
+                  <p className="text-xs text-muted-foreground">ការគ្រប់គ្រងអ្នកជំងឺពេញវ័យ</p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2 order-1 sm:order-2">
-                <Button onClick={handleClear} variant="outline" size="sm" className="flex-1 sm:flex-initial">
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Clear</span>
+              <div className="flex items-center gap-2">
+                <Button 
+                  onClick={handleClear} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 text-xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                  Clear
                 </Button>
-                <Button onClick={handleSave} disabled={loading} size="sm" className="flex-1 sm:flex-initial">
-                  <Save className="w-4 h-4 mr-2" />
-                  <span>{loading ? 'Saving...' : 'Save'}</span>
+                <Button 
+                  onClick={handleSave} 
+                  disabled={loading} 
+                  size="sm" 
+                  className="h-8 text-xs"
+                >
+                  <Save className="w-3.5 h-3.5 mr-1.5" />
+                  {loading ? 'Saving...' : 'Save'}
                 </Button>
                 {id && (
-                  <Button onClick={handleDelete} variant="destructive" size="sm" className="flex-1 sm:flex-initial">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Delete</span>
+                  <Button 
+                    onClick={handleDelete} 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 text-xs text-destructive hover:text-destructive-foreground hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                    Delete
                   </Button>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Tabs - only when editing/adding */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList>
-              <TabsTrigger value="form">Patient Information</TabsTrigger>
-              <TabsTrigger value="medical">Medical & Treatment History</TabsTrigger>
-            </TabsList>
+          {/* Main Content */}
+          <div className="px-4">
+            {/* Minimalistic Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted">
+                <TabsTrigger value="form" className="text-sm font-medium">
+                  Information
+                </TabsTrigger>
+                <TabsTrigger value="medical" className="text-sm font-medium">
+                  Medical History
+                </TabsTrigger>
+              </TabsList>
 
-            {/* Patient Information Tab */}
-            <TabsContent value="form" className="space-y-8">
-              <PatientInformation
-                formData={formData}
-                setFormData={setFormData}
-                handleInputChange={handleInputChange}
-                dropdownOptions={dropdownOptions}
-                familyMembers={familyMembers}
-                setFamilyMembers={setFamilyMembers}
-                newFamilyMember={newFamilyMember}
-                setNewFamilyMember={setNewFamilyMember}
-              />
-            </TabsContent>
+              {/* Patient Information Tab */}
+              <TabsContent value="form" className="space-y-6 mt-0">
+                <PatientInformation
+                  formData={formData}
+                  setFormData={setFormData}
+                  handleInputChange={handleInputChange}
+                  dropdownOptions={dropdownOptions}
+                />
+              </TabsContent>
 
-            {/* Medical & Treatment History Tab */}
-            <TabsContent value="medical" className="space-y-6">
-              <MedicalTreatmentHistory
-                formData={formData}
-                setFormData={setFormData}
-                treatmentHistory={treatmentHistory}
-                setTreatmentHistory={setTreatmentHistory}
-                dropdownOptions={dropdownOptions}
-              />
-            </TabsContent>
-          </Tabs>
+              {/* Medical & Treatment History Tab */}
+              <TabsContent value="medical" className="space-y-6 mt-0">
+                <MedicalTreatmentHistory
+                  formData={formData}
+                  setFormData={setFormData}
+                  arvTreatmentHistory={arvTreatmentHistory}
+                  setArvTreatmentHistory={setArvTreatmentHistory}
+                  otherMedicalTreatments={otherMedicalTreatments}
+                  setOtherMedicalTreatments={setOtherMedicalTreatments}
+                  allergies={allergies}
+                  setAllergies={setAllergies}
+                  dropdownOptions={dropdownOptions}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
         </>
       )}
     </div>

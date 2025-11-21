@@ -59,7 +59,7 @@ router.get('/drugs', async (req, res, next) => {
     const siteConnection = await siteDatabaseManager.getSiteConnection(siteCode);
     
     const drugs = await siteConnection.query(`
-      SELECT Did as id, DrugName as name, Status
+      SELECT Did as id, DrugName as name, TypeDrug as drugtype, Status
       FROM tbldrug 
       ORDER BY DrugName
     `, {
@@ -297,6 +297,42 @@ router.get('/hospitals', async (req, res, next) => {
     });
 
     res.json(hospitals);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get all doctors (tbldoctor)
+router.get('/doctors', async (req, res, next) => {
+  try {
+    const siteCode = req.query.site || '0201';
+    const siteConnection = await siteDatabaseManager.getSiteConnection(siteCode);
+    
+    const doctors = await siteConnection.query(`
+      SELECT Did as id, Name as name, Name as doctorname, Did as did
+      FROM tbldoctor 
+      WHERE Status = '1'
+      ORDER BY Name
+    `, {
+      type: siteConnection.QueryTypes.SELECT
+    });
+
+    res.json(doctors);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get all meet times (static list based on tblAppointment.Time field)
+router.get('/meet-times', async (req, res, next) => {
+  try {
+    // Based on schema: Time field values: -1=not selected, 0=Morning, 1=Afternoon
+    const meetTimes = [
+      { id: 0, tid: 0, name: 'Morning', timename: 'Morning', time: 'Morning' },
+      { id: 1, tid: 1, name: 'Afternoon', timename: 'Afternoon', time: 'Afternoon' }
+    ];
+
+    res.json(meetTimes);
   } catch (error) {
     next(error);
   }

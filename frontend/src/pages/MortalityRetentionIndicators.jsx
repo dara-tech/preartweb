@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, BarChart3, Table2 } from 'lucide-react';
 import siteApi from '../services/siteApi';
 import mortalityRetentionApi from '../services/mortalityRetentionApi';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,56 @@ import {
   generateAvailableQuarters,
   getDateRangeForYearQuarter,
 } from '../components/indicators';
+import { IndicatorDetailsModal } from '../components/modals';
+import IndicatorChart from '../components/indicators/IndicatorChart';
+import { Switch } from '../components/ui/switch';
+import { formatDateForTable } from '@/utils/dateFormatter';
+
+const mortalityIndicatorMap = {
+  '1': '1_percentage_died',
+  '2': '2_percentage_lost_to_followup',
+  '3': '3_reengaged_within_28_days',
+  '4': '4_reengaged_over_28_days',
+  '5a': '5a_late_visits_beyond_buffer',
+  '5b': '5b_late_visits_within_buffer',
+  '5c': '5c_visits_on_schedule',
+  '5d': '5d_early_visits',
+  '6a': '6a_same_day_art_initiation',
+  '6b': '6b_art_initiation_1_7_days',
+  '6c': '6c_art_initiation_over_7_days',
+  '7': '7_baseline_cd4_before_art',
+  '8a': '8a_cotrimoxazole_prophylaxis',
+  '8b': '8b_fluconazole_prophylaxis',
+  '9a': '9a_mmd_less_than_3_months',
+  '9b': '9b_mmd_3_months',
+  '9c': '9c_mmd_4_months',
+  '9d': '9d_mmd_5_months',
+  '9e': '9e_mmd_6_plus_months',
+  '10a': '10a_tld_new_initiation',
+  '10b': '10b_tld_cumulative',
+  '11a': '11a_tpt_received',
+  '11b': '11b_tpt_completed',
+  '12a': '12a_vl_testing_coverage',
+  '12b': '12b_vl_monitored_six_months',
+  '12c': '12c_vl_suppression_12_months',
+  '12d': '12d_vl_suppression_overall',
+  '12e': '12e_vl_results_10_days',
+  '13a': '13a_enhanced_adherence_counseling',
+  '13b': '13b_followup_vl_after_counseling',
+  '13c': '13c_vl_suppression_after_counseling',
+  '14a': '14a_first_line_to_second_line',
+  '14b': '14b_second_line_to_third_line',
+  '15': '15_retention_rate'
+};
+
+const getMortalityIndicatorKey = (indicatorName = '') => {
+  if (!indicatorName) return null;
+  const trimmed = indicatorName.trim();
+  const match = trimmed.match(/^(\d+(?:[a-e]?))/i);
+  if (!match) return null;
+  const code = match[1].toLowerCase();
+  return mortalityIndicatorMap[code] || null;
+};
 
 const MortalityRetentionIndicators = () => {
   const { user } = useAuth();
@@ -18,6 +68,58 @@ const MortalityRetentionIndicators = () => {
   const [error, setError] = useState(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const isLoadingRef = useRef(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedIndicator, setSelectedIndicator] = useState(null);
+  const [indicatorDetails, setIndicatorDetails] = useState([]);
+  const [pagination, setPagination] = useState({});
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentFilters, setCurrentFilters] = useState({});
+  const [detailsError, setDetailsError] = useState(null);
+  const [isSampleData] = useState(false);
+  const [sampleDataInfo] = useState(null);
+  const [chartViewIndicators, setChartViewIndicators] = useState(new Set());
+  
+  const toggleChartView = (indicatorIndex) => {
+    setChartViewIndicators(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(indicatorIndex)) {
+        newSet.delete(indicatorIndex);
+      } else {
+        newSet.add(indicatorIndex);
+      }
+      return newSet;
+    });
+  };
+  
+  // Helper function to determine if indicator has percentage column
+  const hasPercentageColumn = (indicator) => {
+    if (!indicator?.Indicator) return false;
+    const indicatorName = indicator.Indicator.toLowerCase();
+    return indicatorName.includes('reengaged') || 
+           indicatorName.includes('same-day') || 
+           indicatorName.includes('initiating art') ||
+           indicatorName.includes('1-7 days') ||
+           indicatorName.includes('>7 days') ||
+           indicatorName.includes('baseline cd4') ||
+           indicatorName.includes('cotrimoxazole') ||
+           indicatorName.includes('fluconazole') ||
+           indicatorName.includes('mmd') ||
+           indicatorName.includes('tld') ||
+           indicatorName.includes('tpt') ||
+           indicatorName.includes('vl') ||
+           indicatorName.includes('retention') ||
+           indicatorName.includes('first line') ||
+           indicatorName.includes('second line') ||
+           indicatorName.includes('third line') ||
+           indicatorName.includes('switch');
+  };
+  
+  // Calculate column span for chart view
+  const getChartColumnSpan = () => {
+    return hasPercentageColumn(indicators[0]) ? 6 : 5;
+  };
   
   // Check if user is a viewer (read-only access)
   const isViewer = user?.role === 'viewer';
@@ -111,12 +213,9 @@ const MortalityRetentionIndicators = () => {
         previousEndDate: dateRange.previousEndDate
       };
 
-      console.log('Fetching mortality indicators with params:', params);
 
       // Use the dedicated mortality retention API to get all indicators at once
       const siteCode = selectedSite.code || selectedSite.site_code || selectedSite.id;
-      console.log('Using site code:', siteCode, 'from site:', selectedSite);
-      console.log('API URL will be:', `/apiv1/mortality-retention-indicators/sites/${siteCode}`);
       
       const response = await mortalityRetentionApi.getAllIndicators(siteCode, {
         startDate: dateRange.startDate,
@@ -129,10 +228,7 @@ const MortalityRetentionIndicators = () => {
         const transformedData = response.data.filter(item => item && item.Indicator);
         
         setIndicators(transformedData);
-        console.log('Loaded indicators:', transformedData.length);
-        console.log('Sample indicator data:', transformedData[0]);
       } else {
-        console.log('No data received from API. Response structure:', response);
         setIndicators([]);
       }
       
@@ -145,6 +241,132 @@ const MortalityRetentionIndicators = () => {
       isLoadingRef.current = false;
     }
   }, [selectedSite, dateRange]);
+
+  const fetchIndicatorDetails = useCallback(
+    async (indicatorData, page = 1, search = '', filters = {}) => {
+      if (!indicatorData || !selectedSite) {
+        setIndicatorDetails([]);
+        return;
+      }
+
+      const siteCode = selectedSite.code || selectedSite.site_code || selectedSite.id;
+      if (!siteCode) {
+        setDetailsError('Unable to determine site code for detail lookup.');
+        setIndicatorDetails([]);
+        return;
+      }
+
+      const indicatorKey = getMortalityIndicatorKey(indicatorData.Indicator);
+      if (!indicatorKey) {
+        setDetailsError('Unable to map indicator to backend query.');
+        setIndicatorDetails([]);
+        return;
+      }
+
+      const isSearchRequest = Boolean(search?.trim()) || page !== 1;
+      if (isSearchRequest) {
+        setSearchLoading(true);
+      } else {
+        setDetailsLoading(true);
+      }
+      setDetailsError(null);
+
+      try {
+        const response = await mortalityRetentionApi.getIndicatorDetails(siteCode, indicatorKey, {
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
+          previousEndDate: dateRange.previousEndDate,
+          page,
+          limit: 50,
+          search,
+          gender: filters.gender,
+          ageGroup: filters.ageGroup
+        });
+
+        if (response?.success) {
+          setIndicatorDetails(response.data || []);
+          setPagination(response.pagination || {});
+          setDetailsError(null);
+        } else {
+          setIndicatorDetails([]);
+          setPagination({});
+          setDetailsError(response?.message || 'Failed to fetch indicator details');
+        }
+      } catch (detailsError) {
+        console.error('Error fetching mortality indicator details:', detailsError);
+        setIndicatorDetails([]);
+        setPagination({});
+        setDetailsError(detailsError.response?.data?.message || detailsError.message || 'Failed to load indicator details.');
+      } finally {
+        setDetailsLoading(false);
+        setSearchLoading(false);
+      }
+    },
+    [selectedSite, dateRange]
+  );
+
+  const handleIndicatorClick = useCallback(
+    (indicatorData, filters = {}) => {
+      if (!indicatorData) return;
+
+      const decoratedIndicator = {
+        ...indicatorData,
+        _displayName: formatIndicatorName(indicatorData.Indicator || 'Indicator'),
+        _primaryValue: getIndicatorValue(indicatorData),
+        _category: getIndicatorCategory(indicatorData.Indicator || '')
+      };
+
+      setSelectedIndicator(decoratedIndicator);
+      setCurrentFilters(filters);
+      setSearchTerm('');
+      setShowDetailsModal(true);
+      fetchIndicatorDetails(decoratedIndicator, 1, '', filters);
+    },
+    [fetchIndicatorDetails]
+  );
+
+  const handleModalClose = () => {
+    setShowDetailsModal(false);
+    setSelectedIndicator(null);
+    setIndicatorDetails([]);
+    setPagination({});
+    setSearchTerm('');
+    setCurrentFilters({});
+    setDetailsError(null);
+  };
+
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+  };
+
+  // Auto-fetch details for indicator 1 when in chart view
+  useEffect(() => {
+    if (indicators.length > 0) {
+      const firstIndicator = indicators[0];
+      const isDiedIndicator = firstIndicator?.Indicator?.toLowerCase().includes('died') || firstIndicator?.Indicator?.toLowerCase().includes('dead');
+      const isChartView = chartViewIndicators.has(0);
+      
+      if (isChartView && isDiedIndicator && !indicatorDetails.length && !detailsLoading) {
+        const decoratedIndicator = {
+          ...firstIndicator,
+          _displayName: formatIndicatorName(firstIndicator.Indicator || 'Indicator'),
+          _primaryValue: getIndicatorValue(firstIndicator),
+          _category: getIndicatorCategory(firstIndicator.Indicator || '')
+        };
+        fetchIndicatorDetails(decoratedIndicator, 1, '', {});
+      }
+    }
+  }, [chartViewIndicators, indicators, indicatorDetails.length, detailsLoading, fetchIndicatorDetails]);
+
+  const handleSearch = async (page = 1, search = searchTerm) => {
+    if (!selectedIndicator) return;
+    await fetchIndicatorDetails(selectedIndicator, page, search, currentFilters);
+  };
+
+  const handlePageChange = async (page) => {
+    if (!selectedIndicator) return;
+    await fetchIndicatorDetails(selectedIndicator, page, searchTerm, currentFilters);
+  };
 
   // Fetch data when site selection or date range changes
   useEffect(() => {
@@ -197,7 +419,7 @@ const MortalityRetentionIndicators = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const getIndicatorCategory = (indicatorName) => {
+  function getIndicatorCategory(indicatorName) {
     if (indicatorName.includes('died') || indicatorName.includes('lost') || indicatorName.includes('reengaged')) {
       return { category: 'Mortality & Re-engagement', color: 'bg-red-100 text-red-800' };
     }
@@ -217,18 +439,14 @@ const MortalityRetentionIndicators = () => {
       return { category: 'Switching & Retention', color: 'bg-yellow-100 text-yellow-800' };
     }
     return { category: 'Other', color: 'bg-gray-100 text-gray-800' };
-  };
+  }
 
-  const getIndicatorValue = (indicator) => {
+  function getIndicatorValue(indicator) {
     // Debug: Log the entire indicator object
-    console.log('getIndicatorValue called with:', indicator);
-    console.log('Indicator name:', indicator.Indicator);
-    console.log('Available fields:', Object.keys(indicator));
     
     // For specific indicators, prioritize their main field
     if (indicator.Indicator && indicator.Indicator.includes('lost to follow-up')) {
       if (indicator.Lost_to_Followup !== undefined && indicator.Lost_to_Followup !== null) {
-        console.log('Found Lost_to_Followup:', indicator.Lost_to_Followup);
         return indicator.Lost_to_Followup;
       }
     }
@@ -236,7 +454,6 @@ const MortalityRetentionIndicators = () => {
     if (indicator.Indicator && indicator.Indicator.includes('reengaged within 28 days')) {
       // For reengagement indicator, show reengaged count as main value
       if (indicator.Reengaged_Within_28 !== undefined && indicator.Reengaged_Within_28 !== null) {
-        console.log('Found Reengaged_Within_28:', indicator.Reengaged_Within_28);
         return indicator.Reengaged_Within_28;
       }
     }
@@ -244,7 +461,6 @@ const MortalityRetentionIndicators = () => {
     if (indicator.Indicator && indicator.Indicator.includes('reengaged after 28+ days')) {
       // For reengagement over 28 days indicator, show reengaged count as main value
       if (indicator.Reengaged_Over_28 !== undefined && indicator.Reengaged_Over_28 !== null) {
-        console.log('Found Reengaged_Over_28:', indicator.Reengaged_Over_28);
         return indicator.Reengaged_Over_28;
       }
     }
@@ -311,23 +527,21 @@ const MortalityRetentionIndicators = () => {
       'TLD_New_Initiation', 'TLD_Cumulative', 'TPT_Received', 'TPT_Completed',
       'VL_Tested_12M', 'VL_Monitored_6M', 'VL_Suppressed_12M', 'VL_Suppressed_Overall', 'Within_10_Days',
       'Received_Counseling', 'Followup_Received', 'Achieved_Suppression', 'Switched_To_Second_Line', 'Switched_To_Third_Line',
+      'Retention_Quarter_Percentage',
       'Total_Retained', 'TOTAL'
     ];
     
     for (const field of possibleValueFields) {
       if (indicator[field] !== undefined && indicator[field] !== null) {
-        console.log(`Found value for ${field}:`, indicator[field]);
         return indicator[field];
       }
     }
     // If no specific field found, try TOTAL as fallback
     if (indicator.TOTAL !== undefined && indicator.TOTAL !== null) {
-      console.log('Using TOTAL fallback:', indicator.TOTAL);
       return indicator.TOTAL;
     }
-    console.log('No value found, returning N/A. Available fields:', Object.keys(indicator));
     return 'N/A';
-  };
+  }
 
   // Helper function to get age/gender values
   const getAgeGenderValue = (indicator, baseField) => {
@@ -365,8 +579,12 @@ const MortalityRetentionIndicators = () => {
     ];
     
     for (const field of possibleFields) {
-      if (indicator[field] !== undefined && indicator[field] !== null && indicator[field] !== '') {
-        return indicator[field];
+      // Check if field exists and is not null/undefined
+      // Allow 0 as a valid value (don't check for empty string, as 0 is valid)
+      if (indicator[field] !== undefined && indicator[field] !== null) {
+        const value = Number(indicator[field]);
+        // Return the value even if it's 0 (0 is a valid count)
+        return isNaN(value) ? 0 : value;
       }
     }
     return 0;
@@ -393,8 +611,27 @@ const MortalityRetentionIndicators = () => {
   // Helper function to get "With CD4" values for baseline CD4 indicator (7)
   const getAgeGenderWithCD4 = (indicator, baseField) => {
     const withCDField = `${baseField}_With_CD4`;
-    if (indicator[withCDField] !== undefined && indicator[withCDField] !== null && indicator[withCDField] !== '') {
-      return indicator[withCDField];
+    // Check if _With_CD4 field exists (even if 0, it's a valid value)
+    if (indicator[withCDField] !== undefined && indicator[withCDField] !== null) {
+      return Number(indicator[withCDField]) || 0;
+    }
+    // Fallback: for indicator 7, the baseField itself contains the numerator (with CD4)
+    if (indicator[baseField] !== undefined && indicator[baseField] !== null) {
+      return Number(indicator[baseField]) || 0;
+    }
+    return 0;
+  };
+
+  // Helper function to get "Receiving" values for prophylaxis indicators (8a, 8b)
+  const getAgeGenderReceiving = (indicator, baseField) => {
+    const receivingField = `${baseField}_Receiving`;
+    // Check if _Receiving field exists (even if 0, it's a valid value)
+    if (indicator[receivingField] !== undefined && indicator[receivingField] !== null) {
+      return Number(indicator[receivingField]) || 0;
+    }
+    // Fallback: for indicators 8a and 8b, the baseField itself contains the numerator (receiving prophylaxis)
+    if (indicator[baseField] !== undefined && indicator[baseField] !== null) {
+      return Number(indicator[baseField]) || 0;
     }
     return 0;
   };
@@ -407,11 +644,22 @@ const MortalityRetentionIndicators = () => {
   };
 
   // Helper function to format indicator names
-  const formatIndicatorName = (name) => {
+  function formatIndicatorName(name) {
     if (!name) return 'Unknown Indicator';
     // Remove leading numbers and make more user-friendly
     let formatted = name.replace(/^\d+[a-z]?\.\s*/, '');
     
+    // Make EAC indicators use the backend title
+    if (formatted.toLowerCase().includes('enhanced adherence counselling')) {
+      return formatted;
+    }
+    if (formatted.toLowerCase().includes('follow-up vl')) {
+      return formatted;
+    }
+    if (formatted.toLowerCase().includes('achieved viral suppression after')) {
+      return formatted;
+    }
+
     // Make reengagement indicators more clear
     if (formatted.includes('reengaged within 28 days')) {
       return 'Early Reengagement (Within 28 Days)';
@@ -490,7 +738,7 @@ const MortalityRetentionIndicators = () => {
     if (formatted.includes('suppressed viral load') || formatted.includes('VL suppression')) {
       return 'VL Suppression Overall';
     }
-    if (formatted.includes('VL')) {
+    if (formatted.trim().toUpperCase() === 'VL') {
       return 'VL';
     }
     
@@ -499,7 +747,7 @@ const MortalityRetentionIndicators = () => {
     }
     
     return formatted;
-  };
+  }
 
   // Get indicator description/insight
   const getIndicatorInsight = (indicator) => {
@@ -577,6 +825,7 @@ const MortalityRetentionIndicators = () => {
   };
 
   return (
+    <>
     <div className="min-h-screen mx-auto lg:max-w-[300mm]  dark:bg-gray-900">
       <div className="space-y-6 p-6">
         {/* Configuration */}
@@ -638,41 +887,47 @@ const MortalityRetentionIndicators = () => {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  {/* Table Header */}
-                  <thead className="bg-muted border-b-2 border-border">
-                    <tr>
-                      <th className="px-4 py-4 text-center text-sm font-bold text-foreground border-r border-border">
-                        Indicator
-                      </th>
-                      <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24 border-r border-border">
-                        Age
-                      </th>
-                      <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                        Male
-                      </th>
-                      <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                        Female
-                      </th>
-                      <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                        Total
-                      </th>
-                      {indicators.some(ind => 
-                        ind.Indicator?.includes('reengaged') || 
-                        ind.Indicator?.includes('same-day') || 
-                        ind.Indicator?.includes('initiating ART') ||
-                        ind.Indicator?.includes('1-7 days') ||
-                        ind.Indicator?.includes('>7 days') ||
-                        ind.Indicator?.includes('baseline CD4') ||
-                        ind.Indicator?.includes('Cotrimoxazole') ||
-                        ind.Indicator?.includes('Fluconazole') ||
-                        ind.Indicator?.includes('MMD')
-                      ) && (
-                        <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24">
-                          %
+                  {/* Table Header - Hide when any indicator is in chart view */}
+                  {chartViewIndicators.size === 0 && (
+                    <thead className="bg-muted border-b-2 border-border">
+                      <tr>
+                        <th className="px-4 py-4 text-center text-sm font-bold text-foreground border-r border-border">
+                          Indicator
                         </th>
-                      )}
-                    </tr>
-                  </thead>
+                        <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24 border-r border-border">
+                          Age
+                        </th>
+                        <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
+                          Male
+                        </th>
+                        <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
+                          Female
+                        </th>
+                        <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
+                          Total
+                        </th>
+                        {indicators.some(ind => 
+                          ind.Indicator?.includes('reengaged') || 
+                          ind.Indicator?.includes('same-day') || 
+                          ind.Indicator?.includes('initiating ART') ||
+                          ind.Indicator?.includes('1-7 days') ||
+                          ind.Indicator?.includes('>7 days') ||
+                          ind.Indicator?.includes('baseline CD4') ||
+                          ind.Indicator?.includes('Cotrimoxazole') ||
+                          ind.Indicator?.includes('Fluconazole') ||
+                          ind.Indicator?.includes('MMD') ||
+                          ind.Indicator?.includes('first line') ||
+                          ind.Indicator?.includes('second line') ||
+                          ind.Indicator?.includes('third line') ||
+                          ind.Indicator?.includes('switch')
+                        ) && (
+                          <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24">
+                            %
+                          </th>
+                        )}
+                      </tr>
+                    </thead>
+                  )}
 
                   {/* Table Body */}
                   <tbody className="bg-card divide-y divide-border">
@@ -683,6 +938,7 @@ const MortalityRetentionIndicators = () => {
                         indicator.Indicator.includes('reengaged within 28 days') ||
                         indicator.Indicator.includes('reengaged after 28+ days')
                       );
+                      const isLateReengagementIndicator = indicator.Indicator && indicator.Indicator.includes('reengaged after 28+ days');
                       const isSameDayIndicator = indicator.Indicator && (
                         indicator.Indicator.includes('same-day') && indicator.Indicator.includes('0 day')
                       );
@@ -709,21 +965,33 @@ const MortalityRetentionIndicators = () => {
                         indicator.Indicator.includes('received TPT') ||
                         indicator.Indicator.includes('completed TPT')
                       );
+                      const indicatorNameLower = (indicator.Indicator || '').toLowerCase();
+                      const indicatorCodeMatch = (indicator.Indicator || '').trim().match(/^(\d+[a-z]?)/i);
+                      const indicatorCode = indicatorCodeMatch ? indicatorCodeMatch[1].toLowerCase() : '';
+                      const isEACIndicator = indicatorCode === '13a';
+                      const isEACFollowupIndicator = indicatorCode === '13b';
+                      const isEACSuppressionIndicator = indicatorCode === '13c';
+                      const isSwitchingIndicator = indicatorCode === '14a' || indicatorCode === '14b';
+                      const isRetentionIndicator = indicatorCode === '15';
                       const isVLIndicator = indicator.Indicator && (
-                        indicator.Indicator.includes('VL') || 
-                        indicator.Indicator.includes('viral load') ||
-                        indicator.Indicator.includes('VL test') ||
-                        indicator.Indicator.includes('VL tested') ||
-                        indicator.Indicator.includes('VL monitored') ||
-                        indicator.Indicator.includes('VL suppression') ||
-                        indicator.Indicator.includes('VL results')
+                        !(isEACIndicator || isEACFollowupIndicator || isEACSuppressionIndicator) &&
+                        (
+                          indicator.Indicator.includes('VL') || 
+                          indicator.Indicator.includes('viral load') ||
+                          indicator.Indicator.includes('VL test') ||
+                          indicator.Indicator.includes('VL tested') ||
+                          indicator.Indicator.includes('VL monitored') ||
+                          indicator.Indicator.includes('VL suppression') ||
+                          indicator.Indicator.includes('VL results')
+                        )
                       );
                   
                       // For MMD indicators, get totals first (denominator for percentage)
-                      const male014TotalMMD = isMMDIndicator ? getAgeGenderValue(indicator, 'Male_0_14') : null;
-                      const female014TotalMMD = isMMDIndicator ? getAgeGenderValue(indicator, 'Female_0_14') : null;
-                      const male15PlusTotalMMD = isMMDIndicator ? getAgeGenderValue(indicator, 'Male_over_14') : null;
-                      const female15PlusTotalMMD = isMMDIndicator ? getAgeGenderValue(indicator, 'Female_over_14') : null;
+                      // Use _Total fields as denominators (total active patients by demographic)
+                      const male014TotalMMD = isMMDIndicator ? (indicator.Male_0_14_Total || 0) : null;
+                      const female014TotalMMD = isMMDIndicator ? (indicator.Female_0_14_Total || 0) : null;
+                      const male15PlusTotalMMD = isMMDIndicator ? (indicator.Male_over_14_Total || 0) : null;
+                      const female15PlusTotalMMD = isMMDIndicator ? (indicator.Female_over_14_Total || 0) : null;
                       
                       // For MMD indicators, get the category-specific counts (numerator for display and percentage)
                       // The category-specific fields (Male_0_14_Less_3M, etc.) contain the counts to display
@@ -798,6 +1066,36 @@ const MortalityRetentionIndicators = () => {
                       const male15PlusTotalTPT = isTPTIndicator ? getAgeGenderValue(indicator, 'Male_over_14') : null;
                       const female15PlusTotalTPT = isTPTIndicator ? getAgeGenderValue(indicator, 'Female_over_14') : null;
                       
+                      // For EAC indicators (13a, 13b, 13c), extract the appropriate numerator counts
+                      const male014EAC = isEACIndicator
+                        ? (indicator.Male_0_14_Received ?? null)
+                        : isEACFollowupIndicator
+                          ? (indicator.Male_0_14_Followup ?? null)
+                          : isEACSuppressionIndicator
+                            ? (indicator.Male_0_14_Suppressed ?? null)
+                            : null;
+                      const female014EAC = isEACIndicator
+                        ? (indicator.Female_0_14_Received ?? null)
+                        : isEACFollowupIndicator
+                          ? (indicator.Female_0_14_Followup ?? null)
+                          : isEACSuppressionIndicator
+                            ? (indicator.Female_0_14_Suppressed ?? null)
+                            : null;
+                      const male15PlusEAC = isEACIndicator
+                        ? (indicator.Male_over_14_Received ?? null)
+                        : isEACFollowupIndicator
+                          ? (indicator.Male_over_14_Followup ?? null)
+                          : isEACSuppressionIndicator
+                            ? (indicator.Male_over_14_Suppressed ?? null)
+                            : null;
+                      const female15PlusEAC = isEACIndicator
+                        ? (indicator.Female_over_14_Received ?? null)
+                        : isEACFollowupIndicator
+                          ? (indicator.Female_over_14_Followup ?? null)
+                          : isEACSuppressionIndicator
+                            ? (indicator.Female_over_14_Suppressed ?? null)
+                            : null;
+                      
                       // For VL indicators, get VL-specific counts and totals
                       const isVLTestingCoverageIndicator = isVLIndicator && indicator.Indicator && indicator.Indicator.includes('VL test in past 12 months');
                       const isVLMonitoredIndicator = isVLIndicator && indicator.Indicator && indicator.Indicator.includes('VL monitored at six months');
@@ -841,10 +1139,29 @@ const MortalityRetentionIndicators = () => {
                       // For MMD indicators, display category counts
                       // For TPT indicators, display TPT counts (numerator)
                       // For VL indicators, display VL counts (numerator)
-                      const male014 = isVLIndicator ? (male014VL || 0) : (isTPTIndicator ? (male014TPT || 0) : (isTLDIndicator ? (male014TLD || 0) : (isMMDIndicator ? (male014Category || 0) : getAgeGenderValue(indicator, 'Male_0_14'))));
-                      const female014 = isVLIndicator ? (female014VL || 0) : (isTPTIndicator ? (female014TPT || 0) : (isTLDIndicator ? (female014TLD || 0) : (isMMDIndicator ? (female014Category || 0) : getAgeGenderValue(indicator, 'Female_0_14'))));
-                      const male15Plus = isVLIndicator ? (male15PlusVL || 0) : (isTPTIndicator ? (male15PlusTPT || 0) : (isTLDIndicator ? (male15PlusTLD || 0) : (isMMDIndicator ? (male15PlusCategory || 0) : getAgeGenderValue(indicator, 'Male_over_14'))));
-                      const female15Plus = isVLIndicator ? (female15PlusVL || 0) : (isTPTIndicator ? (female15PlusTPT || 0) : (isTLDIndicator ? (female15PlusTLD || 0) : (isMMDIndicator ? (female15PlusCategory || 0) : getAgeGenderValue(indicator, 'Female_over_14'))));
+                      // For baseline CD4 indicator (7), use "With CD4" values
+                      // For prophylaxis indicators (8a, 8b), use "Receiving" values
+                      // For late reengagement indicator (4), use eligible fields instead of total missed
+                      const male014 = isVLIndicator ? (male014VL || 0)
+                        : (isEACIndicator || isEACFollowupIndicator || isEACSuppressionIndicator) ? (Number(male014EAC ?? 0))
+                        : isBaselineCD4Indicator ? getAgeGenderWithCD4(indicator, 'Male_0_14')
+                        : isProphylaxisIndicator ? getAgeGenderReceiving(indicator, 'Male_0_14')
+                        : (isTPTIndicator ? (male014TPT || 0) : (isTLDIndicator ? (male014TLD || 0) : (isMMDIndicator ? (male014Category || 0) : (isLateReengagementIndicator ? (indicator.Male_0_14_Eligible || 0) : getAgeGenderValue(indicator, 'Male_0_14')))));
+                      const female014 = isVLIndicator ? (female014VL || 0)
+                        : (isEACIndicator || isEACFollowupIndicator || isEACSuppressionIndicator) ? (Number(female014EAC ?? 0))
+                        : isBaselineCD4Indicator ? getAgeGenderWithCD4(indicator, 'Female_0_14')
+                        : isProphylaxisIndicator ? getAgeGenderReceiving(indicator, 'Female_0_14')
+                        : (isTPTIndicator ? (female014TPT || 0) : (isTLDIndicator ? (female014TLD || 0) : (isMMDIndicator ? (female014Category || 0) : (isLateReengagementIndicator ? (indicator.Female_0_14_Eligible || 0) : getAgeGenderValue(indicator, 'Female_0_14')))));
+                      const male15Plus = isVLIndicator ? (male15PlusVL || 0)
+                        : (isEACIndicator || isEACFollowupIndicator || isEACSuppressionIndicator) ? (Number(male15PlusEAC ?? 0))
+                        : isBaselineCD4Indicator ? getAgeGenderWithCD4(indicator, 'Male_over_14')
+                        : isProphylaxisIndicator ? getAgeGenderReceiving(indicator, 'Male_over_14')
+                        : (isTPTIndicator ? (male15PlusTPT || 0) : (isTLDIndicator ? (male15PlusTLD || 0) : (isMMDIndicator ? (male15PlusCategory || 0) : (isLateReengagementIndicator ? (indicator.Male_over_14_Eligible || 0) : getAgeGenderValue(indicator, 'Male_over_14')))));
+                      const female15Plus = isVLIndicator ? (female15PlusVL || 0)
+                        : (isEACIndicator || isEACFollowupIndicator || isEACSuppressionIndicator) ? (Number(female15PlusEAC ?? 0))
+                        : isBaselineCD4Indicator ? getAgeGenderWithCD4(indicator, 'Female_over_14')
+                        : isProphylaxisIndicator ? getAgeGenderReceiving(indicator, 'Female_over_14')
+                        : (isTPTIndicator ? (female15PlusTPT || 0) : (isTLDIndicator ? (female15PlusTLD || 0) : (isMMDIndicator ? (female15PlusCategory || 0) : (isLateReengagementIndicator ? (indicator.Female_over_14_Eligible || 0) : getAgeGenderValue(indicator, 'Female_over_14')))));
                       
                       // For reengagement indicator, get reengaged counts
                       const male014Reengaged = isReengagementIndicator ? getAgeGenderReengaged(indicator, 'Male_0_14') : null;
@@ -895,7 +1212,15 @@ const MortalityRetentionIndicators = () => {
                       const total15Plus = Number(male15Plus || 0) + Number(female15Plus || 0);
                       const totalMale = Number(male014 || 0) + Number(male15Plus || 0);
                       const totalFemale = Number(female014 || 0) + Number(female15Plus || 0);
-                      const grandTotal = total014 + total15Plus;
+                      let grandTotal = total014 + total15Plus;
+
+                      if (isEACIndicator) {
+                        grandTotal = Number(indicator.Received_Counseling || 0);
+                      } else if (isEACFollowupIndicator) {
+                        grandTotal = Number(indicator.Followup_Received || 0);
+                      } else if (isEACSuppressionIndicator) {
+                        grandTotal = Number(indicator.Achieved_Suppression || 0);
+                      }
                       
                       // For MMD indicators, calculate totals for percentage calculation
                       // Use total counts (denominator) for percentage calculation
@@ -1019,16 +1344,109 @@ const MortalityRetentionIndicators = () => {
                       const calculatedPercentage = isArtInitiationIndicator && grandTotal > 0 && totalNewlyInitiated > 0 
                         ? Math.round((grandTotal / totalNewlyInitiated) * 100) 
                         : (isArtInitiationIndicator ? 0 : (percentage !== undefined && percentage !== null ? percentage : null));
+                      const switchingConsecutiveTotal = isSwitchingIndicator
+                        ? (indicator.Total_With_Consecutive_High_VL ?? indicator.Total_Second_Line_With_Consecutive_High_VL ?? null)
+                        : null;
+                  
+                  const isChartView = chartViewIndicators.has(index);
+                  const isFirstIndicator = index === 0;
+                  const isDiedIndicator = indicator.Indicator?.toLowerCase().includes('died') || indicator.Indicator?.toLowerCase().includes('dead');
+                  const shouldShowDetailsTable = isChartView && isFirstIndicator && isDiedIndicator;
                   
                   return (
                         <React.Fragment key={index}>
+                          {isChartView ? (
+                            <>
+                            {/* Chart View - Single row spanning all columns */}
+                            <tr className="border-b-2 border-primary/20 bg-muted/30 transition-colors">
+                              <td colSpan={hasPercentageColumn(indicator) ? 6 : 5} className="px-6 py-6">
+                                <div className="w-full space-y-3">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="text-sm font-semibold text-foreground">
+                                      {formatIndicatorName(indicator.Indicator || 'Unknown')}
+                                    </h4>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleChartView(index)}
+                                      className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                                    >
+                                      <Table2 className="h-3 w-3" />
+                                      Back to table
+                                    </button>
+                                  </div>
+                                  <div className="bg-background rounded-lg border border-border p-4">
+                                    <IndicatorChart indicator={indicator} compact={true} />
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                            {/* Detail Table for Indicator 1 */}
+                            {shouldShowDetailsTable && (
+                              <tr className="border-b-2 border-primary/20 bg-muted/30 transition-colors">
+                                <td colSpan={hasPercentageColumn(indicator) ? 6 : 5} className="px-6 py-6">
+                                  <div className="w-full space-y-3">
+                                    <h5 className="text-sm font-semibold text-foreground mb-3">Detail Records</h5>
+                                    {detailsLoading ? (
+                                      <div className="text-center py-4 text-muted-foreground">Loading details...</div>
+                                    ) : detailsError ? (
+                                      <div className="text-center py-4 text-destructive">{detailsError}</div>
+                                    ) : indicatorDetails.length === 0 ? (
+                                      <div className="text-center py-4 text-muted-foreground">No records found</div>
+                                    ) : (
+                                      <div className="border rounded-lg overflow-hidden">
+                                        <table className="w-full text-xs">
+                                          <thead className="bg-primary text-primary-foreground">
+                                            <tr>
+                                              <th className="px-2 py-2 text-left border-r">Nº</th>
+                                              <th className="px-2 py-2 text-left border-r">ClinicID</th>
+                                              <th className="px-2 py-2 text-left border-r">ART</th>
+                                              <th className="px-2 py-2 text-left border-r">Sex</th>
+                                              <th className="px-2 py-2 text-left border-r">Age</th>
+                                              <th className="px-2 py-2 text-left border-r">Date Report Died</th>
+                                              <th className="px-2 py-2 text-left border-r">Died Place</th>
+                                              <th className="px-2 py-2 text-left">Remark</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {indicatorDetails.slice(0, 10).map((record, idx) => (
+                                              <tr key={idx} className="border-b hover:bg-muted/50">
+                                                <td className="px-2 py-2 text-center border-r">{idx + 1}</td>
+                                                <td className="px-2 py-2 border-r">{record.clinicid || 'N/A'}</td>
+                                                <td className="px-2 py-2 border-r">{record.art_number || record.ART || 'N/A'}</td>
+                                                <td className="px-2 py-2 border-r">
+                                                  {record.sex_display === 'Male' ? 'M' : record.sex_display === 'Female' ? 'F' : record.sex_display || 'N/A'}
+                                                </td>
+                                                <td className="px-2 py-2 border-r">{record.age || 'N/A'}</td>
+                                                <td className="px-2 py-2 border-r">
+                                                  {record.death_date ? formatDateForTable(record.death_date) : 'N/A'}
+                                                </td>
+                                                <td className="px-2 py-2 border-r">{record.death_place || 'N/A'}</td>
+                                                <td className="px-2 py-2">{record.death_reason || ''}</td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                        {indicatorDetails.length > 10 && (
+                                          <div className="text-center py-2 text-xs text-muted-foreground border-t">
+                                            Showing 10 of {indicatorDetails.length} records. Click "View details" to see all.
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                            </>
+                          ) : (
+                            <>
                           {/* Indicator Header Row with Name */}
                           <tr className="border-b border-border">
                             {/* Indicator Name - spans 3 rows */}
                             <td className="px-4 py-4 text-sm text-foreground align-middle text-left border-r border-border" rowSpan="3">
                               <div className="font-medium leading-tight text-left">
                             {formatIndicatorName(indicator.Indicator || 'Unknown')}
-                              </div>
+                        </div>
                               {isReengagementIndicator && indicator.Total_Lost !== undefined && (
                                 <div className="mt-2 text-xs text-muted-foreground">
                                   Total Missed: {formatNumber(indicator.Total_Lost || 0)}
@@ -1054,6 +1472,59 @@ const MortalityRetentionIndicators = () => {
                                   Total ART Patients: {formatNumber(indicator.Total_ART_Patients || 0)}
                                 </div>
                               )}
+                              {(isEACIndicator || isEACFollowupIndicator || isEACSuppressionIndicator) && indicator.Eligible_Patients !== undefined && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                  Eligible High VL: {formatNumber(indicator.Eligible_Patients || 0)}
+                                </div>
+                              )}
+                              {isEACIndicator && indicator.Total_High_VL !== undefined && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  Total High VL: {formatNumber(indicator.Total_High_VL || 0)}
+                                </div>
+                              )}
+                              {isEACFollowupIndicator && indicator.Followup_Received !== undefined && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  Follow-up VL Received: {formatNumber(indicator.Followup_Received || 0)}
+                                </div>
+                              )}
+                              {isEACSuppressionIndicator && indicator.With_Followup_VL !== undefined && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  With Follow-up VL: {formatNumber(indicator.With_Followup_VL || 0)}
+                                </div>
+                              )}
+                              {isEACSuppressionIndicator && indicator.Achieved_Suppression !== undefined && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  Achieved Suppression: {formatNumber(indicator.Achieved_Suppression || 0)}
+                                </div>
+                              )}
+                              {isSwitchingIndicator && indicator.Eligible_Patients !== undefined && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                  Eligible For Switch: {formatNumber(indicator.Eligible_Patients || 0)}
+                                </div>
+                              )}
+                              {isSwitchingIndicator && switchingConsecutiveTotal !== null && switchingConsecutiveTotal !== undefined && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  Consecutive High VL: {formatNumber(switchingConsecutiveTotal || 0)}
+                                </div>
+                              )}
+                              {isRetentionIndicator && (
+                                <>
+                                  <div className="mt-2 text-xs text-muted-foreground">
+                                    TX_CURR Prior: {formatNumber(indicator.TX_CURR_Prior || 0)}
+                                  </div>
+                                  <div className="mt-1 text-xs text-muted-foreground">
+                                    TX_NEW: {formatNumber(indicator.TX_NEW || 0)}
+                                  </div>
+                                  <div className="mt-1 text-xs text-muted-foreground">
+                                    TX_CURR Current: {formatNumber(indicator.TX_CURR_Current || 0)}
+                                  </div>
+                                  {indicator.Retention_Annualized_Percentage !== undefined && (
+                                    <div className="mt-1 text-xs font-semibold text-green-600">
+                                      Annualized Retention: {formatNumber(indicator.Retention_Annualized_Percentage || 0)}%
+                                    </div>
+                                  )}
+                                </>
+                              )}
                               {isVLSuppression12MIndicator && indicator.VL_Tested_12M !== undefined && (
                                 <div className="mt-2 text-xs text-muted-foreground">
                                   VL Tested 12M: {formatNumber(indicator.VL_Tested_12M || 0)}
@@ -1071,14 +1542,36 @@ const MortalityRetentionIndicators = () => {
                               )}
                               {isVLIndicator && indicator.Total_With_Dates !== undefined && indicator.Total_ART_Patients === undefined && indicator.Total_Eligible_Patients === undefined && !isVLSuppression12MIndicator && (
                                 <div className="mt-2 text-xs text-muted-foreground">
-                                  Total With Dates: {formatNumber(indicator.Total_With_Dates || 0)}
+                                  Total Tested With Dates: {formatNumber(indicator.Total_With_Dates || 0)}
                                 </div>
                               )}
-                              {percentage !== undefined && percentage !== null && (
+                              {(isArtInitiationIndicator ? (calculatedPercentage !== null && calculatedPercentage !== undefined) : (percentage !== undefined && percentage !== null)) && (
                                 <div className="mt-1 text-xs font-semibold text-green-600">
-                                  {formatNumber(percentage)}%
+                                  {formatNumber(isArtInitiationIndicator ? calculatedPercentage : percentage)}%
                                 </div>
                               )}
+                              <div className="mt-3 space-y-2">
+                                <button
+                                  type="button"
+                                  className="text-xs font-semibold text-primary hover:underline focus:outline-none transition-colors"
+                                  onClick={() => handleIndicatorClick(indicator)}
+                                >
+                                  View details
+                                </button>
+                                <div className="flex items-center gap-2 pt-1 border-t border-border/50">
+                                  <Table2 className={`h-3.5 w-3.5 transition-colors ${chartViewIndicators.has(index) ? 'text-muted-foreground' : 'text-primary'}`} />
+                                  <Switch
+                                    checked={chartViewIndicators.has(index)}
+                                    onCheckedChange={() => toggleChartView(index)}
+                                    className="scale-75"
+                                    aria-label="Toggle chart view"
+                                  />
+                                  <BarChart3 className={`h-3.5 w-3.5 transition-colors ${chartViewIndicators.has(index) ? 'text-primary' : 'text-muted-foreground'}`} />
+                                  <span className="text-[10px] text-muted-foreground ml-1">
+                                    {chartViewIndicators.has(index) ? 'Chart' : 'Table'}
+                                  </span>
+                                </div>
+                              </div>
                             </td>
 
                             {/* Age 0-14 */}
@@ -1093,9 +1586,9 @@ const MortalityRetentionIndicators = () => {
                                 {isReengagementIndicator && male014Reengaged !== null && male014 > 0 && (
                                   <div className="text-xs text-blue-600 dark:text-blue-400">
                                     ({formatNumber(male014Reengaged)} returned)
-                                  </div>
+                            </div>
                                 )}
-                              </div>
+                          </div>
                             </td>
 
                             {/* Female 0-14 */}
@@ -1105,9 +1598,9 @@ const MortalityRetentionIndicators = () => {
                                 {isReengagementIndicator && female014Reengaged !== null && female014 > 0 && (
                                   <div className="text-xs text-pink-600 dark:text-pink-400">
                                     ({formatNumber(female014Reengaged)} returned)
-                                  </div>
+                            </div>
                                 )}
-                        </div>
+                          </div>
                             </td>
 
                             {/* Total 0-14 */}
@@ -1117,13 +1610,13 @@ const MortalityRetentionIndicators = () => {
                                 {isReengagementIndicator && total014Reengaged !== null && total014 > 0 && (
                                   <div className="text-xs text-muted-foreground">
                                     ({formatNumber(total014Reengaged)} returned)
-                            </div>
+                              </div>
                                 )}
-                          </div>
+                            </div>
                             </td>
 
                             {/* Percentage column for reengagement, ART initiation, baseline CD4, prophylaxis, MMD, TLD, TPT, and VL indicators */}
-                            {indicators.some(ind => 
+                      {indicators.some(ind => 
                               ind.Indicator?.includes('reengaged') || 
                               ind.Indicator?.includes('same-day') || 
                               ind.Indicator?.includes('initiating ART') ||
@@ -1135,24 +1628,37 @@ const MortalityRetentionIndicators = () => {
                               ind.Indicator?.includes('MMD') ||
                               ind.Indicator?.includes('TLD') ||
                               ind.Indicator?.includes('TPT') ||
-                              ind.Indicator?.includes('VL')
+                        ind.Indicator?.includes('VL') ||
+                        ind.Indicator?.includes('retention') ||
+                              ind.Indicator?.includes('first line') ||
+                              ind.Indicator?.includes('second line') ||
+                              ind.Indicator?.includes('third line') ||
+                              ind.Indicator?.includes('switch')
                             ) && (
                               <td className="px-3 py-4 text-right">
                                 {isReengagementIndicator && total014 > 0 && total014Reengaged !== null ? (
                                   <div className="text-sm font-semibold text-green-600">
                                     {Math.round((total014Reengaged / total014) * 100)}%
                                   </div>
-                                ) : isBaselineCD4Indicator && total014 > 0 && total014WithCD4 !== null ? (
-                                  <div className="text-sm font-semibold text-green-600">
-                                    {Math.round((total014WithCD4 / total014) * 100)}%
-                                  </div>
                                 ) : isBaselineCD4Indicator && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
-                                ) : isProphylaxisIndicator && total014 > 0 && percentage !== null && percentage !== undefined ? (
                                   <div className="text-sm font-semibold text-green-600">
-                                    {Math.round(percentage)}%
+                                    {(() => {
+                                      // For baseline CD4 indicator, calculate percentage using _Total fields as denominator
+                                      const total014Denominator = (Number(indicator.Male_0_14_Total || 0) + Number(indicator.Female_0_14_Total || 0));
+                                      return total014Denominator > 0 ? Math.round((total014 / total014Denominator) * 100) : 0;
+                                    })()}%
                                   </div>
+                                ) : isBaselineCD4Indicator ? (
+                                  <div className="text-sm font-semibold text-green-600">0%</div>
                                 ) : isProphylaxisIndicator && total014 > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">
+                                    {(() => {
+                                      // For prophylaxis indicators, calculate percentage using _Total fields as denominator
+                                      const total014Denominator = (Number(indicator.Male_0_14_Total || 0) + Number(indicator.Female_0_14_Total || 0));
+                                      return total014Denominator > 0 ? Math.round((total014 / total014Denominator) * 100) : 0;
+                                    })()}%
+                                  </div>
+                                ) : isProphylaxisIndicator ? (
                                   <div className="text-sm font-semibold text-green-600">0%</div>
                                 ) : isMMDIndicator && total014MMD !== null && total014MMD > 0 && total014 > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">
@@ -1192,6 +1698,14 @@ const MortalityRetentionIndicators = () => {
                                   <div className="text-sm font-semibold text-green-600">0%</div>
                                 ) : isVLIndicator && total014 > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">0%</div>
+                                ) : isSwitchingIndicator && percentage !== null && percentage !== undefined ? (
+                                  <div className="text-sm font-semibold text-green-600">
+                                    {Math.round(percentage)}%
+                                  </div>
+                                ) : isRetentionIndicator && percentage !== null && percentage !== undefined ? (
+                                  <div className="text-sm font-semibold text-green-600">
+                                    {Math.round(percentage)}%
+                                  </div>
                                 ) : isArtInitiationIndicator && total014NewlyInitiated > 0 ? (
                                   <div className="text-sm font-semibold text-green-600">
                                     {Math.round((total014 / total014NewlyInitiated) * 100)}%
@@ -1216,7 +1730,7 @@ const MortalityRetentionIndicators = () => {
                                 {isReengagementIndicator && male15PlusReengaged !== null && male15Plus > 0 && (
                                   <div className="text-xs text-blue-600 dark:text-blue-400">
                                     ({formatNumber(male15PlusReengaged)} returned)
-                                  </div>
+                        </div>
                                 )}
                               </div>
                             </td>
@@ -1252,25 +1766,38 @@ const MortalityRetentionIndicators = () => {
                                 ind.Indicator?.includes('MMD') ||
                                 ind.Indicator?.includes('TLD') ||
                                 ind.Indicator?.includes('TPT') ||
-                                ind.Indicator?.includes('VL')
+                                ind.Indicator?.includes('VL') ||
+                                ind.Indicator?.includes('retention') ||
+                                ind.Indicator?.includes('first line') ||
+                                ind.Indicator?.includes('second line') ||
+                                ind.Indicator?.includes('third line') ||
+                                ind.Indicator?.includes('switch')
                               ) && (
                                 <td className="px-3 py-3 text-right">
                                   {isReengagementIndicator && total15Plus > 0 && total15PlusReengaged !== null ? (
                                     <div className="text-sm font-semibold text-green-600">
                                       {Math.round((total15PlusReengaged / total15Plus) * 100)}%
                                     </div>
-                                  ) : isBaselineCD4Indicator && total15Plus > 0 && total15PlusWithCD4 !== null ? (
-                                    <div className="text-sm font-semibold text-green-600">
-                                      {Math.round((total15PlusWithCD4 / total15Plus) * 100)}%
-                                    </div>
                                   ) : isBaselineCD4Indicator && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
-                                  ) : isProphylaxisIndicator && total15Plus > 0 && percentage !== null && percentage !== undefined ? (
                                     <div className="text-sm font-semibold text-green-600">
-                                      {Math.round(percentage)}%
+                                      {(() => {
+                                        // For baseline CD4 indicator, calculate percentage using _Total fields as denominator
+                                        const total15PlusDenominator = (Number(indicator.Male_over_14_Total || 0) + Number(indicator.Female_over_14_Total || 0));
+                                        return total15PlusDenominator > 0 ? Math.round((total15Plus / total15PlusDenominator) * 100) : 0;
+                                      })()}%
                                     </div>
-                                  ) : isProphylaxisIndicator && total15Plus > 0 ? (
+                                  ) : isBaselineCD4Indicator ? (
                                     <div className="text-sm font-semibold text-green-600">0%</div>
+                                  ) : isProphylaxisIndicator && total15Plus > 0 ? (
+                                  <div className="text-sm font-semibold text-green-600">
+                                    {(() => {
+                                      // For prophylaxis indicators, calculate percentage using _Total fields as denominator
+                                      const total15PlusDenominator = (Number(indicator.Male_over_14_Total || 0) + Number(indicator.Female_over_14_Total || 0));
+                                      return total15PlusDenominator > 0 ? Math.round((total15Plus / total15PlusDenominator) * 100) : 0;
+                                    })()}%
+                                  </div>
+                                ) : isProphylaxisIndicator ? (
+                                  <div className="text-sm font-semibold text-green-600">0%</div>
                                   ) : isMMDIndicator && total15PlusMMD !== null && total15PlusMMD > 0 && total15Plus > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">
                                       {Math.round((total15Plus / total15PlusMMD) * 100)}%
@@ -1309,6 +1836,14 @@ const MortalityRetentionIndicators = () => {
                                     <div className="text-sm font-semibold text-green-600">0%</div>
                                   ) : isVLIndicator && total15Plus > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">0%</div>
+                                  ) : isSwitchingIndicator && percentage !== null && percentage !== undefined ? (
+                                    <div className="text-sm font-semibold text-green-600">
+                                      {Math.round(percentage)}%
+                                    </div>
+                                  ) : isRetentionIndicator && percentage !== null && percentage !== undefined ? (
+                                    <div className="text-sm font-semibold text-green-600">
+                                      {Math.round(percentage)}%
+                                    </div>
                                   ) : isArtInitiationIndicator && total15PlusNewlyInitiated > 0 ? (
                                     <div className="text-sm font-semibold text-green-600">
                                       {Math.round((total15Plus / total15PlusNewlyInitiated) * 100)}%
@@ -1333,9 +1868,9 @@ const MortalityRetentionIndicators = () => {
                                 {isReengagementIndicator && totalMaleReengaged !== null && totalMale > 0 && (
                                   <div className="text-xs text-blue-600 dark:text-blue-400">
                                     ({formatNumber(totalMaleReengaged)} returned)
-                                  </div>
+                            </div>
                                 )}
-                              </div>
+                            </div>
                             </td>
                             <td className="px-3 py-3 text-right border-r border-border">
                               <div className={`text-lg font-bold ${isReengagementIndicator ? 'text-foreground' : 'text-pink-700 dark:text-pink-400'}`}>
@@ -1343,7 +1878,7 @@ const MortalityRetentionIndicators = () => {
                                 {isReengagementIndicator && totalFemaleReengaged !== null && totalFemale > 0 && (
                                   <div className="text-xs text-pink-600 dark:text-pink-400">
                                     ({formatNumber(totalFemaleReengaged)} returned)
-                                  </div>
+                            </div>
                                 )}
                             </div>
                             </td>
@@ -1353,9 +1888,9 @@ const MortalityRetentionIndicators = () => {
                                 {isReengagementIndicator && grandTotalReengaged !== null && grandTotal > 0 && (
                                   <div className="text-xs text-muted-foreground">
                                     ({formatNumber(grandTotalReengaged)} returned)
-                            </div>
+                          </div>
                                 )}
-                            </div>
+                        </div>
                             </td>
                               {indicators.some(ind => 
                                 ind.Indicator?.includes('reengaged') || 
@@ -1369,17 +1904,22 @@ const MortalityRetentionIndicators = () => {
                                 ind.Indicator?.includes('MMD') ||
                                 ind.Indicator?.includes('TLD') ||
                                 ind.Indicator?.includes('TPT') ||
-                                ind.Indicator?.includes('VL')
+                                ind.Indicator?.includes('VL') ||
+                                ind.Indicator?.includes('retention') ||
+                                ind.Indicator?.includes('first line') ||
+                                ind.Indicator?.includes('second line') ||
+                                ind.Indicator?.includes('third line') ||
+                                ind.Indicator?.includes('switch')
                               ) && (
                                 <td className="px-3 py-3 text-right">
                                   {isReengagementIndicator && grandTotal > 0 && grandTotalReengaged !== null ? (
                                     <div className="text-lg font-bold text-green-700">
                                       {Math.round((grandTotalReengaged / grandTotal) * 100)}%
-                            </div>
+                      </div>
                                   ) : isBaselineCD4Indicator && grandTotal > 0 && grandTotalWithCD4 !== null ? (
                                     <div className="text-lg font-bold text-green-700">
                                       {Math.round((grandTotalWithCD4 / grandTotal) * 100)}%
-                          </div>
+                    </div>
                                   ) : isBaselineCD4Indicator && grandTotal > 0 ? (
                                     <div className="text-lg font-bold text-green-700">0%</div>
                                   ) : isProphylaxisIndicator && grandTotal > 0 && percentage !== null && percentage !== undefined ? (
@@ -1426,9 +1966,17 @@ const MortalityRetentionIndicators = () => {
                                     <div className="text-lg font-bold text-green-700">0%</div>
                                   ) : isVLIndicator && grandTotal > 0 ? (
                                     <div className="text-lg font-bold text-green-700">0%</div>
+                                  ) : isRetentionIndicator && percentage !== null && percentage !== undefined ? (
+                                    <div className="text-lg font-bold text-green-700">
+                                      {Math.round(percentage)}%
+                                    </div>
+                                  ) : isSwitchingIndicator && percentage !== null && percentage !== undefined ? (
+                                    <div className="text-lg font-bold text-green-700">
+                                      {Math.round(percentage)}%
+                                    </div>
                                   ) : isArtInitiationIndicator && totalNewlyInitiated > 0 ? (
                                     <div className="text-lg font-bold text-green-700">
-                                      {grandTotal > 0 ? Math.round((grandTotal / totalNewlyInitiated) * 100) : 0}%
+                                      {calculatedPercentage !== null && calculatedPercentage !== undefined ? calculatedPercentage : (grandTotal > 0 ? Math.round((grandTotal / totalNewlyInitiated) * 100) : 0)}%
                     </div>
                                   ) : (
                                     <div className="text-sm text-muted-foreground">—</div>
@@ -1436,6 +1984,8 @@ const MortalityRetentionIndicators = () => {
                                 </td>
                               )}
                             </tr>
+                            </>
+                          )}
                         </React.Fragment>
                   );
                 })}
@@ -1447,6 +1997,26 @@ const MortalityRetentionIndicators = () => {
         </div>
       </div>
     </div>
+      <IndicatorDetailsModal
+        isOpen={showDetailsModal}
+        onClose={handleModalClose}
+        selectedIndicator={selectedIndicator}
+        indicatorDetails={indicatorDetails}
+        pagination={pagination}
+        detailsLoading={detailsLoading}
+        searchLoading={searchLoading}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        onSearch={handleSearch}
+        onPageChange={handlePageChange}
+        currentFilters={currentFilters}
+        selectedSite={selectedSite}
+        dateRange={dateRange}
+        error={detailsError}
+        isSampleData={isSampleData}
+        sampleDataInfo={sampleDataInfo}
+      />
+    </>
   );
 };
 

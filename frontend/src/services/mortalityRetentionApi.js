@@ -30,6 +30,34 @@ export const mortalityRetentionApi = {
     const response = await api.get(`/apiv1/mortality-retention-indicators/sites/${siteCode}/indicators/${indicatorId}`, { 
       params: queryParams 
     })
+    console.log('response.data', response.data)
+    return response.data
+  },
+
+  // Get patient-level details for a specific indicator
+  getIndicatorDetails: async (siteCode, indicatorId, params = {}) => {
+    const {
+      startDate,
+      endDate,
+      previousEndDate,
+      page = 1,
+      limit = 50,
+      search = ''
+    } = params
+
+    const queryParams = {
+      startDate,
+      endDate,
+      previousEndDate,
+      page,
+      limit,
+      search
+    }
+
+    const response = await api.get(`/apiv1/mortality-retention-indicators/sites/${siteCode}/indicators/${indicatorId}/details`, {
+      params: queryParams
+    })
+
     return response.data
   },
 
@@ -59,6 +87,33 @@ export const mortalityRetentionApi = {
     const response = await api.put('/apiv1/mortality-retention-indicators/admin/indicators/bulk-status', {
       indicators
     })
+    return response.data
+  },
+
+  // Query Editor Admin endpoints
+  // Get all queries (admin only)
+  getAllQueries: async () => {
+    const response = await api.get('/apiv1/mortality-retention-indicators/admin/queries')
+    return response.data
+  },
+
+  // Get specific query content (admin only)
+  getQuery: async (indicatorId) => {
+    const response = await api.get(`/apiv1/mortality-retention-indicators/admin/queries/${indicatorId}`)
+    return response.data
+  },
+
+  // Update query content (admin only)
+  updateQuery: async (indicatorId, content) => {
+    const response = await api.put(`/apiv1/mortality-retention-indicators/admin/queries/${indicatorId}`, {
+      content
+    })
+    return response.data
+  },
+
+  // Execute query (admin only)
+  executeQuery: async (indicatorId, params) => {
+    const response = await api.post(`/apiv1/mortality-retention-indicators/admin/queries/${indicatorId}/execute`, params)
     return response.data
   }
 }

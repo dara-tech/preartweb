@@ -4,7 +4,7 @@
 
 WITH patients_with_low_cd4 AS (
     -- Adults with CD4 < 350
-    SELECT 
+    SELECT DISTINCT
         'Adult' as type,
         IF(p.Sex=0, "Female", "Male") as Sex,
         p.ClinicID,
@@ -22,10 +22,10 @@ WITH patients_with_low_cd4 AS (
         AND CAST(TRIM(pt.CD4) AS UNSIGNED) < 350
         AND (p.OffIn IS NULL OR p.OffIn <> 1)
     
-    UNION ALL
+    UNION
     
     -- Children with CD4 < 350
-    SELECT 
+    SELECT DISTINCT
         'Child' as type,
         IF(p.Sex=0, "Female", "Male") as Sex,
         p.ClinicID,
@@ -77,16 +77,16 @@ tblcotrimoxazole AS (
 
 cotrimoxazole_stats AS (
     SELECT
-        COUNT(*) AS Total_CD4_Low_350,
-        SUM(CASE WHEN ReceivingCotrimoxazole = 'Yes' THEN 1 ELSE 0 END) AS Receiving_Cotrimoxazole,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_0_14_Total,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_0_14_Total,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_over_14_Total,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_over_14_Total,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' AND ReceivingCotrimoxazole = 'Yes' THEN 1 ELSE 0 END) AS Male_0_14_Receiving,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' AND ReceivingCotrimoxazole = 'Yes' THEN 1 ELSE 0 END) AS Female_0_14_Receiving,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' AND ReceivingCotrimoxazole = 'Yes' THEN 1 ELSE 0 END) AS Male_over_14_Receiving,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' AND ReceivingCotrimoxazole = 'Yes' THEN 1 ELSE 0 END) AS Female_over_14_Receiving
+        COUNT(DISTINCT ClinicID) AS Total_CD4_Low_350,
+        COUNT(DISTINCT CASE WHEN ReceivingCotrimoxazole = 'Yes' THEN ClinicID END) AS Receiving_Cotrimoxazole,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' THEN ClinicID END) AS Male_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' THEN ClinicID END) AS Female_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' THEN ClinicID END) AS Male_over_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' THEN ClinicID END) AS Female_over_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' AND ReceivingCotrimoxazole = 'Yes' THEN ClinicID END) AS Male_0_14_Receiving,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' AND ReceivingCotrimoxazole = 'Yes' THEN ClinicID END) AS Female_0_14_Receiving,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' AND ReceivingCotrimoxazole = 'Yes' THEN ClinicID END) AS Male_over_14_Receiving,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' AND ReceivingCotrimoxazole = 'Yes' THEN ClinicID END) AS Female_over_14_Receiving
     FROM tblcotrimoxazole
 )
 
@@ -100,14 +100,23 @@ SELECT
         THEN ROUND((s.Receiving_Cotrimoxazole * 100.0 / s.Total_CD4_Low_350), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
-    CAST(IFNULL(s.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14,
+    -- Numerators: patients receiving Cotrimoxazole
+    CAST(IFNULL(s.Male_0_14_Receiving, 0) AS UNSIGNED) AS Male_0_14,
     CAST(IFNULL(s.Male_0_14_Receiving, 0) AS UNSIGNED) AS Male_0_14_Receiving,
-    CAST(IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14,
+    CAST(IFNULL(s.Female_0_14_Receiving, 0) AS UNSIGNED) AS Female_0_14,
     CAST(IFNULL(s.Female_0_14_Receiving, 0) AS UNSIGNED) AS Female_0_14_Receiving,
-    CAST(IFNULL(s.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14,
+    CAST(IFNULL(s.Male_over_14_Receiving, 0) AS UNSIGNED) AS Male_over_14,
     CAST(IFNULL(s.Male_over_14_Receiving, 0) AS UNSIGNED) AS Male_over_14_Receiving,
-    CAST(IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14,
-    CAST(IFNULL(s.Female_over_14_Receiving, 0) AS UNSIGNED) AS Female_over_14_Receiving
+    CAST(IFNULL(s.Female_over_14_Receiving, 0) AS UNSIGNED) AS Female_over_14,
+    CAST(IFNULL(s.Female_over_14_Receiving, 0) AS UNSIGNED) AS Female_over_14_Receiving,
+    -- Denominators: total patients with CD4 < 350 by demographic
+    CAST(IFNULL(s.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14_Total,
+    CAST(IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14_Total,
+    CAST(IFNULL(s.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14_Total,
+    CAST(IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14_Total,
+    -- Aggregated totals for easier frontend access
+    CAST(IFNULL(s.Male_0_14_Total, 0) + IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Children_Total,
+    CAST(IFNULL(s.Male_over_14_Total, 0) + IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Adults_Total
 FROM cotrimoxazole_stats s;
 
 

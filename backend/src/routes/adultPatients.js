@@ -473,7 +473,7 @@ router.get('/', async (req, res, next) => {
 // Get single adult patient by clinic ID
 router.get('/:clinicId', [
   authenticateToken,
-  param('clinicId').isNumeric().withMessage('Clinic ID must be numeric')
+  param('clinicId').isLength({ min: 1 }).withMessage('Clinic ID is required')
 ], async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -485,60 +485,166 @@ router.get('/:clinicId', [
     }
 
     const { clinicId } = req.params;
+    const { site } = req.query;
 
-    // Get main patient data
-    const patient = await AdultPatient.findOne({
-      where: { clinicId: parseInt(clinicId) }
-    });
+    // Determine which database(s) to use
+    let siteCodes = [];
+    
+    // If site is provided, use specific site
+    if (site) {
+      try {
+        const { siteCode: resolvedSiteCode } = await resolveSite(site);
+        siteCodes = [resolvedSiteCode];
+      } catch (error) {
+        return res.status(404).json({
+          error: 'Site not found',
+          message: error.message
+        });
+      }
+    } else {
+      // If no site specified, search all available sites
+      const allSites = await siteDatabaseManager.getAllSites();
+      siteCodes = allSites.map(s => s.code);
+    }
+
+    console.log(`[GET /:clinicId] Looking for adult patient: ${clinicId}, site: ${site || 'all'}`);
+    console.log(`[GET /:clinicId] Using site codes: ${siteCodes.join(', ')}`);
+
+    // Search for the patient in all sites
+    let patient = null;
+    let foundSiteCode = null;
+    
+    for (const siteCode of siteCodes) {
+      try {
+        const siteConnection = await siteDatabaseManager.getSiteConnection(siteCode);
+        console.log(`[GET /:clinicId] Querying site ${siteCode} for patient ${clinicId}`);
+        
+        // Use string comparison to handle both numeric and alphanumeric clinic IDs
+        const clinicIdStr = String(clinicId).trim();
+        const results = await siteConnection.query(`
+          SELECT 
+            p.ClinicID as clinicId,
+            p.DafirstVisit as dateFirstVisit,
+            p.TypeofReturn as typeOfReturn,
+            p.LClinicID as lClinicId,
+            p.SiteNameold as siteNameOld,
+            p.DaBirth as dateOfBirth,
+            p.Sex as sex,
+            p.Education as education,
+            p.Rea as \`read\`,
+            p.Write as \`write\`,
+            p.Referred as referred,
+            p.Orefferred as otherReferred,
+            p.DaHIV as dateHIV,
+            p.Vcctcode as vcctCode,
+            p.VcctID as vcctId,
+            p.PclinicID as pClinicId,
+            p.OffIn as offIn,
+            p.SiteName as siteName,
+            p.DaART as dateART,
+            p.Artnum as artNumber,
+            p.TbPast as tbPast,
+            p.TPT as tpt,
+            p.TptDrug as tptDrug,
+            p.DaStartTPT as dateStartTPT,
+            p.DaEndTPT as dateEndTPT,
+            p.TypeTB as typeTB,
+            p.ResultTB as resultTB,
+            p.Daonset as dateOnset,
+            p.Tbtreat as tbTreat,
+            p.Datreat as dateTreat,
+            p.ResultTreat as resultTreat,
+            p.DaResultTreat as dateResultTreat,
+            p.ARVTreatHis as arvTreatHis,
+            p.Diabete as diabetes,
+            p.Hyper as hyper,
+            p.Abnormal as abnormal,
+            p.Renal as renal,
+            p.Anemia as anemia,
+            p.Liver as liver,
+            p.HepBC as hepBC,
+            p.MedOther as medOther,
+            p.Allergy as allergy,
+            p.Nationality as nationality,
+            p.Targroup as targetGroup,
+            p.RefugStatus as refugStatus,
+            p.RefugART as refugART,
+            p.RefugSite as refugSite
+          FROM tblaimain p
+          WHERE p.ClinicID = :clinicId
+          LIMIT 1
+        `, {
+          replacements: { clinicId: clinicIdStr },
+          type: siteConnection.QueryTypes.SELECT
+        });
+        
+        console.log(`[GET /:clinicId] Site ${siteCode} returned ${results?.length || 0} patient(s)`);
+        
+        if (results && results.length > 0) {
+          patient = results[0];
+          foundSiteCode = siteCode;
+          console.log(`[GET /:clinicId] Found patient ${clinicId} in site ${siteCode}`);
+          break;
+        }
+      } catch (error) {
+        console.error(`[GET /:clinicId] Error querying site ${siteCode} for patient ${clinicId}:`, error.message);
+        // Continue searching other sites
+      }
+    }
 
     if (!patient) {
       return res.status(404).json({
-        error: 'Patient not found'
+        error: 'Patient not found',
+        message: `Adult patient with Clinic ID '${clinicId}' not found`
       });
     }
 
+    // Get site-specific connection for related data
+    const siteConnection = await siteDatabaseManager.getSiteConnection(foundSiteCode);
+
     // Get related data like in VB.NET Search function
+    const clinicIdStr = String(clinicId).trim();
     const [
       arvHistory,
       allergies,
       medicalTreatments
     ] = await Promise.all([
       // ARV Treatment History (tblaiarvtreathis)
-      sequelize.query(`
+      siteConnection.query(`
         SELECT * FROM tblaiarvtreathis 
         WHERE ClinicID = :clinicId
       `, {
-        replacements: { clinicId },
-        type: sequelize.QueryTypes.SELECT
+        replacements: { clinicId: clinicIdStr },
+        type: siteConnection.QueryTypes.SELECT
       }),
       
       // Allergies (tblaiallergy)
-      sequelize.query(`
+      siteConnection.query(`
         SELECT * FROM tblaiallergy 
         WHERE ClinicID = :clinicId
       `, {
-        replacements: { clinicId },
-        type: sequelize.QueryTypes.SELECT
+        replacements: { clinicId: clinicIdStr },
+        type: siteConnection.QueryTypes.SELECT
       }),
       
       // Medical treatments (multiple tables)
       Promise.all([
-        sequelize.query(`SELECT * FROM tblaiothmeddiabete WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT }),
-        sequelize.query(`SELECT * FROM tblaiothmedhyper WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT }),
-        sequelize.query(`SELECT * FROM tblaiothmedabnormal WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT }),
-        sequelize.query(`SELECT * FROM tblaiothmedrenal WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT }),
-        sequelize.query(`SELECT * FROM tblaiothmedanemia WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT }),
-        sequelize.query(`SELECT * FROM tblaiothmedliver WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT }),
-        sequelize.query(`SELECT * FROM tblaiothmedhepbc WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT }),
-        sequelize.query(`SELECT * FROM tblaiothmedother WHERE ClinicID = :clinicId`, 
-          { replacements: { clinicId }, type: sequelize.QueryTypes.SELECT })
+        siteConnection.query(`SELECT * FROM tblaiothmeddiabete WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT }),
+        siteConnection.query(`SELECT * FROM tblaiothmedhyper WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT }),
+        siteConnection.query(`SELECT * FROM tblaiothmedabnormal WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT }),
+        siteConnection.query(`SELECT * FROM tblaiothmedrenal WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT }),
+        siteConnection.query(`SELECT * FROM tblaiothmedanemia WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT }),
+        siteConnection.query(`SELECT * FROM tblaiothmedliver WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT }),
+        siteConnection.query(`SELECT * FROM tblaiothmedhepbc WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT }),
+        siteConnection.query(`SELECT * FROM tblaiothmedother WHERE ClinicID = :clinicId`, 
+          { replacements: { clinicId: clinicIdStr }, type: siteConnection.QueryTypes.SELECT })
       ])
     ]);
 

@@ -303,21 +303,21 @@ const IndicatorManagement = () => {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                size="sm"
+                size="md"
                 onClick={handleActivateAll}
                 disabled={pendingCount > 0}
               >
-                <Power className="h-4 w-4 mr-2" />
-                Activate All
+                <Power className="h-4 w-4 " />
+               
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="md"
                 onClick={handleDeactivateAll}
                 disabled={pendingCount > 0}
               >
-                <PowerOff className="h-4 w-4 mr-2" />
-                Deactivate All
+                <PowerOff className="h-4 w-4 " />
+               
               </Button>
             </div>
           </div>

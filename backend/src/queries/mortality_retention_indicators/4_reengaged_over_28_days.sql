@@ -36,6 +36,7 @@ missed_appointments AS (
     -- Missed appointments: using same logic as CQI script
     -- Scheduled appointment where next visit is after grace deadline or null
     -- Only count appointments whose grace deadline falls within reporting period
+    -- For indicator 4 (late reengagement after 28+ days), only include patients who have at least 28 days from miss date to end date
     -- Exclude patients who are dead or transferred out
     SELECT 
         av.type,
@@ -45,6 +46,7 @@ missed_appointments AS (
     FROM adult_visits av
     WHERE av.ScheduledAppointment BETWEEN :StartDate AND :EndDate
       AND av.GraceDeadline <= :EndDate
+      AND DATEDIFF(:EndDate, av.ScheduledAppointment) >= 28
       AND (
           av.NextVisitDate IS NULL 
           OR av.NextVisitDate > av.GraceDeadline
@@ -69,6 +71,7 @@ missed_appointments AS (
     FROM child_visits cv
     WHERE cv.ScheduledAppointment BETWEEN :StartDate AND :EndDate
       AND cv.GraceDeadline <= :EndDate
+      AND DATEDIFF(:EndDate, cv.ScheduledAppointment) >= 28
       AND (
           cv.NextVisitDate IS NULL 
           OR cv.NextVisitDate > cv.GraceDeadline
@@ -197,6 +200,8 @@ SELECT
         THEN ROUND((IFNULL(rs.Reengaged_Over_28, 0) * 100.0 / e.Total_Eligible), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
+    -- Demographic breakdown: use ELIGIBLE counts (not total missed) to match denominator
+    -- This ensures Male_0_14 + Female_0_14 + Male_over_14 + Female_over_14 = Total_Lost
     CAST(IFNULL(e.Male_0_14_Eligible, 0) AS UNSIGNED) AS Male_0_14,
     CAST(IFNULL(rs.Male_0_14_Reengaged, 0) AS UNSIGNED) AS Male_0_14_Reengaged,
     CAST(IFNULL(e.Female_0_14_Eligible, 0) AS UNSIGNED) AS Female_0_14,
@@ -204,6 +209,14 @@ SELECT
     CAST(IFNULL(e.Male_over_14_Eligible, 0) AS UNSIGNED) AS Male_over_14,
     CAST(IFNULL(rs.Male_over_14_Reengaged, 0) AS UNSIGNED) AS Male_over_14_Reengaged,
     CAST(IFNULL(e.Female_over_14_Eligible, 0) AS UNSIGNED) AS Female_over_14,
-    CAST(IFNULL(rs.Female_over_14_Reengaged, 0) AS UNSIGNED) AS Female_over_14_Reengaged
+    CAST(IFNULL(rs.Female_over_14_Reengaged, 0) AS UNSIGNED) AS Female_over_14_Reengaged,
+    -- Eligible fields for denominator calculation (same as above, kept for backward compatibility)
+    CAST(IFNULL(e.Male_0_14_Eligible, 0) AS UNSIGNED) AS Male_0_14_Eligible,
+    CAST(IFNULL(e.Female_0_14_Eligible, 0) AS UNSIGNED) AS Female_0_14_Eligible,
+    CAST(IFNULL(e.Male_over_14_Eligible, 0) AS UNSIGNED) AS Male_over_14_Eligible,
+    CAST(IFNULL(e.Female_over_14_Eligible, 0) AS UNSIGNED) AS Female_over_14_Eligible,
+    -- Aggregated totals: use eligible counts to match Total_Lost
+    CAST(IFNULL(e.Male_0_14_Eligible, 0) + IFNULL(e.Female_0_14_Eligible, 0) AS UNSIGNED) AS Children_Total,
+    CAST(IFNULL(e.Male_over_14_Eligible, 0) + IFNULL(e.Female_over_14_Eligible, 0) AS UNSIGNED) AS Adults_Total
 FROM eligible_for_late_reengagement e
 LEFT JOIN reengaged_stats rs ON 1 = 1;

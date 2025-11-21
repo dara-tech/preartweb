@@ -4,7 +4,7 @@
 
 WITH patient_art AS (
     -- Adults newly initiated on ART
-    SELECT 
+    SELECT DISTINCT
         'Adult' as type,
         IF(p.Sex=0, "Female", "Male") as Sex,
         p.ClinicID,
@@ -15,10 +15,10 @@ WITH patient_art AS (
         art.DaArt BETWEEN :StartDate AND :EndDate
         AND (p.OffIn IS NULL OR p.OffIn <> 1)
     
-    UNION ALL
+    UNION
     
     -- Children newly initiated on ART
-    SELECT 
+    SELECT DISTINCT
         'Child' as type,
         IF(p.Sex=0, "Female", "Male") as Sex,
         p.ClinicID,
@@ -108,16 +108,16 @@ tblbaseline_cd4 AS (
 -- Calculate statistics
 baseline_cd4_stats AS (
     SELECT
-        COUNT(*) AS Total_Newly_Initiated,
-        SUM(CASE WHEN HasBaselineCD4 = 'Yes' THEN 1 ELSE 0 END) AS With_CD4_Count,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_0_14_Total,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_0_14_Total,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_over_14_Total,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_over_14_Total,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' AND HasBaselineCD4 = 'Yes' THEN 1 ELSE 0 END) AS Male_0_14_With_CD4,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' AND HasBaselineCD4 = 'Yes' THEN 1 ELSE 0 END) AS Female_0_14_With_CD4,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' AND HasBaselineCD4 = 'Yes' THEN 1 ELSE 0 END) AS Male_over_14_With_CD4,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' AND HasBaselineCD4 = 'Yes' THEN 1 ELSE 0 END) AS Female_over_14_With_CD4
+        COUNT(DISTINCT ClinicID) AS Total_Newly_Initiated,
+        COUNT(DISTINCT CASE WHEN HasBaselineCD4 = 'Yes' THEN ClinicID END) AS With_CD4_Count,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' THEN ClinicID END) AS Male_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' THEN ClinicID END) AS Female_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' THEN ClinicID END) AS Male_over_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' THEN ClinicID END) AS Female_over_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' AND HasBaselineCD4 = 'Yes' THEN ClinicID END) AS Male_0_14_With_CD4,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' AND HasBaselineCD4 = 'Yes' THEN ClinicID END) AS Female_0_14_With_CD4,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' AND HasBaselineCD4 = 'Yes' THEN ClinicID END) AS Male_over_14_With_CD4,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' AND HasBaselineCD4 = 'Yes' THEN ClinicID END) AS Female_over_14_With_CD4
     FROM tblbaseline_cd4
 )
 
@@ -131,14 +131,23 @@ SELECT
         THEN ROUND((s.With_CD4_Count * 100.0 / s.Total_Newly_Initiated), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
-    CAST(IFNULL(s.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14,
+    -- Numerators: patients with baseline CD4
+    CAST(IFNULL(s.Male_0_14_With_CD4, 0) AS UNSIGNED) AS Male_0_14,
     CAST(IFNULL(s.Male_0_14_With_CD4, 0) AS UNSIGNED) AS Male_0_14_With_CD4,
-    CAST(IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14,
+    CAST(IFNULL(s.Female_0_14_With_CD4, 0) AS UNSIGNED) AS Female_0_14,
     CAST(IFNULL(s.Female_0_14_With_CD4, 0) AS UNSIGNED) AS Female_0_14_With_CD4,
-    CAST(IFNULL(s.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14,
+    CAST(IFNULL(s.Male_over_14_With_CD4, 0) AS UNSIGNED) AS Male_over_14,
     CAST(IFNULL(s.Male_over_14_With_CD4, 0) AS UNSIGNED) AS Male_over_14_With_CD4,
-    CAST(IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14,
-    CAST(IFNULL(s.Female_over_14_With_CD4, 0) AS UNSIGNED) AS Female_over_14_With_CD4
+    CAST(IFNULL(s.Female_over_14_With_CD4, 0) AS UNSIGNED) AS Female_over_14,
+    CAST(IFNULL(s.Female_over_14_With_CD4, 0) AS UNSIGNED) AS Female_over_14_With_CD4,
+    -- Denominators: total newly initiated patients by demographic
+    CAST(IFNULL(s.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14_Total,
+    CAST(IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14_Total,
+    CAST(IFNULL(s.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14_Total,
+    CAST(IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14_Total,
+    -- Aggregated totals for easier frontend access
+    CAST(IFNULL(s.Male_0_14_Total, 0) + IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Children_Total,
+    CAST(IFNULL(s.Male_over_14_Total, 0) + IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Adults_Total
 FROM baseline_cd4_stats s;
 
 

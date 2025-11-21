@@ -29,6 +29,7 @@ const roleManagementRoutes = require('./routes/role-management');
 const importRoutes = require('./routes/import');
 const dataManagementRoutes = require('./routes/data-management');
 const analyticsRoutes = require('./routes/analytics');
+// CQI routes removed
 const mortalityRetentionIndicatorsRoutes = require('./routes/mortality-retention-indicators');
 const adminRoutes = require('./routes/admin');
 const labTestRoutes = require('./routes/lab-tests');
@@ -179,6 +180,7 @@ app.use('/apiv1/roles', roleManagementRoutes);
 app.use('/apiv1/import', importRoutes);
 app.use('/apiv1/data', dataManagementRoutes);
 app.use('/apiv1/analytics', analyticsRoutes);
+// CQI routes removed
 app.use('/apiv1/mortality-retention-indicators', mortalityRetentionIndicatorsRoutes);
 app.use('/apiv1/admin', adminRoutes);
 app.use('/apiv1/lab-tests', labTestRoutes);

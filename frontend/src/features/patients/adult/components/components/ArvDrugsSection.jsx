@@ -329,20 +329,20 @@ const ArvDrugsSection = ({ visitId }) => {
         {loading ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-none h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600 mt-2">កំពុងផ្ទុកថ្នាំ ARV... (Loading ARV drugs...)</p>
+            <p className="text-muted-foreground mt-2">កំពុងផ្ទុកថ្នាំ ARV... (Loading ARV drugs...)</p>
           </div>
         ) : arvDrugs.length === 0 ? (
-          <Card className="border-2 border-dashed border-gray-200">
+          <Card className="border-2 border-dashed border-border">
             <CardContent className="text-center py-8">
               <Pill className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">រកមិនឃើញថ្នាំ ARV សម្រាប់ការពិនិត្យនេះ។ (No ARV drugs found for this visit.)</p>
-              <p className="text-sm text-gray-500">បន្ថែមថ្នាំថ្មីដោយប្រើទម្រង់ខាងលើ។ (Add a new drug using the form above.)</p>
+              <p className="text-muted-foreground">រកមិនឃើញថ្នាំ ARV សម្រាប់ការពិនិត្យនេះ។ (No ARV drugs found for this visit.)</p>
+              <p className="text-sm text-muted-foreground">បន្ថែមថ្នាំថ្មីដោយប្រើទម្រង់ខាងលើ។ (Add a new drug using the form above.)</p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-4">
             {arvDrugs.map((drug, index) => (
-              <Card key={`${drug.drugName}-${index}`} className="border border-gray-200 hover:border-blue-300 transition-colors">
+              <Card key={`${drug.drugName}-${index}`} className="border border-border hover:border-blue-300 transition-colors">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -368,26 +368,26 @@ const ArvDrugsSection = ({ visitId }) => {
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <Hash className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-600">កម្រិត (Dose):</span>
+                          <Hash className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">កម្រិត (Dose):</span>
                           <span className="font-medium">{drug.dose || 'N/A'}</span>
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Hash className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-600">បរិមាណ (Quantity):</span>
+                          <Hash className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">បរិមាណ (Quantity):</span>
                           <span className="font-medium">{drug.quantity || 'N/A'}</span>
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-600">ដង (Frequency):</span>
+                          <Clock className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">ដង (Frequency):</span>
                           <span className="font-medium">{drug.frequency || 'N/A'}</span>
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-600">ថ្ងៃ (Date):</span>
+                          <Calendar className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">ថ្ងៃ (Date):</span>
                           <span className="font-medium">{formatDate(drug.date)}</span>
                         </div>
                       </div>
@@ -397,19 +397,19 @@ const ArvDrugsSection = ({ visitId }) => {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             {drug.form && (
                               <div>
-                                <span className="text-gray-600">ទម្រង់ (Form):</span>
+                                <span className="text-muted-foreground">ទម្រង់ (Form):</span>
                                 <span className="ml-2 font-medium">{drug.form}</span>
                               </div>
                             )}
                             {drug.reason && (
                               <div>
-                                <span className="text-gray-600">ហេតុ (Reason):</span>
+                                <span className="text-muted-foreground">ហេតុ (Reason):</span>
                                 <span className="ml-2 font-medium">{drug.reason}</span>
                               </div>
                             )}
                             {drug.remarks && (
                               <div>
-                                <span className="text-gray-600">ចំណាំ (Remarks):</span>
+                                <span className="text-muted-foreground">ចំណាំ (Remarks):</span>
                                 <span className="ml-2 font-medium">{drug.remarks}</span>
                               </div>
                             )}

@@ -1,102 +1,182 @@
 -- ===================================================================
--- Indicator 13b: Percentage of PLHIV receiving ART with viral load ≥1000 copies/mL who received a follow-up viral load test within six months after enhance adherence counselling
+-- Indicator 13b: Percentage of PLHIV receiving ART with viral load ≥1000 copies/mL who received a follow-up viral load test ~3 months after enhanced adherence counselling
 -- ===================================================================
 
-WITH tblfollowup_vl AS (
-    -- Adults with follow-up VL after enhanced counseling
+WITH adult_vl AS (
     SELECT 
-        'Adult' as type,
-        IF(p.Sex=0, "Female", "Male") as Sex,
-        p.ClinicID,
-        pt1.HIVLoad as InitialViralLoad,
-        pt1.Dat as InitialVLDate,
-        v1.VLDetectable as CounselingReceived,
-        pt2.HIVLoad as FollowupViralLoad,
-        pt2.Dat as FollowupVLDate,
-        DATEDIFF(pt2.Dat, v1.DatVisit) as DaysToFollowup,
-        CASE 
-            WHEN pt1.HIVLoad IS NOT NULL 
-                AND CAST(REPLACE(pt1.HIVLoad, '<', '') AS UNSIGNED) >= 1000
-                AND v1.VLDetectable IS NOT NULL 
-                AND v1.VLDetectable > 0
-                AND pt2.HIVLoad IS NOT NULL
-                AND pt2.Dat BETWEEN v1.DatVisit AND DATE_ADD(v1.DatVisit, INTERVAL 6 MONTH) THEN 'Followup_Received'
-            WHEN pt1.HIVLoad IS NOT NULL 
-                AND CAST(REPLACE(pt1.HIVLoad, '<', '') AS UNSIGNED) >= 1000
-                AND v1.VLDetectable IS NOT NULL 
-                AND v1.VLDetectable > 0 THEN 'No_Followup'
-            ELSE 'Not_Eligible'
-        END as FollowupStatus
-    FROM tblaimain p 
-    JOIN tblpatienttest pt1 ON p.ClinicID = pt1.ClinicID
-    JOIN tblavmain v1 ON p.ClinicID = v1.ClinicID 
-        AND v1.DatVisit >= pt1.Dat
-        AND v1.VLDetectable IS NOT NULL
-        AND v1.VLDetectable > 0
-    LEFT JOIN tblpatienttest pt2 ON p.ClinicID = pt2.ClinicID 
-        AND pt2.Dat > v1.DatVisit
-        AND pt2.Dat BETWEEN v1.DatVisit AND DATE_ADD(v1.DatVisit, INTERVAL 6 MONTH)
-    WHERE 
-        pt1.HIVLoad IS NOT NULL
-        AND pt1.Dat BETWEEN :StartDate AND :EndDate
-        AND CAST(REPLACE(pt1.HIVLoad, '<', '') AS UNSIGNED) >= 1000
-    
+        '15+' AS typepatients,
+        IFNULL(p.Sex, 0) AS Sex,
+        CONVERT(p.ClinicID, CHAR) AS ClinicID,
+        pt.Dat AS VLDate,
+        CAST(REPLACE(REPLACE(REPLACE(pt.HIVLoad, '<', ''), '>', ''), '=', '') AS UNSIGNED) AS VLValue
+    FROM tblaimain p
+    JOIN tblpatienttest pt ON CONVERT(p.ClinicID, CHAR) = CONVERT(pt.ClinicID, CHAR)
+    WHERE pt.HIVLoad IS NOT NULL
+      AND pt.HIVLoad <> ''
+      AND pt.Dat BETWEEN :StartDate AND :EndDate
+),
+child_vl AS (
+    SELECT 
+        '≤14' AS typepatients,
+        IFNULL(p.Sex, 0) AS Sex,
+        CONVERT(p.ClinicID, CHAR) AS ClinicID,
+        pt.Dat AS VLDate,
+        CAST(REPLACE(REPLACE(REPLACE(pt.HIVLoad, '<', ''), '>', ''), '=', '') AS UNSIGNED) AS VLValue
+    FROM tblcimain p
+    JOIN tblpatienttest pt ON p.ClinicID = pt.ClinicID
+    WHERE pt.HIVLoad IS NOT NULL
+      AND pt.HIVLoad <> ''
+      AND pt.Dat BETWEEN :StartDate AND :EndDate
+),
+vl_tests AS (
+    SELECT * FROM adult_vl
     UNION ALL
-    
-    -- Children with follow-up VL after enhanced counseling
+    SELECT * FROM child_vl
+),
+latest_high_vl AS (
+    SELECT ClinicID,
+           typepatients,
+           Sex,
+           VLDate,
+           VLValue
+    FROM (
+        SELECT vt.*,
+               ROW_NUMBER() OVER (PARTITION BY ClinicID ORDER BY VLDate DESC) AS rn
+        FROM vl_tests vt
+    ) ranked
+    WHERE rn = 1
+      AND VLValue >= 1000
+),
+adult_eac AS (
     SELECT 
-        'Child' as type,
-        IF(p.Sex=0, "Female", "Male") as Sex,
-        p.ClinicID,
-        pt1.HIVLoad as InitialViralLoad,
-        pt1.Dat as InitialVLDate,
-        v1.VLDetectable as CounselingReceived,
-        pt2.HIVLoad as FollowupViralLoad,
-        pt2.Dat as FollowupVLDate,
-        DATEDIFF(pt2.Dat, v1.DatVisit) as DaysToFollowup,
-        CASE 
-            WHEN pt1.HIVLoad IS NOT NULL 
-                AND CAST(REPLACE(pt1.HIVLoad, '<', '') AS UNSIGNED) >= 1000
-                AND v1.VLDetectable IS NOT NULL 
-                AND v1.VLDetectable > 0
-                AND pt2.HIVLoad IS NOT NULL
-                AND pt2.Dat BETWEEN v1.DatVisit AND DATE_ADD(v1.DatVisit, INTERVAL 6 MONTH) THEN 'Followup_Received'
-            WHEN pt1.HIVLoad IS NOT NULL 
-                AND CAST(REPLACE(pt1.HIVLoad, '<', '') AS UNSIGNED) >= 1000
-                AND v1.VLDetectable IS NOT NULL 
-                AND v1.VLDetectable > 0 THEN 'No_Followup'
-            ELSE 'Not_Eligible'
-        END as FollowupStatus
-    FROM tblcimain p 
-    JOIN tblpatienttest pt1 ON p.ClinicID = pt1.ClinicID
-    JOIN tblcvmain v1 ON p.ClinicID = v1.ClinicID 
-        AND v1.DatVisit >= pt1.Dat
-        AND v1.VLDetectable IS NOT NULL
-        AND v1.VLDetectable > 0
-    LEFT JOIN tblpatienttest pt2 ON p.ClinicID = pt2.ClinicID 
-        AND pt2.Dat > v1.DatVisit
-        AND pt2.Dat BETWEEN v1.DatVisit AND DATE_ADD(v1.DatVisit, INTERVAL 6 MONTH)
-    WHERE 
-        pt1.HIVLoad IS NOT NULL
-        AND pt1.Dat BETWEEN :StartDate AND :EndDate
-        AND CAST(REPLACE(pt1.HIVLoad, '<', '') AS UNSIGNED) >= 1000
+        '15+' AS typepatients,
+        IFNULL(p.Sex, 0) AS Sex,
+        CONVERT(p.ClinicID, CHAR) AS ClinicID,
+        v.DatVisit AS EACDate
+    FROM tblaimain p
+    JOIN tblavmain v ON p.ClinicID = v.ClinicID
+    WHERE v.VLDetectable IS NOT NULL
+      AND v.VLDetectable > 0
+),
+child_eac AS (
+    SELECT 
+        '≤14' AS typepatients,
+        IFNULL(p.Sex, 0) AS Sex,
+        CONVERT(p.ClinicID, CHAR) AS ClinicID,
+        v.DatVisit AS EACDate
+    FROM tblcimain p
+    JOIN tblcvmain v ON p.ClinicID = v.ClinicID
+    WHERE v.VLDetectable IS NOT NULL
+      AND v.VLDetectable > 0
+),
+eac_sessions AS (
+    SELECT * FROM adult_eac
+    UNION ALL
+    SELECT * FROM child_eac
+),
+high_vl_with_eac AS (
+    SELECT 
+        h.ClinicID,
+        h.typepatients,
+        h.Sex,
+        h.VLDate,
+        h.VLValue,
+        MIN(e.EACDate) AS EACDate
+    FROM latest_high_vl h
+    LEFT JOIN eac_sessions e
+      ON e.ClinicID = h.ClinicID
+     AND e.EACDate >= h.VLDate
+    GROUP BY h.ClinicID, h.typepatients, h.Sex, h.VLDate, h.VLValue
+),
+eac_received AS (
+    SELECT *
+    FROM high_vl_with_eac
+    WHERE EACDate IS NOT NULL
+),
+adult_followup_vl AS (
+    SELECT 
+        '15+' AS typepatients,
+        IFNULL(p.Sex, 0) AS Sex,
+        CONVERT(p.ClinicID, CHAR) AS ClinicID,
+        pt.Dat AS VLDate,
+        CAST(REPLACE(REPLACE(REPLACE(pt.HIVLoad, '<', ''), '>', ''), '=', '') AS UNSIGNED) AS VLValue
+    FROM tblaimain p
+    JOIN tblpatienttest pt ON CONVERT(p.ClinicID, CHAR) = CONVERT(pt.ClinicID, CHAR)
+    WHERE pt.HIVLoad IS NOT NULL
+      AND pt.HIVLoad <> ''
+      AND pt.Dat BETWEEN :StartDate AND DATE_ADD(:EndDate, INTERVAL 4 MONTH)
+),
+child_followup_vl AS (
+    SELECT 
+        '≤14' AS typepatients,
+        IFNULL(p.Sex, 0) AS Sex,
+        CONVERT(p.ClinicID, CHAR) AS ClinicID,
+        pt.Dat AS VLDate,
+        CAST(REPLACE(REPLACE(REPLACE(pt.HIVLoad, '<', ''), '>', ''), '=', '') AS UNSIGNED) AS VLValue
+    FROM tblcimain p
+    JOIN tblpatienttest pt ON p.ClinicID = pt.ClinicID
+    WHERE pt.HIVLoad IS NOT NULL
+      AND pt.HIVLoad <> ''
+      AND pt.Dat BETWEEN :StartDate AND DATE_ADD(:EndDate, INTERVAL 4 MONTH)
+),
+followup_tests AS (
+    SELECT * FROM adult_followup_vl
+    UNION ALL
+    SELECT * FROM child_followup_vl
+),
+followup_ranked AS (
+    SELECT 
+        e.ClinicID,
+        e.typepatients,
+        e.Sex,
+        e.VLDate,
+        e.VLValue,
+        e.EACDate,
+        f.VLDate AS FollowupDate,
+        f.VLValue AS FollowupValue,
+        ROW_NUMBER() OVER (PARTITION BY e.ClinicID ORDER BY f.VLDate) AS rn
+    FROM eac_received e
+    LEFT JOIN followup_tests f
+      ON f.ClinicID = e.ClinicID
+     AND f.VLDate BETWEEN DATE_ADD(e.EACDate, INTERVAL 3 MONTH) AND DATE_ADD(e.EACDate, INTERVAL 4 MONTH)
+),
+followup_ready AS (
+    SELECT 
+        ClinicID,
+        typepatients,
+        Sex,
+        VLDate,
+        VLValue,
+        EACDate,
+        MAX(CASE WHEN rn = 1 THEN FollowupDate END) AS FollowupDate,
+        MAX(CASE WHEN rn = 1 THEN FollowupValue END) AS FollowupValue
+    FROM followup_ranked
+    GROUP BY ClinicID, typepatients, Sex, VLDate, VLValue, EACDate
 )
 
 SELECT
-    '13b. Percentage of PLHIV with VL ≥1000 copies/mL who received follow-up VL test within 6 months after enhanced adherence counselling' AS Indicator,
-    IFNULL(SUM(CASE WHEN FollowupStatus = 'Followup_Received' THEN 1 ELSE 0 END), 0) AS Followup_Received,
-    IFNULL(SUM(CASE WHEN FollowupStatus IN ('Followup_Received', 'No_Followup') THEN 1 ELSE 0 END), 0) AS Eligible_Patients,
-    IFNULL(COUNT(*), 0) AS Total_High_VL_Counseled,
-    CASE 
-        WHEN SUM(CASE WHEN FollowupStatus IN ('Followup_Received', 'No_Followup') THEN 1 ELSE 0 END) > 0 
-        THEN ROUND((SUM(CASE WHEN FollowupStatus = 'Followup_Received' THEN 1 ELSE 0 END) * 100.0 / SUM(CASE WHEN FollowupStatus IN ('Followup_Received', 'No_Followup') THEN 1 ELSE 0 END)), 2)
-        ELSE 0 
-    END AS Percentage,
-    IFNULL(SUM(CASE WHEN type = 'Child' AND Sex = 'Male' AND FollowupStatus = 'Followup_Received' THEN 1 ELSE 0 END), 0) AS Male_0_14_Followup,
-    IFNULL(SUM(CASE WHEN type = 'Child' AND Sex = 'Female' AND FollowupStatus = 'Followup_Received' THEN 1 ELSE 0 END), 0) AS Female_0_14_Followup,
-    IFNULL(SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' AND FollowupStatus = 'Followup_Received' THEN 1 ELSE 0 END), 0) AS Male_over_14_Followup,
-    IFNULL(SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' AND FollowupStatus = 'Followup_Received' THEN 1 ELSE 0 END), 0) AS Female_over_14_Followup
-FROM tblfollowup_vl;
+    '13b. Percentage of PLHIV with VL ≥1000 copies/mL who received follow-up VL test ~3 months after enhanced adherence counselling' AS Indicator,
+    CAST(COALESCE(SUM(CASE WHEN FollowupDate IS NOT NULL THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Followup_Received,
+    CAST(COALESCE(COUNT(*), 0) AS UNSIGNED) AS Eligible_Patients,
+    CAST(COALESCE(COUNT(*), 0) AS UNSIGNED) AS Total_High_VL_Counseled,
+    CAST(
+        CASE 
+            WHEN COUNT(*) > 0 
+            THEN ROUND(COALESCE(SUM(CASE WHEN FollowupDate IS NOT NULL THEN 1 ELSE 0 END), 0) * 100.0 / COUNT(*), 2)
+            ELSE 0 
+        END AS DECIMAL(5,2)
+    ) AS Percentage,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '≤14' AND Sex = 1 AND FollowupDate IS NOT NULL THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Male_0_14_Followup,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '≤14' AND Sex = 0 AND FollowupDate IS NOT NULL THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Female_0_14_Followup,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '15+' AND Sex = 1 AND FollowupDate IS NOT NULL THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Male_over_14_Followup,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '15+' AND Sex = 0 AND FollowupDate IS NOT NULL THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Female_over_14_Followup,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '≤14' AND Sex = 1 THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Male_0_14_Total,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '≤14' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Female_0_14_Total,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '15+' AND Sex = 1 THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Male_over_14_Total,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '15+' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Female_over_14_Total,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '≤14' THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Children_Total,
+    CAST(COALESCE(SUM(CASE WHEN typepatients = '15+' THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS Adults_Total
+FROM followup_ready;
 
 
 

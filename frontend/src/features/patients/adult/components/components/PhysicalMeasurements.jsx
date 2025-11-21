@@ -5,23 +5,23 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
   return (
     <div className="space-y-8">
       {/* Simple Section Header */}
-      <div className="border-b border-gray-300 pb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className="border-b border-border pb-4">
+        <h3 className="text-lg font-medium text-foreground">
           {showKhmer ? 'ការវាស់វែងរាងកាយ (Physical Measurements)' : 'Physical Measurements'}
         </h3>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {showKhmer ? 'សញ្ញាជីវិត និងការវាស់វែងរាងកាយ' : 'Vital signs and body measurements'}
         </p>
       </div>
 
       {/* Basic Measurements */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
+        <h4 className="text-md font-medium text-foreground">
           {showKhmer ? 'ការវាស់វែងមូលដ្ឋាន (Basic Measurements)' : 'Basic Measurements'}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <Label htmlFor="weight" className="text-sm text-gray-700">
+            <Label htmlFor="weight" className="text-sm text-foreground">
               {showKhmer ? 'ទម្ងន់ Weight (kg)' : 'Weight (kg)'}
             </Label>
             <Input
@@ -31,11 +31,11 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
               value={formData.weight || ''}
               onChange={(e) => handleInputChange('weight', e.target.value)}
               placeholder="Enter weight"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
           <div>
-            <Label htmlFor="height" className="text-sm text-gray-700">
+            <Label htmlFor="height" className="text-sm text-foreground">
               {showKhmer ? 'កម្ពស់ Height (cm)' : 'Height (cm)'}
             </Label>
             <Input
@@ -45,11 +45,11 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
               value={formData.height || ''}
               onChange={(e) => handleInputChange('height', e.target.value)}
               placeholder="Enter height"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
           <div>
-            <Label htmlFor="temperature" className="text-sm text-gray-700">
+            <Label htmlFor="temperature" className="text-sm text-foreground">
               {showKhmer ? 'សីតុណ្ហភាព Temperature (°C)' : 'Temperature (°C)'}
             </Label>
             <Input
@@ -59,7 +59,7 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
               value={formData.temperature || ''}
               onChange={(e) => handleInputChange('temperature', e.target.value)}
               placeholder="Enter temperature"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
         </div>
@@ -67,12 +67,12 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
 
       {/* Vital Signs */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
+        <h4 className="text-md font-medium text-foreground">
           {showKhmer ? 'សញ្ញាជីវិត (Vital Signs)' : 'Vital Signs'}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <Label htmlFor="pulse" className="text-sm text-gray-700">
+            <Label htmlFor="pulse" className="text-sm text-foreground">
               {showKhmer ? 'ជាល់បេះដូង Pulse (bpm)' : 'Pulse (bpm)'}
             </Label>
             <Input
@@ -81,11 +81,11 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
               value={formData.pulse || ''}
               onChange={(e) => handleInputChange('pulse', e.target.value)}
               placeholder="Enter pulse rate"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
           <div>
-            <Label htmlFor="respiration" className="text-sm text-gray-700">
+            <Label htmlFor="respiration" className="text-sm text-foreground">
               {showKhmer ? 'ដង្ហើម Respiration (bpm)' : 'Respiration (bpm)'}
             </Label>
             <Input
@@ -94,11 +94,11 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
               value={formData.respiration || ''}
               onChange={(e) => handleInputChange('respiration', e.target.value)}
               placeholder="Enter respiration rate"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
           <div>
-            <Label htmlFor="bloodPressure" className="text-sm text-gray-700">
+            <Label htmlFor="bloodPressure" className="text-sm text-foreground">
               {showKhmer ? 'សម្ពាធឈាម Blood Pressure' : 'Blood Pressure'}
             </Label>
             <Input
@@ -106,7 +106,7 @@ function PhysicalMeasurements({ formData, handleInputChange, showKhmer = false }
               value={formData.bloodPressure || ''}
               onChange={(e) => handleInputChange('bloodPressure', e.target.value)}
               placeholder="e.g., 120/80"
-              className="mt-1 border-gray-300"
+              className="mt-1 border-border"
             />
           </div>
         </div>

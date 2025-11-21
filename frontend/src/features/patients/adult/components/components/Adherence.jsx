@@ -5,11 +5,11 @@ function Adherence({ formData, handleInputChange, showKhmer = false }) {
   return (
     <div className="space-y-8">
       {/* Simple Section Header */}
-      <div className="border-b border-gray-300 pb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className="border-b border-border pb-4">
+        <h3 className="text-lg font-medium text-foreground">
           {showKhmer ? 'ការវាយតម្លៃលើការលេបថ្នាំ (Adherence Assessment)' : 'Adherence Assessment'}
         </h3>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {showKhmer ? 'ការពិនិត្យការលេបថ្នាំអោយត្រឹមត្រូវ' : 'Assessment of medication adherence'}
         </p>
       </div>
@@ -17,13 +17,13 @@ function Adherence({ formData, handleInputChange, showKhmer = false }) {
       {/* Adherence Questions */}
       <div className="space-y-6">
         <div className="space-y-4">
-          <h4 className="text-md font-medium text-gray-900">
+          <h4 className="text-md font-medium text-foreground">
             {showKhmer ? 'សំណួរវាយតម្លៃ (Assessment Questions)' : 'Assessment Questions'}
           </h4>
           
           <div className="space-y-4">
-            <div className="border border-gray-300 rounded-none p-4">
-              <h5 className="font-medium text-gray-900 mb-3">
+            <div className="border border-border rounded-none p-4">
+              <h5 className="font-medium text-foreground mb-3">
                 {showKhmer ? 'តើអ្នកធ្លាប់ភ្លេចលេបថ្នាំ ARV ឬទេ? Have you missed any ARV doses?' : 'Have you missed any ARV doses?'}
               </h5>
               <RadioGroup
@@ -46,8 +46,8 @@ function Adherence({ formData, handleInputChange, showKhmer = false }) {
               </RadioGroup>
             </div>
 
-            <div className="border border-gray-300 rounded-none p-4">
-              <h5 className="font-medium text-gray-900 mb-3">
+            <div className="border border-border rounded-none p-4">
+              <h5 className="font-medium text-foreground mb-3">
                 {showKhmer ? 'តើអ្នកធ្លាប់លេបថ្នាំមិនទាន់ពេលវេលាឬទេ? Have you taken medication at wrong times?' : 'Have you taken medication at wrong times?'}
               </h5>
               <RadioGroup

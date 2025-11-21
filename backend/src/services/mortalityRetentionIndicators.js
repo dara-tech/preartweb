@@ -11,8 +11,10 @@ const path = require('path');
 class MortalityRetentionIndicators {
   constructor() {
     this.queries = new Map();
+    this.detailQueries = new Map();
     this.indicatorStatusCache = new Map();
     this.loadAllQueries();
+    this.loadAllDetailQueries();
     // Load status asynchronously - will be ready when needed
     this.loadIndicatorStatus().catch(err => {
       console.error('[MortalityRetentionIndicators] Error loading indicator status in constructor:', err);
@@ -113,6 +115,24 @@ class MortalityRetentionIndicators {
     console.log(`[MortalityRetentionIndicators] Loaded ${this.queries.size} mortality and retention indicators`);
   }
 
+  // Load detail queries (patient-level)
+  loadAllDetailQueries() {
+    const detailsDir = path.join(__dirname, '../queries/mortality_retention_indicators');
+    const files = fs.readdirSync(detailsDir).filter(filename => filename.endsWith('_details.sql'));
+
+    files.forEach(filename => {
+      const filePath = path.join(detailsDir, filename);
+      const query = fs.readFileSync(filePath, 'utf8');
+      const indicatorId = filename.replace('.sql', '');
+      this.detailQueries.set(indicatorId, query);
+
+      if (indicatorId.endsWith('_details')) {
+        const baseId = indicatorId.replace('_details', '');
+        this.detailQueries.set(baseId, query);
+      }
+    });
+  }
+
   // Process query with parameters
   // Handles both SET @variable syntax and :parameter syntax
   processQuery(query, params) {
@@ -200,24 +220,86 @@ class MortalityRetentionIndicators {
       
       const executionTime = performance.now() - startTime;
       
-      // Ensure consistent data types for numeric fields
+      // STANDARDIZE all results to the same schema for analytics
+      // ALL indicators must return the EXACT SAME fields (0 for non-applicable)
       const processedResults = results.map(row => {
         if (row && typeof row === 'object') {
-          return {
-            ...row,
+          // Create standardized result with ALL possible fields (0 if not present)
+          const standardized = {
+            // Core fields (always present)
+            Indicator: row.Indicator || '',
             TOTAL: Number(row.TOTAL || 0),
-            Deaths: Number(row.Deaths || 0),
-            Total_ART: Number(row.Total_ART || 0),
             Percentage: Number(row.Percentage || 0),
             Male_0_14: Number(row.Male_0_14 || 0),
             Female_0_14: Number(row.Female_0_14 || 0),
             Male_over_14: Number(row.Male_over_14 || 0),
             Female_over_14: Number(row.Female_over_14 || 0),
+            Children_Total: Number(row.Children_Total || (Number(row.Male_0_14 || 0) + Number(row.Female_0_14 || 0))),
+            Adults_Total: Number(row.Adults_Total || (Number(row.Male_over_14 || 0) + Number(row.Female_over_14 || 0))),
+            
+            // Denominator fields (always present, 0 if not applicable)
+            Total_ART: Number(row.Total_ART || 0),
+            Total_Lost: Number(row.Total_Lost || 0),
+            Total_Eligible: Number(row.Total_Eligible || 0),
+            Total_Visits: Number(row.Total_Visits || 0),
+            Total_Newly_Initiated: Number(row.Total_Newly_Initiated || 0),
+            Eligible_Patients: Number(row.Eligible_Patients || 0),
+            
+            // Numerator fields (always present, 0 if not applicable)
+            Deaths: Number(row.Deaths || 0),
+            Lost_to_Followup: Number(row.Lost_to_Followup || 0),
+            Reengaged_Within_28: Number(row.Reengaged_Within_28 || 0),
+            Reengaged_Over_28: Number(row.Reengaged_Over_28 || 0),
+            Late_Visits_Beyond_Buffer: Number(row.Late_Visits_Beyond_Buffer || 0),
+            Late_Visits_Within_Buffer: Number(row.Late_Visits_Within_Buffer || 0),
+            Visits_On_Schedule: Number(row.Visits_On_Schedule || row.On_Schedule_Visits || 0),
+            Early_Visits: Number(row.Early_Visits || 0),
+            Same_Day_Initiation: Number(row.Same_Day_Initiation || 0),
+            Initiation_1_7_Days: Number(row.Initiation_1_7_Days || 0),
+            Initiation_Over_7_Days: Number(row.Initiation_Over_7_Days || 0),
+            With_Baseline_CD4: Number(row.With_Baseline_CD4 || 0),
+            Receiving_Cotrimoxazole: Number(row.Receiving_Cotrimoxazole || 0),
+            Receiving_Fluconazole: Number(row.Receiving_Fluconazole || 0),
+            TPT_Received: Number(row.TPT_Received || 0),
+            TPT_Completed: Number(row.TPT_Completed || 0),
+            VL_Tested_12M: Number(row.VL_Tested_12M || 0),
+            VL_Monitored_6M: Number(row.VL_Monitored_6M || 0),
+            VL_Suppressed_12M: Number(row.VL_Suppressed_12M || 0),
+            VL_Suppressed_Overall: Number(row.VL_Suppressed_Overall || 0),
+            Within_10_Days: Number(row.Within_10_Days || 0),
+            Received_Counseling: Number(row.Received_Counseling || 0),
+            Followup_Received: Number(row.Followup_Received || 0),
+            Achieved_Suppression: Number(row.Achieved_Suppression || 0),
+            Switched_To_Second_Line: Number(row.Switched_To_Second_Line || 0),
+            Switched_To_Third_Line: Number(row.Switched_To_Third_Line || 0),
+            Total_Retained: Number(row.Total_Retained || 0),
+            
+            // Demographic total fields (denominator demographics)
+            Male_0_14_Total: Number(row.Male_0_14_Total || 0),
+            Female_0_14_Total: Number(row.Female_0_14_Total || 0),
+            Male_over_14_Total: Number(row.Male_over_14_Total || 0),
+            Female_over_14_Total: Number(row.Female_over_14_Total || 0),
+            
+            // Additional demographic breakdown fields (if present, keep them)
             Male_0_14_Deaths: Number(row.Male_0_14_Deaths || 0),
             Female_0_14_Deaths: Number(row.Female_0_14_Deaths || 0),
             Male_over_14_Deaths: Number(row.Male_over_14_Deaths || 0),
-            Female_over_14_Deaths: Number(row.Female_over_14_Deaths || 0)
+            Female_over_14_Deaths: Number(row.Female_over_14_Deaths || 0),
+            Male_0_14_Lost: Number(row.Male_0_14_Lost || 0),
+            Female_0_14_Lost: Number(row.Female_0_14_Lost || 0),
+            Male_over_14_Lost: Number(row.Male_over_14_Lost || 0),
+            Female_over_14_Lost: Number(row.Female_over_14_Lost || 0),
+            Male_0_14_Reengaged: Number(row.Male_0_14_Reengaged || 0),
+            Female_0_14_Reengaged: Number(row.Female_0_14_Reengaged || 0),
+            Male_over_14_Reengaged: Number(row.Male_over_14_Reengaged || 0),
+            Female_over_14_Reengaged: Number(row.Female_over_14_Reengaged || 0),
+            Male_0_14_Eligible: Number(row.Male_0_14_Eligible || 0),
+            Female_0_14_Eligible: Number(row.Female_0_14_Eligible || 0),
+            Male_over_14_Eligible: Number(row.Male_over_14_Eligible || 0),
+            Female_over_14_Eligible: Number(row.Female_over_14_Eligible || 0)
           };
+          
+          return standardized;
         }
         return row;
       });
@@ -233,6 +315,105 @@ class MortalityRetentionIndicators {
       console.error(`[MortalityRetentionIndicators] Error executing ${indicatorId} for site ${siteCode}:`, error);
       throw error;
     }
+  }
+
+  // Execute query and return RAW results (for Query Editor - no standardization)
+  async executeIndicatorRaw(siteCode, indicatorId, params) {
+    const startTime = performance.now();
+    
+    try {
+      // Get query
+      const query = this.queries.get(indicatorId);
+      if (!query) {
+        throw new Error(`Mortality retention indicator ${indicatorId} not found`);
+      }
+
+      // Process query with parameters
+      const processedQuery = this.processQuery(query, params);
+      
+      // Execute on site database
+      const siteDb = await siteDatabaseManager.getSiteConnection(siteCode);
+      const results = await siteDb.query(processedQuery, {
+        type: siteDb.QueryTypes.SELECT
+      });
+      
+      const executionTime = performance.now() - startTime;
+      
+      // Return RAW results - exactly what the SQL query returns, no standardization
+      return {
+        siteCode,
+        indicatorId,
+        data: results, // Raw results from SQL query
+        executionTime: Math.round(executionTime),
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error(`[MortalityRetentionIndicators] Error executing ${indicatorId} for site ${siteCode}:`, error);
+      throw error;
+    }
+  }
+
+  getDetailQueryKey(indicatorId) {
+    if (this.detailQueries.has(indicatorId)) {
+      return indicatorId;
+    }
+
+    const detailKey = `${indicatorId}_details`;
+    if (this.detailQueries.has(detailKey)) {
+      return detailKey;
+    }
+
+    return null;
+  }
+
+  async executeIndicatorDetails(siteCode, indicatorId, params, options = {}) {
+    const { page = 1, limit = 50, search = '' } = options;
+    const detailKey = this.getDetailQueryKey(indicatorId);
+
+    if (!detailKey) {
+      throw new Error(`Mortality retention detail indicator ${indicatorId} not found`);
+    }
+
+    const query = this.detailQueries.get(detailKey);
+    const processedQuery = this.processQuery(query, params);
+    const siteDb = await siteDatabaseManager.getSiteConnection(siteCode);
+
+    const records = await siteDb.query(processedQuery, {
+      type: siteDb.QueryTypes.SELECT
+    });
+
+    const normalizedSearch = (search || '').toString().trim().toLowerCase();
+    const filteredRecords = normalizedSearch
+      ? records.filter(record =>
+          Object.values(record || {}).some(value => {
+            if (value === null || value === undefined) return false;
+            return value
+              .toString()
+              .toLowerCase()
+              .includes(normalizedSearch);
+          })
+        )
+      : records;
+
+    const safeLimit = limit > 0 ? limit : 50;
+    const totalCount = filteredRecords.length;
+    const totalPages = Math.max(1, Math.ceil(totalCount / safeLimit));
+    const currentPage = Math.min(Math.max(1, page), totalPages);
+    const offset = (currentPage - 1) * safeLimit;
+    const paginatedRecords = filteredRecords.slice(offset, offset + safeLimit);
+
+    return {
+      data: paginatedRecords,
+      pagination: {
+        page: currentPage,
+        limit: safeLimit,
+        totalCount,
+        totalPages,
+        hasNext: currentPage < totalPages,
+        hasPrev: currentPage > 1
+      },
+      timestamp: new Date().toISOString()
+    };
   }
 
   // Execute all mortality retention indicators for a site (only active ones)

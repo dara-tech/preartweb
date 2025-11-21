@@ -19,7 +19,8 @@
     "setup-user-table": "node scripts/setup-user-table.js",
     "test-real-auth": "node scripts/test-real-auth.js",
     "add-file-name-field": "node scripts/add-file-name-field.js",
-    "test-file-name-api": "node scripts/test-file-name-api.js"
+    "test-file-name-api": "node scripts/test-file-name-api.js",
+    "validate-cqi-cache": "node scripts/validateCQICache.js"
   },
   "keywords": [
     "medical",

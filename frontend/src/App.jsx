@@ -22,7 +22,9 @@ import DataImportExport from './pages/DataManagement/components/DataImportExport
 import IndicatorsReport from './pages/indicators/IndicatorsReport'
 import MortalityRetentionIndicators from './pages/MortalityRetentionIndicators'
 import AnalyticsAdmin from './pages/admin/AnalyticsAdmin'
+// CQI Admin removed
 import IndicatorManagement from './pages/admin/IndicatorManagement'
+import QueryEditorAdmin from './pages/admin/QueryEditorAdmin'
 import LabTestResultsPage from './pages/LabTestResults'
 import PatientTestsPage from './pages/PatientTests'
 import InfantTestsPage from './pages/InfantTests'
@@ -224,10 +226,19 @@ function App() {
             </ProtectedRoute>
           } />
           
+          {/* CQI Admin removed */}
+          
           {/* Indicator Management - Only for super_admin and admin */}
           <Route path="/indicator-management" element={
             <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
               <IndicatorManagement />
+            </ProtectedRoute>
+          } />
+          
+          {/* Query Editor Admin - Only for super_admin and admin */}
+          <Route path="/query-editor-admin" element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <QueryEditorAdmin />
             </ProtectedRoute>
           } />
           

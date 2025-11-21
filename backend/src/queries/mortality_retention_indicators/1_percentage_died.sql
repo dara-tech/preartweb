@@ -26,10 +26,11 @@ WITH tbldead AS (
 
 tblactive AS (
     -- Active ART patients (using proper Indicator 10 logic)
-    SELECT 
+    SELECT DISTINCT
         i.clinicid, 
         i.typepatients, 
-        i.Sex
+        IF(i.Sex=0, 'Female', 'Male') AS Sex,
+        CASE WHEN i.typepatients = "≤14" THEN 'Child' ELSE 'Adult' END as type
     FROM (
         SELECT 
             clinicid,
@@ -67,9 +68,9 @@ tblactive AS (
         WHERE DafirstVisit <= :EndDate
     ) i ON i.clinicid = v.clinicid
     LEFT JOIN (
-        SELECT clinicid FROM tblaart WHERE DaArt <= :EndDate
-        UNION ALL
-        SELECT clinicid FROM tblcart WHERE DaArt <= :EndDate
+        SELECT DISTINCT clinicid FROM tblaart WHERE DaArt <= :EndDate
+        UNION
+        SELECT DISTINCT clinicid FROM tblcart WHERE DaArt <= :EndDate
     ) a ON a.clinicid = v.clinicid
     LEFT JOIN (
         SELECT clinicid, status FROM tblavpatientstatus WHERE da <= :EndDate
@@ -82,11 +83,11 @@ tblactive AS (
 SELECT
     '1. Percentage of ART patients who died' AS Indicator,
     CAST(IFNULL(dead_stats.Deaths, 0) AS UNSIGNED) AS Deaths,
-    CAST(IFNULL(active_stats.Total_ART, 0) AS UNSIGNED) AS TOTAL,
-    CAST(IFNULL(active_stats.Total_ART, 0) AS UNSIGNED) AS Total_ART,
+    CAST(IFNULL(dead_stats.Deaths, 0) AS UNSIGNED) AS TOTAL,
+    CAST(IFNULL(total_stats.Total_ART, 0) AS UNSIGNED) AS Total_ART,
     CAST(CASE 
-        WHEN active_stats.Total_ART > 0 
-        THEN ROUND((dead_stats.Deaths * 100.0 / active_stats.Total_ART), 2)
+        WHEN total_stats.Total_ART > 0 
+        THEN ROUND((dead_stats.Deaths * 100.0 / total_stats.Total_ART), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
     CAST(IFNULL(dead_stats.Male_0_14, 0) AS UNSIGNED) AS Male_0_14,
@@ -96,7 +97,15 @@ SELECT
     CAST(IFNULL(dead_stats.Male_over_14, 0) AS UNSIGNED) AS Male_over_14,
     CAST(IFNULL(dead_stats.Male_over_14, 0) AS UNSIGNED) AS Male_over_14_Deaths,
     CAST(IFNULL(dead_stats.Female_over_14, 0) AS UNSIGNED) AS Female_over_14,
-    CAST(IFNULL(dead_stats.Female_over_14, 0) AS UNSIGNED) AS Female_over_14_Deaths
+    CAST(IFNULL(dead_stats.Female_over_14, 0) AS UNSIGNED) AS Female_over_14_Deaths,
+    -- Active ART patients by demographic (denominators)
+    CAST(IFNULL(active_stats.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14_Total,
+    CAST(IFNULL(active_stats.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14_Total,
+    CAST(IFNULL(active_stats.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14_Total,
+    CAST(IFNULL(active_stats.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14_Total,
+    -- Aggregated totals for easier frontend access
+    CAST(IFNULL(active_stats.Male_0_14_Total, 0) + IFNULL(active_stats.Female_0_14_Total, 0) AS UNSIGNED) AS Children_Total,
+    CAST(IFNULL(active_stats.Male_over_14_Total, 0) + IFNULL(active_stats.Female_over_14_Total, 0) AS UNSIGNED) AS Adults_Total
 FROM (
     SELECT 
         COUNT(DISTINCT ClinicID) AS Deaths,
@@ -108,6 +117,18 @@ FROM (
 ) dead_stats
 CROSS JOIN (
     SELECT 
-        COUNT(DISTINCT ClinicID) AS Total_ART
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' THEN clinicid END) AS Male_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' THEN clinicid END) AS Female_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' THEN clinicid END) AS Male_over_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' THEN clinicid END) AS Female_over_14_Total
     FROM tblactive
-) active_stats;
+) active_stats
+CROSS JOIN (
+    SELECT 
+        -- Calculate Total_ART as sum of all demographic groups to ensure consistency
+        (COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' THEN clinicid END) +
+         COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' THEN clinicid END) +
+         COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' THEN clinicid END) +
+         COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' THEN clinicid END)) AS Total_ART
+    FROM tblactive
+) total_stats;

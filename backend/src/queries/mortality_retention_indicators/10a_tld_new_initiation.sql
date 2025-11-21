@@ -154,16 +154,16 @@ tld_status AS (
 -- Statistics
 tld_stats AS (
     SELECT
-        COUNT(*) AS Total_Newly_Initiated,
-        SUM(CASE WHEN TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS TLD_New_Initiation,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_0_14_Total,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_0_14_Total,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' THEN 1 ELSE 0 END) AS Male_over_14_Total,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' THEN 1 ELSE 0 END) AS Female_over_14_Total,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Male' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_0_14_TLD,
-        SUM(CASE WHEN type = 'Child' AND Sex = 'Female' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_0_14_TLD,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Male' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Male_over_14_TLD,
-        SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' AND TLDStatus = 'TLD' THEN 1 ELSE 0 END) AS Female_over_14_TLD
+        COUNT(DISTINCT ClinicID) AS Total_Newly_Initiated,
+        COUNT(DISTINCT CASE WHEN TLDStatus = 'TLD' THEN ClinicID END) AS TLD_New_Initiation,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' THEN ClinicID END) AS Male_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' THEN ClinicID END) AS Female_0_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' THEN ClinicID END) AS Male_over_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' THEN ClinicID END) AS Female_over_14_Total,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Male' AND TLDStatus = 'TLD' THEN ClinicID END) AS Male_0_14_TLD,
+        COUNT(DISTINCT CASE WHEN type = 'Child' AND Sex = 'Female' AND TLDStatus = 'TLD' THEN ClinicID END) AS Female_0_14_TLD,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Male' AND TLDStatus = 'TLD' THEN ClinicID END) AS Male_over_14_TLD,
+        COUNT(DISTINCT CASE WHEN type = 'Adult' AND Sex = 'Female' AND TLDStatus = 'TLD' THEN ClinicID END) AS Female_over_14_TLD
     FROM tld_status
 )
 
@@ -177,12 +177,21 @@ SELECT
         THEN ROUND((s.TLD_New_Initiation * 100.0 / s.Total_Newly_Initiated), 2)
         ELSE 0.00 
     END AS DECIMAL(5,2)) AS Percentage,
-    CAST(IFNULL(s.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14,
+    -- Numerators: patients with TLD
+    CAST(IFNULL(s.Male_0_14_TLD, 0) AS UNSIGNED) AS Male_0_14,
     CAST(IFNULL(s.Male_0_14_TLD, 0) AS UNSIGNED) AS Male_0_14_TLD,
-    CAST(IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14,
+    CAST(IFNULL(s.Female_0_14_TLD, 0) AS UNSIGNED) AS Female_0_14,
     CAST(IFNULL(s.Female_0_14_TLD, 0) AS UNSIGNED) AS Female_0_14_TLD,
-    CAST(IFNULL(s.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14,
+    CAST(IFNULL(s.Male_over_14_TLD, 0) AS UNSIGNED) AS Male_over_14,
     CAST(IFNULL(s.Male_over_14_TLD, 0) AS UNSIGNED) AS Male_over_14_TLD,
-    CAST(IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14,
-    CAST(IFNULL(s.Female_over_14_TLD, 0) AS UNSIGNED) AS Female_over_14_TLD
+    CAST(IFNULL(s.Female_over_14_TLD, 0) AS UNSIGNED) AS Female_over_14,
+    CAST(IFNULL(s.Female_over_14_TLD, 0) AS UNSIGNED) AS Female_over_14_TLD,
+    -- Denominators: total newly initiated patients by demographic
+    CAST(IFNULL(s.Male_0_14_Total, 0) AS UNSIGNED) AS Male_0_14_Total,
+    CAST(IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Female_0_14_Total,
+    CAST(IFNULL(s.Male_over_14_Total, 0) AS UNSIGNED) AS Male_over_14_Total,
+    CAST(IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Female_over_14_Total,
+    -- Aggregated totals for easier frontend access
+    CAST(IFNULL(s.Male_0_14_Total, 0) + IFNULL(s.Female_0_14_Total, 0) AS UNSIGNED) AS Children_Total,
+    CAST(IFNULL(s.Male_over_14_Total, 0) + IFNULL(s.Female_over_14_Total, 0) AS UNSIGNED) AS Adults_Total
 FROM tld_stats s;

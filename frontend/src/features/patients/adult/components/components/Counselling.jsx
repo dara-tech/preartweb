@@ -5,18 +5,18 @@ function Counselling({ formData, handleInputChange, showKhmer = false }) {
   return (
     <div className="space-y-8">
       {/* Simple Section Header */}
-      <div className="border-b border-gray-300 pb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className="border-b border-border pb-4">
+        <h3 className="text-lg font-medium text-foreground">
           {showKhmer ? 'ការប្រឹក្សាអប់រំ (Counselling)' : 'Counselling'}
         </h3>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {showKhmer ? 'ការប្រឹក្សាអប់រំអ្នកជំងឺ' : 'Patient counselling and education'}
         </p>
       </div>
 
       {/* Counselling Topics */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
+        <h4 className="text-md font-medium text-foreground">
           {showKhmer ? 'ប្រធានបទប្រឹក្សា (Counselling Topics)' : 'Counselling Topics'}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
