@@ -7,7 +7,7 @@ const IndicatorsReportSkeleton = () => {
     <div className="min-h-screen bg-background mx-auto lg:max-w-[300mm]">
       <div className="p-4 space-y-6">
         {/* Report Configuration Panel Skeleton */}
-        <div className="bg-card border border-border rounded-none shadow-sm">
+        <div className="bg-card border border-border rounded-none">
           <div className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4 lg:gap-6">
               {/* Health Facility Selection */}
@@ -40,7 +40,7 @@ const IndicatorsReportSkeleton = () => {
 
         {/* Report Header Skeleton */}
         
-        <div className="bg-card shadow-sm p-6 mb-6">
+        <div className="bg-card p-6 mb-6">
           {/* Main Title */}
           <div className="text-center mb-6">
             <Skeleton className="h-8 w-96 mx-auto mb-2" />

@@ -29,13 +29,13 @@ const radioGroupVariants = cva(
 )
 
 const radioGroupItemVariants = cva(
-  "relative flex items-center justify-center rounded-none border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white data-[state=checked]:border-blue-600",
+  "relative flex items-center justify-center rounded-md border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary",
   {
     variants: {
       variant: {
-        default: "border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400",
-        outline: "border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50",
-        filled: "bg-gray-100 hover:bg-gray-200 border-gray-200",
+        default: "border-input bg-background hover:bg-accent hover:border-primary/50",
+        outline: "border-2 border-border hover:border-primary hover:bg-accent",
+        filled: "bg-muted hover:bg-muted/80 border-border",
       },
       size: {
         sm: "h-3 w-3",
@@ -119,7 +119,7 @@ const RadioGroupItem = React.forwardRef(({
       dot: (
         <div 
           className={cn(
-            "rounded-none bg-current transition-all duration-200",
+            "rounded-full bg-current transition-all duration-200",
             getIndicatorSize()
           )} 
         />
@@ -160,7 +160,7 @@ const RadioGroupOption = React.forwardRef(({
   <div
     ref={ref}
     className={cn(
-      "flex items-start space-x-3 rounded-none border border-transparent p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800",
+      "flex items-start space-x-3 rounded-md border border-transparent p-3 transition-colors hover:bg-accent",
       disabled && "opacity-50 cursor-not-allowed",
       className
     )}
@@ -176,14 +176,14 @@ const RadioGroupOption = React.forwardRef(({
       <label
         htmlFor={value}
         className={cn(
-          "text-sm font-medium cursor-pointer text-gray-900 dark:text-gray-100",
+          "text-sm font-medium cursor-pointer text-foreground",
           disabled && "cursor-not-allowed"
         )}
       >
         {label}
       </label>
       {description && (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
       )}
     </div>
   </div>

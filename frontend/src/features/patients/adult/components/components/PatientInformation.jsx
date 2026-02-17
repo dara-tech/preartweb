@@ -50,7 +50,7 @@ function PatientInformation({ formData, setFormData, handleInputChange, dropdown
 
   return (
     <div className="space-y-5">
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <BasicInformationSection
             formData={formData}
@@ -60,7 +60,7 @@ function PatientInformation({ formData, setFormData, handleInputChange, dropdown
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <DemographicsSection
             formData={formData}
@@ -70,7 +70,7 @@ function PatientInformation({ formData, setFormData, handleInputChange, dropdown
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <HIVTestingSection
             formData={formData}
@@ -80,7 +80,7 @@ function PatientInformation({ formData, setFormData, handleInputChange, dropdown
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <TransferInSection
             formData={formData}
@@ -90,7 +90,7 @@ function PatientInformation({ formData, setFormData, handleInputChange, dropdown
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <RefugeeStatusSection
             formData={formData}

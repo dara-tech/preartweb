@@ -851,7 +851,7 @@ const UserLogs = ({ users = [] }) => {
               </div>
             ) : (
               getDisplayLogs().map((log, index) => (
-                <Card key={`log-${log.id}-${index}`} className="hover:shadow-md transition-shadow">
+                <Card key={`log-${log.id}-${index}`} className="">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">

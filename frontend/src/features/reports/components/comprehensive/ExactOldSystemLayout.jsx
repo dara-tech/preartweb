@@ -27,25 +27,25 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
         
         {/* Facility Information - 3x2 Grid Layout */}
         <div className="mb-4">
-          <table className="w-full border-collapse text-sm" style={{ border: '1px solid #374151' }}>
+          <table className="w-full border-collapse border border-border text-sm">
             <tbody>
               <tr>
-                <td className="border border-gray-800 p-2 font-semibold w-1/3">ឈ្មោះមន្ទីរពេទ្យបង្អែក/គ្លីនីក (Facility)</td>
-                <td className="border border-gray-800 p-2 w-1/3">{siteInfo?.SiteName || 'N/A'}</td>
-                <td className="border border-gray-800 p-2 font-semibold w-1/3">លេខកូដ (Facility Code)</td>
-                <td className="border border-gray-800 p-2 w-1/3">{siteInfo?.SiteCode || 'N/A'}</td>
+                <td className="border border-border p-2 font-semibold w-1/3">ឈ្មោះមន្ទីរពេទ្យបង្អែក/គ្លីនីក (Facility)</td>
+                <td className="border border-border p-2 w-1/3">{siteInfo?.SiteName || 'N/A'}</td>
+                <td className="border border-border p-2 font-semibold w-1/3">លេខកូដ (Facility Code)</td>
+                <td className="border border-border p-2 w-1/3">{siteInfo?.SiteCode || 'N/A'}</td>
               </tr>
               <tr>
-                <td className="border border-gray-800 p-2 font-semibold">ឈ្មោះស្រុកប្រតិបត្តិ (Operational District)</td>
-                <td className="border border-gray-800 p-2">{siteInfo?.OperationalDistrict || 'N/A'}</td>
-                <td className="border border-gray-800 p-2 font-semibold">ខេត្ត-ក្រុង (Province)</td>
-                <td className="border border-gray-800 p-2">{siteInfo?.Province || 'N/A'}</td>
+                <td className="border border-border p-2 font-semibold">ឈ្មោះស្រុកប្រតិបត្តិ (Operational District)</td>
+                <td className="border border-border p-2">{siteInfo?.OperationalDistrict || 'N/A'}</td>
+                <td className="border border-border p-2 font-semibold">ខេត្ត-ក្រុង (Province)</td>
+                <td className="border border-border p-2">{siteInfo?.Province || 'N/A'}</td>
               </tr>
               <tr>
-                <td className="border border-gray-800 p-2 font-semibold">ឆ្នាំ(Year)</td>
-                <td className="border border-gray-800 p-2">{safePeriod.year || 'N/A'}</td>
-                <td className="border border-gray-800 p-2 font-semibold">ត្រីមាសទី (Quarter)</td>
-                <td className="border border-gray-800 p-2">{safePeriod.quarter || 'N/A'}</td>
+                <td className="border border-border p-2 font-semibold">ឆ្នាំ(Year)</td>
+                <td className="border border-border p-2">{safePeriod.year || 'N/A'}</td>
+                <td className="border border-border p-2 font-semibold">ត្រីមាសទី (Quarter)</td>
+                <td className="border border-border p-2">{safePeriod.quarter || 'N/A'}</td>
               </tr>
             </tbody>
           </table>
@@ -54,15 +54,15 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
 
       {/* Main Report Table */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-xs" style={{ border: '1px solid #374151' }}>
+        <table className="w-full border-collapse border border-border text-xs">
           {/* Table Header */}
           <thead>
             <tr className="bg-gray-200">
-              <th className="border border-gray-800 p-2 text-left font-bold">ប្រភេទ (Category)</th>
-              <th className="border border-gray-800 p-2 text-center font-bold">អាយុ(Age)</th>
-              <th className="border border-gray-800 p-2 text-center font-bold">ប្រុស(M)</th>
-              <th className="border border-gray-800 p-2 text-center font-bold">ស្រី(F)</th>
-              <th className="border border-gray-800 p-2 text-center font-bold">សរុប (Total)</th>
+              <th className="border border-border p-2 text-left font-bold">ប្រភេទ (Category)</th>
+              <th className="border border-border p-2 text-center font-bold">អាយុ(Age)</th>
+              <th className="border border-border p-2 text-center font-bold">ប្រុស(M)</th>
+              <th className="border border-border p-2 text-center font-bold">ស្រី(F)</th>
+              <th className="border border-border p-2 text-center font-bold">សរុប (Total)</th>
             </tr>
           </thead>
           
@@ -76,65 +76,65 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
             
             {/* Pre-ART Patients */}
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">អ្នកជំងឺ Pre-ART</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">អ្នកជំងឺ Pre-ART</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activePreART014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activePreART014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activePreART014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activePreART14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activePreART14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activePreART14Plus?.total || 0)}
               </td>
             </tr>
             
             {/* ART Patients */}
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">អ្នកជំងឺ ART</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">អ្នកជំងឺ ART</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activeART014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activeART014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activeART014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activeART14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activeART14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.activeART14Plus?.total || 0)}
               </td>
             </tr>
             
             {/* Total for Active Patients */}
             <tr className="bg-blue-100 font-bold">
-              <td className="border border-gray-800 p-2 pl-2">សរុប</td>
-              <td className="border border-gray-800 p-2 text-center">-</td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 pl-2">សរុប</td>
+              <td className="border border-border p-2 text-center">-</td>
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.activePreART014?.male || 0) +
                   (adultChild?.activePreART14Plus?.male || 0) +
@@ -142,7 +142,7 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
                   (adultChild?.activeART14Plus?.male || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.activePreART014?.female || 0) +
                   (adultChild?.activePreART14Plus?.female || 0) +
@@ -150,7 +150,7 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
                   (adultChild?.activeART14Plus?.female || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.activePreART014?.total || 0) +
                   (adultChild?.activePreART14Plus?.total || 0) +
@@ -167,40 +167,40 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">អ្នកជំងឺ ART ពេញវ័យ</td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">អ្នកជំងឺ ART ពេញវ័យ</td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.adult?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.adult?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.adult?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">អ្នកជំងឺ ART កុមារ</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">អ្នកជំងឺ ART កុមារ</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.child?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.child?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.child?.total || 0)}
               </td>
             </tr>
             <tr className="bg-gray-100">
-              <td className="border border-gray-800 p-2 font-bold" colSpan="2">សរុប (Total)</td>
-              <td className="border border-gray-800 p-2 text-center font-bold">
+              <td className="border border-border p-2 font-bold" colSpan="2">សរុប (Total)</td>
+              <td className="border border-border p-2 text-center font-bold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.total?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-bold">
+              <td className="border border-border p-2 text-center font-bold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.total?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-bold">
+              <td className="border border-border p-2 text-center font-bold">
                 {formatNumber(adultChild?.mpiActiveART?.previous?.total?.total || 0)}
               </td>
             </tr>
@@ -212,40 +212,40 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">អ្នកជំងឺ ART ពេញវ័យ</td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">អ្នកជំងឺ ART ពេញវ័យ</td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.adult?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.adult?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.adult?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">អ្នកជំងឺ ART កុមារ</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">អ្នកជំងឺ ART កុមារ</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.child?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.child?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.child?.total || 0)}
               </td>
             </tr>
             <tr className="bg-gray-100">
-              <td className="border border-gray-800 p-2 font-bold" colSpan="2">សរុប (Total)</td>
-              <td className="border border-gray-800 p-2 text-center font-bold">
+              <td className="border border-border p-2 font-bold" colSpan="2">សរុប (Total)</td>
+              <td className="border border-border p-2 text-center font-bold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.total?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-bold">
+              <td className="border border-border p-2 text-center font-bold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.total?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-bold">
+              <td className="border border-border p-2 text-center font-bold">
                 {formatNumber(adultChild?.mpiActiveART?.current?.total?.total || 0)}
               </td>
             </tr>
@@ -257,47 +257,47 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">ចុះឈ្មោះថ្មី</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">ចុះឈ្មោះថ្មី</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newPatients014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newPatients014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newPatients014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newPatients14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newPatients14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newPatients14Plus?.total || 0)}
               </td>
             </tr>
             <tr className="bg-green-100 font-bold">
-              <td className="border border-gray-800 p-2 pl-2">សរុប</td>
-              <td className="border border-gray-800 p-2 text-center">-</td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 pl-2">សរុប</td>
+              <td className="border border-border p-2 text-center">-</td>
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.newPatients014?.male || 0) +
                   (adultChild?.newPatients14Plus?.male || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.newPatients014?.female || 0) +
                   (adultChild?.newPatients14Plus?.female || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.newPatients014?.total || 0) +
                   (adultChild?.newPatients14Plus?.total || 0)
@@ -312,47 +312,47 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">តេស្តឡើងវិញ</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">តេស្តឡើងវិញ</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.retestPreART?.age014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.retestPreART?.age014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.retestPreART?.age014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.retestPreART?.age14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.retestPreART?.age14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.retestPreART?.age14Plus?.total || 0)}
               </td>
             </tr>
             <tr className="bg-yellow-100 font-bold">
-              <td className="border border-gray-800 p-2 pl-2">សរុប</td>
-              <td className="border border-gray-800 p-2 text-center">-</td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 pl-2">សរុប</td>
+              <td className="border border-border p-2 text-center">-</td>
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.retestPreART?.age014?.male || 0) +
                   (adultChild?.retestPreART?.age14Plus?.male || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.retestPreART?.age014?.female || 0) +
                   (adultChild?.retestPreART?.age14Plus?.female || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.retestPreART?.age014?.total || 0) +
                   (adultChild?.retestPreART?.age14Plus?.total || 0)
@@ -367,47 +367,47 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">អ្នកជំងឺ Pre-ART</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">អ្នកជំងឺ Pre-ART</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.lostReturnedPreART014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.lostReturnedPreART014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.lostReturnedPreART014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.lostReturnedPreART14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.lostReturnedPreART14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.lostReturnedPreART14Plus?.total || 0)}
               </td>
             </tr>
             <tr className="bg-orange-100 font-bold">
-              <td className="border border-gray-800 p-2 pl-2">សរុប</td>
-              <td className="border border-gray-800 p-2 text-center">-</td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 pl-2">សរុប</td>
+              <td className="border border-border p-2 text-center">-</td>
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.lostReturnedPreART014?.male || 0) +
                   (adultChild?.lostReturnedPreART14Plus?.male || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.lostReturnedPreART014?.female || 0) +
                   (adultChild?.lostReturnedPreART14Plus?.female || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.lostReturnedPreART014?.total || 0) +
                   (adultChild?.lostReturnedPreART14Plus?.total || 0)
@@ -422,47 +422,47 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">ចាប់ផ្តើម ARV</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">ចាប់ផ្តើម ARV</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newARV014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newARV014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newARV014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newARV14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newARV14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.newARV14Plus?.total || 0)}
               </td>
             </tr>
             <tr className="bg-purple-100 font-bold">
-              <td className="border border-gray-800 p-2 pl-2">សរុប</td>
-              <td className="border border-gray-800 p-2 text-center">-</td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 pl-2">សរុប</td>
+              <td className="border border-border p-2 text-center">-</td>
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.newARV014?.male || 0) +
                   (adultChild?.newARV14Plus?.male || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.newARV014?.female || 0) +
                   (adultChild?.newARV14Plus?.female || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.newARV014?.total || 0) +
                   (adultChild?.newARV14Plus?.total || 0)
@@ -477,47 +477,47 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">ផ្ទេរចូល</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">ផ្ទេរចូល</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.transferredIn014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.transferredIn014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.transferredIn014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.transferredIn14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.transferredIn14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(adultChild?.transferredIn14Plus?.total || 0)}
               </td>
             </tr>
             <tr className="bg-indigo-100 font-bold">
-              <td className="border border-gray-800 p-2 pl-2">សរុប</td>
-              <td className="border border-gray-800 p-2 text-center">-</td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 pl-2">សរុប</td>
+              <td className="border border-border p-2 text-center">-</td>
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.transferredIn014?.male || 0) +
                   (adultChild?.transferredIn14Plus?.male || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.transferredIn014?.female || 0) +
                   (adultChild?.transferredIn14Plus?.female || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (adultChild?.transferredIn014?.total || 0) +
                   (adultChild?.transferredIn14Plus?.total || 0)
@@ -534,173 +534,173 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
             
             {/* Negative re-test */}
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">លទ្ធផលធ្វើតេស្តឡើងវិញអវិជ្ជមាន</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">លទ្ធផលធ្វើតេស្តឡើងវិញអវិជ្ជមាន</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.negativeRetest?.age014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.negativeRetest?.age014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.negativeRetest?.age014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.negativeRetest?.age14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.negativeRetest?.age14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.negativeRetest?.age14Plus?.total || 0)}
               </td>
             </tr>
             
             {/* Transferred out */}
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">បញ្ជូនចេញ</td>
-              <td className="border border-gray-800 p-2 text-center">0-14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">បញ្ជូនចេញ</td>
+              <td className="border border-border p-2 text-center">0-14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.transferredOut?.age014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.transferredOut?.age014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.transferredOut?.age014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">&gt;14</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">&gt;14</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.transferredOut?.age14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.transferredOut?.age14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.transferredOut?.age14Plus?.total || 0)}
               </td>
             </tr>
             
             {/* Abandoned treatment */}
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">លះបង់ការព្យាបាល</td>
-              <td className="border border-gray-800 p-2 text-center">Pre-ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">លះបង់ការព្យាបាល</td>
+              <td className="border border-border p-2 text-center">Pre-ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentPreART?.age014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentPreART?.age014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentPreART?.age014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">Pre-ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">Pre-ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentPreART?.age14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentPreART?.age14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentPreART?.age14Plus?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentART?.age014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentART?.age014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentART?.age014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentART?.age14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentART?.age14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.abandonedTreatmentART?.age14Plus?.total || 0)}
               </td>
             </tr>
             
             {/* Died */}
             <tr>
-              <td className="border border-gray-800 p-2 pl-4">ស្លាប់</td>
-              <td className="border border-gray-800 p-2 text-center">Pre-ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4">ស្លាប់</td>
+              <td className="border border-border p-2 text-center">Pre-ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedPreART?.age014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedPreART?.age014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedPreART?.age014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">Pre-ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">Pre-ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedPreART?.age14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedPreART?.age14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedPreART?.age14Plus?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedART?.age014?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedART?.age014?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedART?.age014?.total || 0)}
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-800 p-2 pl-4"></td>
-              <td className="border border-gray-800 p-2 text-center">ART</td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 pl-4"></td>
+              <td className="border border-border p-2 text-center">ART</td>
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedART?.age14Plus?.male || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedART?.age14Plus?.female || 0)}
               </td>
-              <td className="border border-gray-800 p-2 text-center font-semibold">
+              <td className="border border-border p-2 text-center font-semibold">
                 {formatNumber(patientsLeftCare?.diedART?.age14Plus?.total || 0)}
               </td>
             </tr>
             
             {/* Total for Patients Left Care */}
             <tr className="bg-red-100 font-bold">
-              <td className="border border-gray-800 p-2 pl-2">សរុបអ្នកជំងឺដែលចាកចេញពីការព្យាបាលទាំងអស់ (Total patients who left care)</td>
-              <td className="border border-gray-800 p-2 text-center">-</td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 pl-2">សរុបអ្នកជំងឺដែលចាកចេញពីការព្យាបាលទាំងអស់ (Total patients who left care)</td>
+              <td className="border border-border p-2 text-center">-</td>
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (patientsLeftCare?.negativeRetest?.age014?.male || 0) +
                   (patientsLeftCare?.negativeRetest?.age14Plus?.male || 0) +
@@ -716,7 +716,7 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
                   (patientsLeftCare?.diedART?.age14Plus?.male || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (patientsLeftCare?.negativeRetest?.age014?.female || 0) +
                   (patientsLeftCare?.negativeRetest?.age14Plus?.female || 0) +
@@ -732,7 +732,7 @@ const ExactOldSystemLayout = ({ reportData, period }) => {
                   (patientsLeftCare?.diedART?.age14Plus?.female || 0)
                 )}
               </td>
-              <td className="border border-gray-800 p-2 text-center">
+              <td className="border border-border p-2 text-center">
                 {formatNumber(
                   (patientsLeftCare?.negativeRetest?.age014?.total || 0) +
                   (patientsLeftCare?.negativeRetest?.age14Plus?.total || 0) +

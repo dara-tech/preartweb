@@ -1,4 +1,4 @@
-# 🏥 PreART System
+# 🏥 ART Web / PreART System
 ## Complete User & Developer Documentation
 
 ---
@@ -20,7 +20,7 @@
 
 ## 🏥 **System Overview**
 
-The PreART Medical Management System is a comprehensive web-based platform for managing HIV/AIDS treatment across multiple health facilities. It provides real-time reporting, patient management, and analytics capabilities for healthcare professionals.
+The ART Web / PreART Medical Management System is a comprehensive web-based platform for managing HIV/AIDS treatment across multiple health facilities. It provides real-time reporting, patient management, and analytics capabilities for healthcare professionals.
 
 ### **Architecture**
 - **Frontend**: React 18 with Vite, Tailwind CSS, Radix UI
@@ -224,7 +224,7 @@ The PreART Medical Management System is a comprehensive web-based platform for m
 
 ### **Authentication Endpoints**
 
-#### **POST /api/auth/login**
+#### **POST /apiv1/auth/login**
 Login to the system
 ```json
 {
@@ -233,7 +233,7 @@ Login to the system
 }
 ```
 
-#### **GET /api/auth/profile**
+#### **GET /apiv1/auth/profile**
 Get current user profile
 ```json
 {
@@ -245,12 +245,12 @@ Get current user profile
 }
 ```
 
-#### **POST /api/auth/logout**
+#### **POST /apiv1/auth/logout**
 Logout from the system
 
 ### **Site Management Endpoints**
 
-#### **GET /api/site-operations/sites**
+#### **GET /apiv1/site-operations/sites**
 Get all available sites
 ```json
 {
@@ -267,7 +267,7 @@ Get all available sites
 }
 ```
 
-#### **GET /api/site-operations/sites/:code/stats**
+#### **GET /apiv1/site-operations/sites/:code/stats**
 Get site statistics
 ```json
 {
@@ -282,7 +282,7 @@ Get site statistics
 
 ### **Indicators Endpoints**
 
-#### **GET /api/indicators-optimized/all**
+#### **GET /apiv1/indicators-optimized/all**
 Get all indicators for selected site and date range
 ```json
 {
@@ -298,16 +298,16 @@ Get all indicators for selected site and date range
 }
 ```
 
-#### **GET /api/indicators-optimized/category/:category**
+#### **GET /apiv1/indicators-optimized/category/:category**
 Get indicators by category
 - Categories: `enrollment`, `retention`, `treatment`, `outcomes`
 
-#### **GET /api/indicators-optimized/:indicator/details**
+#### **GET /apiv1/indicators-optimized/:indicator/details**
 Get detailed breakdown of specific indicator
 
 ### **Patient Management Endpoints**
 
-#### **GET /api/patients/adult**
+#### **GET /apiv1/patients/adult**
 Get adult patients
 ```json
 {
@@ -325,18 +325,18 @@ Get adult patients
 }
 ```
 
-#### **POST /api/patients/adult**
+#### **POST /apiv1/patients/adult**
 Create new adult patient
 
-#### **PUT /api/patients/adult/:id**
+#### **PUT /apiv1/patients/adult/:id**
 Update adult patient
 
-#### **DELETE /api/patients/adult/:id**
+#### **DELETE /apiv1/patients/adult/:id**
 Delete adult patient
 
 ### **Import Data Endpoints**
 
-#### **POST /api/import/sql**
+#### **POST /apiv1/import/sql**
 Import SQL file and create new site
 ```json
 {
@@ -348,6 +348,62 @@ Import SQL file and create new site
   "fileName": "site_data_2024.sql"
 }
 ```
+
+### **Report Endpoints**
+
+#### **GET /apiv1/reports/infant-report**
+Get aggregated Infant report for a site and period
+```json
+{
+  "success": true,
+  "siteCode": "0201",
+  "period": {
+    "startDate": "2025-01-01",
+    "endDate": "2025-03-31",
+    "previousEndDate": "2024-12-31"
+  },
+  "sections": [
+    {
+      "id": "11_INFANT_DNA_9MONTHS_aggregate",
+      "title": "DNA PCR at 9 months",
+      "rows": [
+        { "label": "Total", "total": 120, "male": 60, "female": 60 }
+      ]
+    }
+  ]
+}
+```
+Query parameters:
+- `siteCode` (required)
+- `startDate`, `endDate`, `previousEndDate` (optional, ISO date strings)
+
+#### **GET /apiv1/reports/infant-report/details**
+Get Infant report detail rows for a given aggregate section
+Query parameters:
+- `siteCode` (required)
+- `scriptId` (required, e.g. `11_INFANT_DNA_9MONTHS_details`)
+- `startDate`, `endDate`, `previousEndDate` (optional)
+
+#### **GET /apiv1/reports/pntt-report**
+Get aggregated PNTT report for a site and period (Partners & Children)
+Query parameters:
+- `siteCode` (required)
+- `startDate`, `endDate`, `previousEndDate` (optional)
+
+#### **GET /apiv1/reports/pntt-report/details**
+Get PNTT report detail rows for a given aggregate section
+Query parameters:
+- `siteCode` (required)
+- `scriptId` (required, matches a file in `PNTT_DETAIL_SCRIPTS`)
+- `startDate`, `endDate`, `previousEndDate` (optional)
+
+#### **GET /apiv1/reports/idpoor-duplicated-artid**
+List IDPoor patients among active patients who share duplicated ART IDs
+Query parameters:
+- `startDate`, `endDate` (optional; defaults to current year)
+- `siteId` (optional; site code or `all`)
+- `page`, `pageSize` (optional pagination)
+- `search` (optional free-text filter)
 
 ---
 
@@ -443,7 +499,7 @@ Extended information for infant patients
 #### **1. Clone Repository**
 ```bash
 git clone <repository-url>
-cd preartweb
+cd artweb
 ```
 
 #### **2. Backend Setup**
@@ -471,7 +527,7 @@ All databases use the preart_ naming convention by default.
 ### **Project Structure**
 
 ```
-preartweb/
+artweb/
 ├── backend/
 │   ├── src/
 │   │   ├── config/          # Database configuration
@@ -492,6 +548,14 @@ preartweb/
 │   └── package.json
 └── README.md
 ```
+
+### **SQL Workbench & Analysis Scripts**
+
+- **Location**: `backend/src/sql-workbench/`
+- **Contents**: Aggregate and detail SQL scripts for ART, Infant, PNTT, and related indicators
+- **Download as ZIP**:
+  - **From UI**: Open `Analytics Admin` → `Analytics Data` → click **Download SQL Workbench**
+  - **Via API** (authenticated): `GET /apiv1/scripts/scripts/download-sql-workbench`
 
 ### **Development Commands**
 

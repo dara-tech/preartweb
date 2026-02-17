@@ -163,9 +163,9 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
 
   const getGenderBadgeColor = (sex) => {
     switch (sex) {
-      case 1: return 'bg-blue-100 text-blue-800'
-      case 2: return 'bg-pink-100 text-pink-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 1: return 'bg-primary/10 text-primary'
+      case 2: return 'bg-muted text-muted-foreground'
+      default: return 'bg-muted text-muted-foreground'
     }
   }
 
@@ -195,17 +195,17 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-7xl h-[95vh] max-h-[95vh] overflow-hidden p-0">
-        <DialogHeader className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0">
+        <DialogHeader className="px-4 sm:px-6 py-4 border-b border-border flex-shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-3">
-              <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-none shadow-lg">
+              <div className="p-2 sm:p-3 bg-primary rounded-md">
                 {getCategoryIcon(category)}
               </div>
               <div className="min-w-0 flex-1">
-                <DialogTitle className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 truncate">
+                <DialogTitle className="text-lg sm:text-2xl lg:text-3xl font-bold text-foreground mb-1 truncate">
                   {getCategoryTitle(category)}
                 </DialogTitle>
-                <DialogDescription className="text-sm sm:text-base lg:text-lg text-gray-600">
+                <DialogDescription className="text-sm sm:text-base lg:text-lg text-muted-foreground">
                   {totalCount.toLocaleString()} patients found for the selected period
                 </DialogDescription>
               </div>
@@ -236,17 +236,17 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
             {/* Enhanced Search and Controls Bar */}
-            <div className="bg-white border border-gray-200 rounded-none p-4 sm:p-6 shadow-sm">
+            <div className="bg-card border border-border rounded-md p-4 sm:p-6">
               <div className="space-y-4">
                 {/* Search Row */}
                 <div className="w-full">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Search by Clinic ID, Type, or Gender..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 h-10 sm:h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-none w-full"
+                      className="pl-10 h-10 sm:h-11 border-input focus:border-primary focus:ring-ring rounded-md w-full"
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           loadPatientDetails()
@@ -260,7 +260,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-3 sm:space-y-0 sm:space-x-4">
                   <div className="flex items-center space-x-3">
                     <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(parseInt(value))}>
-                      <SelectTrigger className="w-20 h-10 border-gray-300 rounded-none">
+                      <SelectTrigger className="w-20 h-10 border-input rounded-md">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -272,12 +272,12 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                       </SelectContent>
                     </Select>
                     
-                    <div className="flex items-center border border-gray-300 rounded-none overflow-hidden">
+                    <div className="flex items-center border border-input rounded-md overflow-hidden">
                       <Button
                         variant={viewMode === 'table' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => setViewMode('table')}
-                        className="h-10 px-3 rounded-none border-0"
+                        className="h-10 px-3 rounded-md border-0"
                       >
                         <List className="h-4 w-4" />
                       </Button>
@@ -285,7 +285,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                         variant={viewMode === 'card' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => setViewMode('card')}
-                        className="h-10 px-3 rounded-none border-0"
+                        className="h-10 px-3 rounded-md border-0"
                       >
                         <Grid3X3 className="h-4 w-4" />
                       </Button>
@@ -294,7 +294,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
 
                   <div className="flex items-center space-x-3">
                     {selectedPatients.length > 0 && (
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                         <span>{selectedPatients.length} selected</span>
                         <Button
                           variant="outline"
@@ -322,10 +322,10 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
             </div>
 
             {/* Period Info Card */}
-            <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <Card className="border-border bg-muted/30">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
-                  <div className="flex items-center text-blue-700">
+                  <div className="flex items-center text-primary">
                     <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
                     <div className="flex flex-col sm:flex-row sm:items-center">
                       <span className="font-semibold text-base sm:text-lg">Reporting Period:</span>
@@ -352,12 +352,12 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                     <Card key={i} className="animate-pulse">
                       <CardContent className="p-4 sm:p-6">
                         <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-none"></div>
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-md"></div>
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-muted rounded-none w-1/4"></div>
-                            <div className="h-3 bg-muted rounded-none w-1/2"></div>
+                            <div className="h-4 bg-muted rounded-md w-1/4"></div>
+                            <div className="h-3 bg-muted rounded-md w-1/2"></div>
                           </div>
-                          <div className="w-16 sm:w-20 h-6 bg-muted rounded-none"></div>
+                          <div className="w-16 sm:w-20 h-6 bg-muted rounded-md"></div>
                         </div>
                       </CardContent>
                     </Card>
@@ -386,7 +386,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                   </CardContent>
                 </Card>
               ) : viewMode === 'table' ? (
-                <Card className="border-gray-200 shadow-sm overflow-hidden">
+                <Card className="border-border overflow-hidden">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -477,7 +477,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                             </TableCell>
                             <TableCell className="font-medium">
                               <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-none flex items-center justify-center text-white font-semibold text-sm">
+                                <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-semibold text-sm">
                                   {patient.ClinicID ? patient.ClinicID.charAt(0) : '?'}
                                 </div>
                                 <span className="truncate">{patient.ClinicID || 'Unknown ID'}</span>
@@ -490,19 +490,19 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-2">
-                                <User className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                 <span className="truncate">{getGenderText(patient.Sex)}</span>
                               </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-2">
-                                <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                 <span>{patient.Age || 'N/A'} years</span>
                               </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-2">
-                                <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                 <span className="truncate">
                                   {patient.DaFirstVisit ? 
                                     new Date(patient.DaFirstVisit).toLocaleDateString() : 
@@ -530,17 +530,17 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                   {currentPatients.map((patient, index) => (
                     <Card 
                       key={index} 
-                      className="hover:shadow-lg transition-all duration-200 border-gray-200 hover:border-blue-300 cursor-pointer group"
+                      className="transition-all duration-200 border-border hover:border-primary/50 cursor-pointer group"
                     >
                       <CardContent className="p-4 sm:p-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
                           <div className="flex items-center space-x-4">
                             {/* Avatar */}
                             <div className="relative flex-shrink-0">
-                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-none flex items-center justify-center text-white font-semibold text-base sm:text-lg shadow-lg">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-semibold text-base sm:text-lg">
                                 {patient.ClinicID ? patient.ClinicID.charAt(0) : '?'}
                               </div>
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-none flex items-center justify-center shadow-md">
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-card rounded-md flex items-center justify-center">
                                 {getCategoryIcon(category)}
                               </div>
                             </div>
@@ -548,7 +548,7 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                             {/* Patient Info */}
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                                <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+                                <h3 className="text-lg sm:text-xl font-bold text-foreground truncate">
                                   {patient.ClinicID || 'Unknown ID'}
                                 </h3>
                                 <Badge variant="outline" className="text-sm self-start">
@@ -556,17 +556,17 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
                                 </Badge>
                               </div>
                               
-                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-600">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-muted-foreground">
                                 <div className="flex items-center space-x-2">
-                                  <User className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                   <span className="font-medium truncate">{getGenderText(patient.Sex)}</span>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                   <span className="font-medium">{patient.Age || 'N/A'} years</span>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                   <span className="font-medium truncate">
                                     {patient.DaFirstVisit ? 
                                       new Date(patient.DaFirstVisit).toLocaleDateString() : 
@@ -601,15 +601,15 @@ const PatientDetailsModal = ({ category, period, onClose }) => {
 
             {/* Enhanced Pagination */}
             {totalPages > 1 && (
-              <Card className="border-gray-200 bg-white shadow-sm">
+              <Card className="border-border bg-card">
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                       <span className="font-medium">
                         Showing {startIndex + 1} to {Math.min(endIndex, sortedPatients.length)} of {sortedPatients.length.toLocaleString()} patients
                       </span>
                       {selectedPatients.length > 0 && (
-                        <span className="text-blue-600 font-medium">
+                        <span className="text-primary font-medium">
                           ({selectedPatients.length} selected)
                         </span>
                       )}

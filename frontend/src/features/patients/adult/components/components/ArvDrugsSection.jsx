@@ -181,7 +181,7 @@ const ArvDrugsSection = ({ visitId }) => {
   return (
     <div className="space-y-6">
       {/* Add New Drug Form */}
-        <Card className="border-2 border-dashed border-blue-200 bg-blue-50/50">
+        <Card className="border-2 border-dashed border-primary/40 bg-primary/5">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
             <Plus className="w-5 h-5" />
@@ -197,7 +197,7 @@ const ArvDrugsSection = ({ visitId }) => {
                 value={newDrug.drugName}
                 onChange={(e) => setNewDrug({ ...newDrug, drugName: e.target.value })}
                 placeholder="e.g., TDF, 3TC, DTG"
-                className="border-blue-200 focus:border-blue-400"
+                className="border-border focus:border-primary"
               />
             </div>
             
@@ -208,7 +208,7 @@ const ArvDrugsSection = ({ visitId }) => {
                 value={newDrug.dose}
                 onChange={(e) => setNewDrug({ ...newDrug, dose: e.target.value })}
                 placeholder="e.g., 300mg, 150mg"
-                className="border-blue-200 focus:border-blue-400"
+                className="border-border focus:border-primary"
               />
             </div>
             
@@ -220,14 +220,14 @@ const ArvDrugsSection = ({ visitId }) => {
                 value={newDrug.quantity}
                 onChange={(e) => setNewDrug({ ...newDrug, quantity: e.target.value })}
                 placeholder="e.g., 30, 60"
-                className="border-blue-200 focus:border-blue-400"
+                className="border-border focus:border-primary"
               />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="new-frequency">ដង (Frequency)</Label>
               <Select value={newDrug.frequency} onValueChange={(value) => setNewDrug({ ...newDrug, frequency: value })}>
-                <SelectTrigger className="border-blue-200 focus:border-blue-400">
+                <SelectTrigger className="border-border focus:border-primary">
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
                 <SelectContent>
@@ -247,14 +247,14 @@ const ArvDrugsSection = ({ visitId }) => {
                 value={newDrug.form}
                 onChange={(e) => setNewDrug({ ...newDrug, form: e.target.value })}
                 placeholder="e.g., tablet, capsule"
-                className="border-blue-200 focus:border-blue-400"
+                className="border-border focus:border-primary"
               />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="new-status">ស្ថានភាព (Status)</Label>
               <Select value={newDrug.status.toString()} onValueChange={(value) => setNewDrug({ ...newDrug, status: parseInt(value) })}>
-                <SelectTrigger className="border-blue-200 focus:border-blue-400">
+                <SelectTrigger className="border-border focus:border-primary">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -277,7 +277,7 @@ const ArvDrugsSection = ({ visitId }) => {
                 type="date"
                 value={newDrug.date}
                 onChange={(e) => setNewDrug({ ...newDrug, date: e.target.value })}
-                className="border-blue-200 focus:border-blue-400"
+                className="border-border focus:border-primary"
               />
             </div>
             
@@ -288,7 +288,7 @@ const ArvDrugsSection = ({ visitId }) => {
                 value={newDrug.reason}
                 onChange={(e) => setNewDrug({ ...newDrug, reason: e.target.value })}
                 placeholder="Reason for prescription"
-                className="border-blue-200 focus:border-blue-400"
+                className="border-border focus:border-primary"
               />
             </div>
             
@@ -299,7 +299,7 @@ const ArvDrugsSection = ({ visitId }) => {
                 value={newDrug.remarks}
                 onChange={(e) => setNewDrug({ ...newDrug, remarks: e.target.value })}
                 placeholder="Additional notes"
-                className="border-blue-200 focus:border-blue-400"
+                className="border-border focus:border-primary"
               />
             </div>
           </div>
@@ -342,7 +342,7 @@ const ArvDrugsSection = ({ visitId }) => {
         ) : (
           <div className="grid gap-4">
             {arvDrugs.map((drug, index) => (
-              <Card key={`${drug.drugName}-${index}`} className="border border-border hover:border-blue-300 transition-colors">
+              <Card key={`${drug.drugName}-${index}`} className="border border-border hover:border-primary/60 transition-colors">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -355,9 +355,9 @@ const ArvDrugsSection = ({ visitId }) => {
                           <Badge 
                             variant="outline" 
                             className={`${
-                              getStatusInfo(drug.status).color === 'green' ? 'border-green-300 text-green-700 bg-green-50' :
-                              getStatusInfo(drug.status).color === 'red' ? 'border-red-300 text-red-700 bg-red-50' :
-                              'border-yellow-300 text-yellow-700 bg-yellow-50'
+                              getStatusInfo(drug.status).color === 'green' ? 'border-success/60 text-success bg-success/10' :
+                              getStatusInfo(drug.status).color === 'red' ? 'border-destructive/60 text-destructive bg-destructive/10' :
+                              'border-warning/60 text-warning-foreground bg-warning/10'
                             }`}
                           >
                             {React.createElement(getStatusInfo(drug.status).icon, { className: "w-3 h-3 mr-1" })}
@@ -393,7 +393,7 @@ const ArvDrugsSection = ({ visitId }) => {
                       </div>
                       
                       {(drug.form || drug.reason || drug.remarks) && (
-                        <div className="mt-3 pt-3 border-t border-gray-100">
+                        <div className="mt-3 pt-3 border-t border-border">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             {drug.form && (
                               <div>

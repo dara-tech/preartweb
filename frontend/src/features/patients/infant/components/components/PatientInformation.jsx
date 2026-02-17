@@ -56,10 +56,10 @@ function PatientInformation({
   return (
     <div className="space-y-5">
       {/* Basic Information Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ព័ត៌មានមូលដ្ឋាន</h3>
               <p className="text-xs text-gray-500 mt-0.5">Basic Information</p>
             </div>
@@ -161,10 +161,10 @@ function PatientInformation({
       </Card>
 
       {/* Address Information Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ព័ត៌មានអាសយដ្ឋាន</h3>
               <p className="text-xs text-gray-500 mt-0.5">Address Information</p>
             </div>
@@ -243,10 +243,10 @@ function PatientInformation({
       </Card>
 
       {/* Contact Information Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ព័ត៌មានទំនាក់ទំនង</h3>
               <p className="text-xs text-gray-500 mt-0.5">Contact Information</p>
             </div>
@@ -286,10 +286,10 @@ function PatientInformation({
       </Card>
 
       {/* Family Information Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ព័ត៌មានគ្រួសារ</h3>
               <p className="text-xs text-gray-500 mt-0.5">Family Information</p>
             </div>
@@ -420,10 +420,10 @@ function PatientInformation({
       </Card>
 
       {/* Delivery Information Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ព័ត៌មានការកើត</h3>
               <p className="text-xs text-gray-500 mt-0.5">Delivery Information</p>
             </div>
@@ -528,10 +528,10 @@ function PatientInformation({
       </Card>
 
       {/* HIV Information Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ព័ត៌មាន HIV</h3>
               <p className="text-xs text-gray-500 mt-0.5">HIV Information</p>
             </div>

@@ -22,10 +22,10 @@ const SiteFilter = ({
       }}
       disabled={disabled}
     >
-      <SelectTrigger className={`h-11 text-sm  border-gray-200 focus:border-slate-400 focus:ring-slate-400 ${className}`}>
+      <SelectTrigger className={`h-11 text-sm border border-border focus:border-primary focus:ring-ring ${className}`}>
         <SelectValue placeholder="Select site" />
       </SelectTrigger>
-      <SelectContent className="max-h-60 overflow-y-auto scrollbar-hide">
+      <SelectContent className="max-h-60 overflow-y-auto scrollbar-hide border-border">
         {showAllOption && (
           <SelectItem value="all">
             All Sites

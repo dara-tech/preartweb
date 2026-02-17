@@ -483,7 +483,7 @@ function UnifiedPatientList({
             {/* Patient Cards */}
             <div className="space-y-3">
               {patients.map((patient, index) => (
-                <Card key={patient.clinicId || index} className="hover:shadow-md transition-shadow">
+                <Card key={patient.clinicId || index} className="">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4 flex-1 min-w-0">

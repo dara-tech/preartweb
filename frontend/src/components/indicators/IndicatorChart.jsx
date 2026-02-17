@@ -1053,7 +1053,7 @@ const IndicatorChart = ({ indicator, viewType = 'bar', compact = false }) => {
                 const percentage = data?.percentage;
                 
                 return (
-                  <div className="rounded-lg border border-border bg-background/95 backdrop-blur-sm px-3 py-2 shadow-lg">
+                  <div className="rounded-lg border border-border bg-background/95 backdrop-blur-sm px-3 py-2">
                     <div className="mb-2 font-semibold text-sm text-foreground">{label}</div>
                     <div className="space-y-1 text-xs">
                       {total !== null && total !== undefined && (

@@ -149,6 +149,70 @@ router.get('/scripts/:scriptType/:fileName', authenticateToken, async (req, res)
   }
 });
 
+// Download the entire sql-workbench folder as a zip (includes all subfolders)
+router.get('/scripts/download-sql-workbench', authenticateToken, async (req, res) => {
+  const workbenchDir = path.join(__dirname, '../sql-workbench');
+  if (!fs.existsSync(workbenchDir)) {
+    return res.status(404).json({
+      success: false,
+      message: 'sql-workbench folder not found'
+    });
+  }
+
+  try {
+    const archiver = require('archiver');
+    const archive = archiver('zip', {
+      zlib: { level: 1 },
+      forceLocalTime: true,
+      forceZip64: false
+    });
+
+    archive.on('error', (err) => {
+      console.error('Archive error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: 'Failed to create zip file',
+          error: err.message
+        });
+      }
+    });
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="sql-workbench.zip"');
+    archive.pipe(res);
+
+    function addDirToArchive(dir, baseDir) {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relativePath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
+        if (entry.isDirectory()) {
+          addDirToArchive(fullPath, baseDir);
+        } else {
+          try {
+            archive.file(fullPath, { name: `sql-workbench/${relativePath}` });
+          } catch (fileErr) {
+            console.error('Error adding file to archive:', fullPath, fileErr);
+          }
+        }
+      }
+    }
+
+    addDirToArchive(workbenchDir, workbenchDir);
+    await archive.finalize();
+  } catch (error) {
+    console.error('Error creating sql-workbench zip:', error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create zip file',
+        error: error.message
+      });
+    }
+  }
+});
+
 // Download all scripts as a zip
 router.get('/scripts/download-all', authenticateToken, async (req, res) => {
   try {

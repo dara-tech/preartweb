@@ -7,7 +7,7 @@ import {
 const ExecutiveSummary = ({ summaryStats }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-      <Card className=" text-primary-foreground border-0 shadow-lg">
+      <Card className=" text-primary-foreground border-0">
         <CardContent className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -23,7 +23,7 @@ const ExecutiveSummary = ({ summaryStats }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-success text-success-foreground border-0 shadow-lg">
+      <Card className="bg-success text-success-foreground border-0">
         <CardContent className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -39,7 +39,7 @@ const ExecutiveSummary = ({ summaryStats }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-secondary text-secondary-foreground border-0 shadow-lg">
+      <Card className="bg-secondary text-secondary-foreground border-0">
         <CardContent className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -55,7 +55,7 @@ const ExecutiveSummary = ({ summaryStats }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-warning text-warning-foreground border-0 shadow-lg">
+      <Card className="bg-warning text-warning-foreground border-0">
         <CardContent className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>

@@ -17,7 +17,18 @@ import {
   CheckCircle,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+  X,
+  Check,
+  XCircle,
+  Minus,
+  FileText,
+  User,
+  Beaker,
+  Droplets
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -705,7 +716,7 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
                 <p className="text-sm font-medium text-muted-foreground">Lab Records</p>
                 <p className="text-2xl font-bold">{totalLabRecords}</p>
               </div>
-              <TestTube className="h-8 w-8 text-blue-500" />
+              <TestTube className="h-8 w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -715,12 +726,12 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Complete</p>
-                <p className="text-2xl font-bold text-green-600">{completeEntries.length}</p>
+                <p className="text-2xl font-bold text-primary">{completeEntries.length}</p>
                 <p className="text-xs text-muted-foreground">
                   {totalLabRecords > 0 ? ((completeEntries.length / totalLabRecords) * 100).toFixed(1) : 0}% complete
                 </p>
               </div>
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -730,10 +741,10 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Missing</p>
-                <p className="text-2xl font-bold text-red-600">{missingDatabaseEntry.length}</p>
+                <p className="text-2xl font-bold text-destructive">{missingDatabaseEntry.length}</p>
                 <p className="text-xs text-muted-foreground">Not in database</p>
               </div>
-              <AlertCircle className="h-8 w-8 text-red-500" />
+              <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
           </CardContent>
         </Card>
@@ -743,10 +754,10 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Mismatches</p>
-                <p className="text-2xl font-bold text-orange-600">{resultMismatches.length}</p>
+                <p className="text-2xl font-bold text-warning-foreground">{resultMismatches.length}</p>
                 <p className="text-xs text-muted-foreground">Result differences</p>
               </div>
-              <AlertTriangle className="h-8 w-8 text-orange-500" />
+              <AlertTriangle className="h-8 w-8 text-warning-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -818,7 +829,7 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             >
               <AlertTriangle className="h-4 w-4" />
               Incomplete
-              <Badge variant="secondary" className="ml-1 bg-orange-100 text-orange-800">
+              <Badge variant="secondary" className="ml-1 bg-warning/10 text-warning-foreground">
                 {comparisonData.filter(item => item.patientData && item.missingFields.length > 0 && item.labData).length}
               </Badge>
             </Button>
@@ -833,7 +844,7 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             >
               <AlertTriangle className="h-4 w-4" />
               Mismatches
-              <Badge variant="secondary" className="ml-1 bg-orange-100 text-orange-800">
+              <Badge variant="secondary" className="ml-1 bg-warning/10 text-warning-foreground">
                 {comparisonData.filter(item => 
                   item.resultComparison && 
                   item.patientData && 
@@ -853,7 +864,7 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             >
               <CheckCircle className="h-4 w-4" />
               Complete
-              <Badge variant="secondary" className="ml-1 bg-green-100 text-green-800">
+              <Badge variant="secondary" className="ml-1 bg-primary/10 text-primary">
                 {comparisonData.filter(item => 
                   item.patientData && 
                   item.labData && 
@@ -872,7 +883,7 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
             >
               <TestTube className="h-4 w-4" />
               Missing Lab Data
-              <Badge variant="secondary" className="ml-1 bg-yellow-100 text-yellow-800">
+              <Badge variant="secondary" className="ml-1 bg-muted text-muted-foreground">
                 {comparisonData.filter(item => !item.labData && item.patientData).length}
               </Badge>
             </Button>
@@ -953,10 +964,10 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
                         <Badge 
                           variant={statusColor === 'green' ? 'default' : 'secondary'}
                           className={`${
-                            statusColor === 'green' ? 'bg-green-100 text-green-800' :
-                            statusColor === 'red' ? 'bg-red-100 text-red-800' :
-                            statusColor === 'orange' ? 'bg-orange-100 text-orange-800' :
-                            'bg-yellow-100 text-yellow-800'
+                            statusColor === 'green' ? 'bg-primary/10 text-primary' :
+                            statusColor === 'red' ? 'bg-destructive/10 text-destructive' :
+                            statusColor === 'orange' ? 'bg-warning/10 text-warning-foreground' :
+                            'bg-muted text-muted-foreground'
                           } w-fit`}
                         >
                           {statusColor === 'green' ? <CheckCircle className="h-3 w-3 mr-1" /> : <AlertCircle className="h-3 w-3 mr-1" />}
@@ -967,18 +978,18 @@ const LabDataEntryComparison = ({ patientTests, filters, onMetricsUpdate }) => {
                         {item.missingFields.length > 0 ? (
                           <div className="text-sm">
                             {item.missingFields.slice(0, 2).map((field, i) => (
-                              <div key={i} className="text-orange-600">
+                              <div key={i} className="text-warning-foreground">
                                 • {field}
                               </div>
                             ))}
                             {item.missingFields.length > 2 && (
-                              <div className="text-orange-600">
+                              <div className="text-warning-foreground">
                                 + {item.missingFields.length - 2} more
                               </div>
                             )}
                           </div>
                         ) : (
-                          <span className="text-green-600 text-sm">All good</span>
+                          <span className="text-primary text-sm">All good</span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -1074,6 +1085,24 @@ const PatientTests = () => {
     missingDatabase: '0',
     incompleteEntries: '0',
     actionRequired: 0
+  });
+  
+  // Enhanced UI states
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [quickViewDrawer, setQuickViewDrawer] = useState({
+    isOpen: false,
+    data: null
+  });
+  const [visibleColumns, setVisibleColumns] = useState({
+    test_id: true,
+    clinic_id: true,
+    test_date: true,
+    test_type: true,
+    cd4: true,
+    viral_load: true,
+    hcv: true,
+    site: true,
+    actions: true
   });
   
   // Helper function to get current fiscal quarter dates
@@ -1699,6 +1728,95 @@ const PatientTests = () => {
   const handleMetricsUpdate = (metrics) => {
     setDataEntryMetrics(metrics);
   };
+  
+  // Classify viral load result with visual indicators
+  const classifyViralLoad = (viralLoad) => {
+    if (!viralLoad || viralLoad === '' || viralLoad === '-') {
+      return { label: 'N/A', color: 'gray', bgColor: 'bg-muted', textColor: 'text-muted-foreground', icon: Minus };
+    }
+    
+    const value = parseFloat(viralLoad);
+    if (isNaN(value)) {
+      if (viralLoad?.toString().toLowerCase().includes('not detected')) {
+        return { label: 'Not Detected', color: 'green', bgColor: 'bg-primary/10', textColor: 'text-primary', icon: CheckCircle };
+      }
+      return { label: 'N/A', color: 'gray', bgColor: 'bg-muted', textColor: 'text-muted-foreground', icon: Minus };
+    }
+    
+    if (value === 0) {
+      return { label: 'Not Detected', color: 'green', bgColor: 'bg-primary/10', textColor: 'text-primary', icon: CheckCircle };
+    }
+    if (value < 20) {
+      return { label: 'Suppressed', color: 'green', bgColor: 'bg-primary/10', textColor: 'text-primary', icon: Check };
+    }
+    if (value < 1000) {
+      return { label: '<1000', color: 'yellow', bgColor: 'bg-warning/10', textColor: 'text-warning-foreground', icon: AlertTriangle };
+    }
+    return { label: 'High VL', color: 'red', bgColor: 'bg-destructive/10', textColor: 'text-destructive', icon: XCircle };
+  };
+  
+  // Calculate enhanced summary statistics
+  const calculateEnhancedStats = () => {
+    if (!patientTests || patientTests.length === 0) {
+      return {
+        total: 0,
+        suppressed: 0,
+        highVL: 0,
+        cd4Tests: 0,
+        hcvTests: 0,
+        avgCD4: 0,
+        suppressionRate: 0
+      };
+    }
+    
+    let suppressed = 0;
+    let highVL = 0;
+    let cd4Tests = 0;
+    let hcvTests = 0;
+    let cd4Sum = 0;
+    let cd4Count = 0;
+    
+    patientTests.forEach(test => {
+      // Count VL classifications
+      if (test.HIVLoad && test.HIVLoad !== '' && test.HIVLoad !== '-') {
+        const value = parseFloat(test.HIVLoad);
+        if (!isNaN(value)) {
+          if (value < 20) suppressed++;
+          else if (value >= 1000) highVL++;
+        } else if (test.HIVLoad?.toString().toLowerCase().includes('not detected')) {
+          suppressed++;
+        }
+      }
+      
+      // Count CD4 tests
+      if (test.CD4 && test.CD4 !== '' && test.CD4 !== '-') {
+        cd4Tests++;
+        const cd4Value = parseFloat(test.CD4);
+        if (!isNaN(cd4Value)) {
+          cd4Sum += cd4Value;
+          cd4Count++;
+        }
+      }
+      
+      // Count HCV tests
+      if (test.HCV && test.HCV !== '' && test.HCV !== '-') {
+        hcvTests++;
+      }
+    });
+    
+    const avgCD4 = cd4Count > 0 ? Math.round(cd4Sum / cd4Count) : 0;
+    const suppressionRate = patientTests.length > 0 ? ((suppressed / patientTests.length) * 100).toFixed(1) : 0;
+    
+    return {
+      total: patientTests.length,
+      suppressed,
+      highVL,
+      cd4Tests,
+      hcvTests,
+      avgCD4,
+      suppressionRate
+    };
+  };
 
   const formatTestValue = (value, type) => {
     if (value === null || value === undefined || value === '') return '-';
@@ -1747,14 +1865,28 @@ const PatientTests = () => {
 
   const FilterPanel = () => (
     <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Filter className="h-5 w-5" />
-          Search Filters
-        </CardTitle>
-        <CardDescription>
-          Filter patient test results by various criteria
-        </CardDescription>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Search Filters
+            </CardTitle>
+            <CardDescription>
+              Filter patient test results by various criteria
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className="gap-2"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Advanced
+            {showAdvancedFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1773,7 +1905,7 @@ const PatientTests = () => {
                 {sites.map(site => (
                   <SelectItem key={site.siteCode || site.code} value={site.siteCode || site.code}>
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span>{site.name}</span>
                     </div>
                   </SelectItem>
@@ -1817,7 +1949,7 @@ const PatientTests = () => {
                     ? 'Custom Range' 
                     : `FY${selectedFiscalYear}-Q${selectedQuarterNum}`}
                   readOnly
-                  className="w-full h-9 sm:h-9 px-3 pr-10 text-sm border shadow-sm  rounded-none  cursor-pointer transition-colors "
+                  className="w-full h-9 sm:h-9 px-3 pr-10 text-sm border border-border rounded-md cursor-pointer transition-colors"
                   onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -1827,7 +1959,7 @@ const PatientTests = () => {
 
               {/* Custom Period Picker Panel */}
               {isPeriodPickerOpen && (
-                <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background backdrop-blur-sm border border-border rounded-none shadow-xl p-6 min-w-[320px]">
+                <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background backdrop-blur-sm border border-border rounded-md p-6 min-w-[320px] shadow-lg">
                   {/* Year Navigation */}
                   <div className="flex items-center justify-between mb-6">
                     <Button
@@ -1844,7 +1976,7 @@ const PatientTests = () => {
                       type="button"
                       onClick={() => setShowYearGrid(!showYearGrid)}
                       variant="ghost"
-                      className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-none transition-colors cursor-pointer"
+                      className="px-4 py-2 text-base font-semibold hover:text-primary rounded-none transition-colors cursor-pointer"
                     >
                       FY {selectedFiscalYear}
                     </Button>
@@ -1881,18 +2013,18 @@ const PatientTests = () => {
                             className={`
                               px-3 py-2 text-sm rounded-none transition-all duration-200 relative
                               ${isSelected
-                                ? 'bg-blue-500 text-white shadow-md'
+                                ? 'bg-primary text-primary-foreground'
                                 : isCurrentYear && isInCurrentDecade
-                                ? 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                                ? 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
                                 : isInCurrentDecade
-                                ? 'text-gray-700 hover:bg-gray-100 hover:border-gray-300'
-                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                                ? 'text-muted-foreground hover:bg-muted hover:border-border'
+                                : 'text-muted-foreground hover:bg-muted/80'
                               }
                             `}
                           >
                             {year}
                             {isCurrentYear && !isSelected && isInCurrentDecade && (
-                              <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-none"></div>
+                              <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary/60 rounded-full"></div>
                             )}
                           </Button>
                         );
@@ -1921,8 +2053,8 @@ const PatientTests = () => {
                         className={`
                           px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
                           ${selectedQuarterNum === q
-                            ? 'bg-blue-500 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:border-gray-300'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'
                           }
                         `}
                         title={label}
@@ -2019,43 +2151,151 @@ const PatientTests = () => {
             </>
           )}
         </div>
+        
+        {/* Advanced Filters - Collapsible */}
+        {showAdvancedFilters && (
+          <div className="mt-6 pt-6 border-t animate-in slide-in-from-top-2 duration-300">
+            <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              Advanced Filtering Options
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Gender Filter */}
+              <div className="space-y-2">
+                <Label>Gender</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue placeholder="All genders" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Genders</SelectItem>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Result Range */}
+              <div className="space-y-2">
+                <Label>VL Status</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue placeholder="All results" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Results</SelectItem>
+                    <SelectItem value="suppressed">Suppressed (&lt;20)</SelectItem>
+                    <SelectItem value="moderate">Moderate (20-1000)</SelectItem>
+                    <SelectItem value="high">High VL (&gt;1000)</SelectItem>
+                    <SelectItem value="not_detected">Not Detected</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* CD4 Range */}
+              <div className="space-y-2">
+                <Label>CD4 Range</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue placeholder="All CD4 ranges" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All CD4 Ranges</SelectItem>
+                    <SelectItem value="low">&lt;200 (Low)</SelectItem>
+                    <SelectItem value="moderate">200-500 (Moderate)</SelectItem>
+                    <SelectItem value="normal">&gt;500 (Normal)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 
   const StatsCards = () => {
-    // console.log('📊 StatsCards rendering with stats:', stats);
-    if (!stats) return null;
-
+    const enhancedStats = calculateEnhancedStats();
+    
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tests</CardTitle>
-            <TestTube className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalTests?.toLocaleString() || 0}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        {/* Total Tests */}
+        <Card className="transition-all duration-300 border-l-4 border-l-primary">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Tests</p>
+                <h3 className="text-3xl font-bold text-foreground mt-2">{enhancedStats.total}</h3>
+                <p className="text-xs text-muted-foreground mt-1">This period</p>
+              </div>
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <TestTube className="h-6 w-6 text-primary" />
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CD4 Tests</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.cd4Tests?.toLocaleString() || 0}</div>
+        
+        {/* Suppressed VL */}
+        <Card className="transition-all duration-300 border-l-4 border-l-success">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Suppressed</p>
+                <h3 className="text-3xl font-bold text-primary mt-2">{enhancedStats.suppressed}</h3>
+                <p className="text-xs text-primary font-medium mt-1">{enhancedStats.suppressionRate}% rate</p>
+              </div>
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-primary" />
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Viral Load Tests</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.viralLoadTests?.toLocaleString() || 0}</div>
+        
+        {/* High VL */}
+        <Card className="transition-all duration-300 border-l-4 border-l-destructive">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">High VL</p>
+                <h3 className="text-3xl font-bold text-destructive mt-2">{enhancedStats.highVL}</h3>
+                <p className="text-xs text-destructive mt-1">&gt;1000 copies</p>
+              </div>
+              <div className="h-12 w-12 bg-destructive/10 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-destructive" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* CD4 Tests */}
+        <Card className="transition-all duration-300 border-l-4 border-l-info">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">CD4 Tests</p>
+                <h3 className="text-3xl font-bold text-purple-600 mt-2">{enhancedStats.cd4Tests}</h3>
+                <p className="text-xs text-purple-600 mt-1">Avg: {enhancedStats.avgCD4}</p>
+              </div>
+              <div className="h-12 w-12 bg-muted rounded-lg flex items-center justify-center">
+                <Beaker className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* HCV Tests */}
+        <Card className="transition-all duration-300 border-l-4 border-l-warning">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">HCV Tests</p>
+                <h3 className="text-3xl font-bold text-amber-600 mt-2">{enhancedStats.hcvTests}</h3>
+                <p className="text-xs text-muted-foreground mt-1">Completed</p>
+              </div>
+              <div className="h-12 w-12 bg-warning/10 rounded-lg flex items-center justify-center">
+                <Droplets className="h-6 w-6 text-amber-600" />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -2066,7 +2306,7 @@ const PatientTests = () => {
     if (totalPages <= 1) return null;
 
     return (
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-end gap-4 flex-wrap">
         <div className="text-sm text-muted-foreground">
           Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, totalCount)} of {totalCount} results
         </div>
@@ -2111,31 +2351,48 @@ const PatientTests = () => {
     );
   };
 
-  if (error) {
-    return (
-      <div className="container mx-auto p-6">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
   return (
-    <div >
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Patient Test Results</h1>
-        <p className="text-muted-foreground">
-          View and manage patient laboratory test results
-        </p>
-      </div>
+    <div>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <TestTube className="h-8 w-8 text-primary" />
+              Patient Test Results
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              View and manage patient laboratory test results
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Button
+              variant="outline"
+              onClick={exportResults}
+              disabled={patientTests.length === 0 || loading}
+              className="gap-2"
+            >
+              {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              Export CSV
+            </Button>
+            <Button variant="outline" onClick={fetchPatientTests} disabled={loading} className="gap-2">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+        </div>
 
-      <Tabs defaultValue="results" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="results">Test Results</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <Tabs defaultValue="results" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="results">Test Results</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
 
         <TabsContent value="results" className="space-y-6">
           <FilterPanel />
@@ -2177,19 +2434,20 @@ const PatientTests = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Search Bar */}
-                <div className="flex gap-2">
+                {/* Enhanced Search Bar */}
+                <div className="flex gap-2 bg-muted/30 p-4 rounded-lg border border-border">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
-                      placeholder="Search by Clinic ID or Test ID..."
+                      placeholder="🔍 Search by Clinic ID, Test ID, or Site Name..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                      className="pl-10"
+                      className="pl-10 bg-background border border-border rounded-md focus:border-primary focus:ring-2 focus:ring-ring/20 transition-colors"
                     />
                   </div>
-                  <Button onClick={handleSearch} disabled={loading}>
+                  <Button onClick={handleSearch} disabled={loading} className="px-6 rounded-md">
+                    <Search className="h-4 w-4 mr-2" />
                     Search
                   </Button>
                 </div>
@@ -2206,57 +2464,121 @@ const PatientTests = () => {
                     No test results found
                   </div>
                 ) : (
-                  <div className="rounded-none border">
+                  <div className="rounded-lg border overflow-hidden">
                     <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TestResultTableHead field="TestID">Test ID</TestResultTableHead>
-                          <TestResultTableHead field="ClinicID">Clinic ID</TestResultTableHead>
-                          <TestResultTableHead field="Dat">Test Date</TestResultTableHead>
-                          <TableHead>Test Type</TableHead>
-                          <TestResultTableHead field="CD4">CD4</TestResultTableHead>
-                          <TestResultTableHead field="HIVLoad">Viral Load</TestResultTableHead>
-                          <TestResultTableHead field="HCV">HCV</TestResultTableHead>
-                          <TestResultTableHead field="siteName">Site</TestResultTableHead>
-                          <TableHead>Actions</TableHead>
+                      <TableHeader className="sticky top-0 bg-muted z-10">
+                        <TableRow className="hover:bg-muted">
+                          {visibleColumns.test_id && <TestResultTableHead field="TestID">Test ID</TestResultTableHead>}
+                          {visibleColumns.clinic_id && <TestResultTableHead field="ClinicID">Clinic ID</TestResultTableHead>}
+                          {visibleColumns.test_date && <TestResultTableHead field="Dat">Test Date</TestResultTableHead>}
+                          {visibleColumns.test_type && <TableHead className="font-semibold">Test Type</TableHead>}
+                          {visibleColumns.cd4 && <TestResultTableHead field="CD4">CD4</TestResultTableHead>}
+                          {visibleColumns.viral_load && <TestResultTableHead field="HIVLoad">Viral Load</TestResultTableHead>}
+                          <TableHead className="font-semibold">VL Status</TableHead>
+                          {visibleColumns.hcv && <TestResultTableHead field="HCV">HCV</TestResultTableHead>}
+                          {visibleColumns.site && <TestResultTableHead field="siteName">Site</TestResultTableHead>}
+                          {visibleColumns.actions && <TableHead className="font-semibold">Actions</TableHead>}
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {getSortedPatientTests().map((test) => (
-                          <TableRow key={test.TestID}>
-                            <TableCell className="font-medium">{test.TestID}</TableCell>
-                            <TableCell>{test.ClinicID}</TableCell>
-                            <TableCell>
-                              {test.Dat ? new Date(test.Dat).toLocaleDateString() : '-'}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="secondary">
-                                {getTestTypeBadge(test)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{formatTestValue(test.CD4)}</TableCell>
-                            <TableCell>
-                              {formatTestValue(test.HIVLoad)}
-                              {test.HIVLog && test.HIVLog !== '' && (
-                                <span className="text-xs text-muted-foreground ml-1">
-                                  (log: {test.HIVLog})
-                                </span>
+                        {getSortedPatientTests().map((test, index) => {
+                          const vlClassification = classifyViralLoad(test.HIVLoad);
+                          const StatusIcon = vlClassification.icon;
+                          const hasAnomalies = !test.CD4 || test.CD4 === '' || test.CD4 === '-';
+                          
+                          return (
+                            <TableRow 
+                              key={test.TestID}
+                              className={`
+                                ${vlClassification.bgColor}
+                                hover:brightness-95
+                                transition-all duration-200
+                                cursor-pointer
+                                ${index % 2 === 0 ? 'bg-opacity-30' : 'bg-opacity-50'}
+                                ${hasAnomalies ? 'border-l-4 border-l-warning' : ''}
+                              `}
+                              onClick={() => setQuickViewDrawer({ isOpen: true, data: test })}
+                            >
+                              {visibleColumns.test_id && (
+                                <TableCell className="font-medium font-mono text-sm">
+                                  {test.TestID}
+                                </TableCell>
                               )}
-                            </TableCell>
-                            <TableCell>{formatTestValue(test.HCV)}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                <span className="text-xs">{test.siteName}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                              {visibleColumns.clinic_id && (
+                                <TableCell className="font-mono text-sm font-semibold">
+                                  {test.ClinicID}
+                                </TableCell>
+                              )}
+                              {visibleColumns.test_date && (
+                                <TableCell className="text-sm">
+                                  {test.Dat ? new Date(test.Dat).toLocaleDateString() : '-'}
+                                </TableCell>
+                              )}
+                              {visibleColumns.test_type && (
+                                <TableCell>
+                                  <Badge variant="outline" className="font-medium">
+                                    {getTestTypeBadge(test)}
+                                  </Badge>
+                                </TableCell>
+                              )}
+                              {visibleColumns.cd4 && (
+                                <TableCell className="font-semibold">
+                                  {formatTestValue(test.CD4)}
+                                </TableCell>
+                              )}
+                              {visibleColumns.viral_load && (
+                                <TableCell>
+                                  <div className="space-y-1">
+                                    <div className="font-mono font-semibold text-sm">
+                                      {formatTestValue(test.HIVLoad)}
+                                    </div>
+                                    {test.HIVLog && test.HIVLog !== '' && (
+                                      <div className="text-xs text-muted-foreground">
+                                        Log: {test.HIVLog}
+                                      </div>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              )}
+                              <TableCell>
+                                <Badge className={`${vlClassification.bgColor} ${vlClassification.textColor} border-0 gap-1 font-medium`}>
+                                  <StatusIcon className="h-3 w-3" />
+                                  {vlClassification.label}
+                                </Badge>
+                              </TableCell>
+                              {visibleColumns.hcv && (
+                                <TableCell className="font-semibold">
+                                  {formatTestValue(test.HCV)}
+                                </TableCell>
+                              )}
+                              {visibleColumns.site && (
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                      <MapPin className="h-4 w-4 text-primary" />
+                                    </div>
+                                    <span className="text-sm font-medium">{test.siteName}</span>
+                                  </div>
+                                </TableCell>
+                              )}
+                              {visibleColumns.actions && (
+                                <TableCell>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="hover:bg-primary/10"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setQuickViewDrawer({ isOpen: true, data: test });
+                                    }}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </TableCell>
+                              )}
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
@@ -2291,6 +2613,168 @@ const PatientTests = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Quick View Drawer */}
+      {quickViewDrawer.isOpen && quickViewDrawer.data && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setQuickViewDrawer({ isOpen: false, data: null })} />
+          
+          <div className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-background animate-in slide-in-from-right duration-300">
+            <div className="flex flex-col h-full">
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b">
+                <div>
+                  <h3 className="text-lg font-semibold">Test Details</h3>
+                  <p className="text-sm text-muted-foreground">Test ID: {quickViewDrawer.data.TestID}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setQuickViewDrawer({ isOpen: false, data: null })}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {/* Patient Info */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Patient Information</h4>
+                  <div className="bg-muted rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Clinic ID: {quickViewDrawer.data.ClinicID}</p>
+                        <p className="text-sm text-muted-foreground">Test #{quickViewDrawer.data.TestID}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Test Date</p>
+                        <p className="font-medium">
+                          {quickViewDrawer.data.Dat ? new Date(quickViewDrawer.data.Dat).toLocaleDateString() : '-'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Collection Date</p>
+                        <p className="font-medium">
+                          {quickViewDrawer.data.DaCollect ? new Date(quickViewDrawer.data.DaCollect).toLocaleDateString() : '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Viral Load Results */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Viral Load Results</h4>
+                  <div className="bg-muted rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Viral Load</span>
+                      <span className="font-mono font-bold text-lg">
+                        {formatTestValue(quickViewDrawer.data.HIVLoad)}
+                      </span>
+                    </div>
+                    {quickViewDrawer.data.HIVLog && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">VL Log</span>
+                        <span className="font-mono font-semibold">
+                          {quickViewDrawer.data.HIVLog}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Status</span>
+                      {(() => {
+                        const classification = classifyViralLoad(quickViewDrawer.data.HIVLoad);
+                        const StatusIcon = classification.icon;
+                        return (
+                          <Badge className={`${classification.bgColor} ${classification.textColor} border-0 gap-1`}>
+                            <StatusIcon className="h-3 w-3" />
+                            {classification.label}
+                          </Badge>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* CD4 & Other Tests */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Other Lab Results</h4>
+                  <div className="bg-muted rounded-lg p-4 space-y-2">
+                    <div className="flex items-center justify-between py-2 border-b">
+                      <span className="text-sm text-muted-foreground">CD4 Count</span>
+                      <span className="font-semibold">{formatTestValue(quickViewDrawer.data.CD4)}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b">
+                      <span className="text-sm text-muted-foreground">HCV</span>
+                      <span className="font-semibold">{formatTestValue(quickViewDrawer.data.HCV)}</span>
+                    </div>
+                    {quickViewDrawer.data.WBC && quickViewDrawer.data.WBC !== '' && (
+                      <div className="flex items-center justify-between py-2 border-b">
+                        <span className="text-sm text-muted-foreground">WBC</span>
+                        <span className="font-semibold">{formatTestValue(quickViewDrawer.data.WBC)}</span>
+                      </div>
+                    )}
+                    {quickViewDrawer.data.Hemoglobin && quickViewDrawer.data.Hemoglobin !== '' && (
+                      <div className="flex items-center justify-between py-2 border-b">
+                        <span className="text-sm text-muted-foreground">Hemoglobin</span>
+                        <span className="font-semibold">{formatTestValue(quickViewDrawer.data.Hemoglobin)}</span>
+                      </div>
+                    )}
+                    {quickViewDrawer.data.Platelet && quickViewDrawer.data.Platelet !== '' && (
+                      <div className="flex items-center justify-between py-2">
+                        <span className="text-sm text-muted-foreground">Platelet</span>
+                        <span className="font-semibold">{formatTestValue(quickViewDrawer.data.Platelet)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Site Information */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Healthcare Facility</h4>
+                  <div className="bg-muted rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <MapPin className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{quickViewDrawer.data.siteName || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground">Site Code: {quickViewDrawer.data.siteCode || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Quick Actions</h4>
+                  <div className="space-y-2">
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <Download className="h-4 w-4" />
+                      Download Test Report
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <FileText className="h-4 w-4" />
+                      View Patient History
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <User className="h-4 w-4" />
+                      View Patient Profile
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
     </div>
   );
 };

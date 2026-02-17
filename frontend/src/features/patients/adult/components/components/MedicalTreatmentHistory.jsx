@@ -18,7 +18,7 @@ function MedicalTreatmentHistory({
 }) {
   return (
     <div className="space-y-5">
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <TBHistorySection
             formData={formData}
@@ -27,7 +27,7 @@ function MedicalTreatmentHistory({
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <ARVHistorySection
             formData={formData}
@@ -39,7 +39,7 @@ function MedicalTreatmentHistory({
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <OtherMedicalSection
             formData={formData}
@@ -51,7 +51,7 @@ function MedicalTreatmentHistory({
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <AllergiesSection
             formData={formData}

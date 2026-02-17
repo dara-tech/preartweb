@@ -18,7 +18,7 @@ function PatientInformation({
 }) {
   return (
     <div className="space-y-6">
-      <Card className="border border-border shadow-none bg-card rounded-none">
+      <Card className="border border-border bg-card rounded-none">
         <CardContent className="p-6">
           <PatientIdentificationSection
             formData={formData}
@@ -28,7 +28,7 @@ function PatientInformation({
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <DemographicsSection
             formData={formData}
@@ -38,7 +38,7 @@ function PatientInformation({
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <HIVTestSection
             formData={formData}
@@ -48,7 +48,7 @@ function PatientInformation({
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <FeedingSection
             formData={formData}
@@ -57,7 +57,7 @@ function PatientInformation({
         </CardContent>
       </Card>
 
-      <Card className="border border-border shadow-none bg-card">
+      <Card className="border border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <FamilyHistorySection
             familyMembers={familyMembers}

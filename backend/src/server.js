@@ -29,14 +29,16 @@ const roleManagementRoutes = require('./routes/role-management');
 const importRoutes = require('./routes/import');
 const dataManagementRoutes = require('./routes/data-management');
 const analyticsRoutes = require('./routes/analytics');
-// CQI routes removed
+const cqiIndicatorsRoutes = require('./routes/cqi-indicators');
 const mortalityRetentionIndicatorsRoutes = require('./routes/mortality-retention-indicators');
 const adminRoutes = require('./routes/admin');
 const labTestRoutes = require('./routes/lab-tests');
 const patientTestRoutes = require('./routes/patientTests');
 const infantTestRoutes = require('./routes/infantTests');
+const reportsRoutes = require('./routes/reports');
 const { router: userLogsRoutes } = require('./routes/user-logs');
 const schedulerService = require('./services/scheduler');
+const cqiSchedulerService = require('./services/cqiSchedulerService');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -180,12 +182,13 @@ app.use('/apiv1/roles', roleManagementRoutes);
 app.use('/apiv1/import', importRoutes);
 app.use('/apiv1/data', dataManagementRoutes);
 app.use('/apiv1/analytics', analyticsRoutes);
-// CQI routes removed
+app.use('/apiv1/cqi-indicators', cqiIndicatorsRoutes);
 app.use('/apiv1/mortality-retention-indicators', mortalityRetentionIndicatorsRoutes);
 app.use('/apiv1/admin', adminRoutes);
 app.use('/apiv1/lab-tests', labTestRoutes);
 app.use('/apiv1/patient-tests', patientTestRoutes);
 app.use('/apiv1/infant-tests', infantTestRoutes);
+app.use('/apiv1/reports', reportsRoutes);
 app.use('/apiv1', userLogsRoutes);
 
 // Make io available to routes
@@ -237,6 +240,14 @@ const startServer = async () => {
       // Start analytics scheduler
       schedulerService.start();
       console.log(`📅 Analytics scheduler started`);
+      
+      // Initialize CQI scheduler
+      try {
+        cqiSchedulerService.initialize();
+        console.log(`📊 CQI scheduler initialized`);
+      } catch (error) {
+        console.error('⚠️ Failed to initialize CQI scheduler:', error);
+      }
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

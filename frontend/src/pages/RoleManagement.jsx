@@ -317,15 +317,15 @@ const RoleManagement = () => {
 
   const getRoleBadgeColor = (role) => {
     const colors = {
-      super_admin: 'bg-red-100 text-red-800',
-      admin: 'bg-purple-100 text-purple-800',
-      doctor: 'bg-blue-100 text-blue-800',
-      nurse: 'bg-green-100 text-green-800',
-      data_entry: 'bg-yellow-100 text-yellow-800',
-      viewer: 'bg-gray-100 text-gray-800',
-      site_manager: 'bg-indigo-100 text-indigo-800'
+      super_admin: 'bg-destructive/10 text-destructive border-transparent',
+      admin: 'bg-primary/10 text-primary border-transparent',
+      doctor: 'bg-secondary text-secondary-foreground',
+      nurse: 'bg-secondary text-secondary-foreground',
+      data_entry: 'bg-muted text-muted-foreground',
+      viewer: 'bg-muted text-muted-foreground',
+      site_manager: 'bg-secondary text-secondary-foreground'
     };
-    return colors[role] || 'bg-gray-100 text-gray-800';
+    return colors[role] || 'bg-muted text-muted-foreground';
   };
 
   if (!canManageRoles) {
@@ -352,20 +352,20 @@ const RoleManagement = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <div className="container mx-auto p-6 space-y-8">
+      <div className="space-y-8">
         {/* Advanced Header */}
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-none">
+                <div className="p-3 rounded-md">
                   <Shield className="h-8 w-8 text-primary" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-primary">
                     Role Management
                   </h1>
-                  <p className="text-muted-foreground text-lg">Advanced user & permission control center</p>
+               
                 </div>
               </div>
             </div>
@@ -373,14 +373,14 @@ const RoleManagement = () => {
             <div className="flex items-center gap-3">
              
               
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} >
                 <DialogTrigger asChild>
-                  <Button className=" from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+                  <Button className=" from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white transition-all duration-200">
                     <Plus className="h-4 w-4 mr-2" />
                     Create User
                   </Button>
                 </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md bg-background">
               <DialogHeader>
                 <DialogTitle>Create New User</DialogTitle>
                 <DialogDescription>Add a new user with specific role and permissions</DialogDescription>
@@ -470,62 +470,62 @@ const RoleManagement = () => {
 
         {/* Analytics Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+          <Card className="border-border bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Total Users</p>
-                  <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{analytics.totalUsers}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                  <p className="text-3xl font-bold text-foreground">{analytics.totalUsers}</p>
                 </div>
-                <div className="p-3 bg-blue-500 rounded-none">
-                  <Users className="h-6 w-6 text-white" />
+                <div className="p-3 bg-primary rounded-md">
+                  <Users className="h-6 w-6 text-primary-foreground" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+          <Card className="border-border bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-600 dark:text-green-400">Active Users</p>
-                  <p className="text-3xl font-bold text-green-900 dark:text-green-100">{analytics.activeUsers}</p>
-                  <p className="text-xs text-green-600 dark:text-green-400">{analytics.activePercentage}% of total</p>
+                  <p className="text-sm font-medium text-muted-foreground">Active Users</p>
+                  <p className="text-3xl font-bold text-foreground">{analytics.activeUsers}</p>
+                  <p className="text-xs text-muted-foreground">{analytics.activePercentage}% of total</p>
                 </div>
-                <div className="p-3 bg-green-500 rounded-none">
-                  <UserCheck className="h-6 w-6 text-white" />
+                <div className="p-3 bg-primary rounded-md">
+                  <UserCheck className="h-6 w-6 text-primary-foreground" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
+          <Card className="border-border bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Recent Users</p>
-                  <p className="text-3xl font-bold text-orange-900 dark:text-orange-100">{analytics.recentUsers}</p>
-                  <p className="text-xs text-orange-600 dark:text-orange-400">Last 7 days</p>
+                  <p className="text-sm font-medium text-muted-foreground">Recent Users</p>
+                  <p className="text-3xl font-bold text-foreground">{analytics.recentUsers}</p>
+                  <p className="text-xs text-muted-foreground">Last 7 days</p>
                 </div>
-                <div className="p-3 bg-orange-500 rounded-none">
-                  <TrendingUp className="h-6 w-6 text-white" />
+                <div className="p-3 bg-primary rounded-md">
+                  <TrendingUp className="h-6 w-6 text-primary-foreground" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+          <Card className="border-border bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Admin Users</p>
-                  <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">
+                  <p className="text-sm font-medium text-muted-foreground">Admin Users</p>
+                  <p className="text-3xl font-bold text-foreground">
                     {(analytics.roleStats.super_admin || 0) + (analytics.roleStats.admin || 0)}
                   </p>
-                  <p className="text-xs text-purple-600 dark:text-purple-400">Super Admin + Admin</p>
+                  <p className="text-xs text-muted-foreground">Super Admin + Admin</p>
                 </div>
-                <div className="p-3 bg-purple-500 rounded-none">
-                  <Crown className="h-6 w-6 text-white" />
+                <div className="p-3 bg-primary rounded-md">
+                  <Crown className="h-6 w-6 text-primary-foreground" />
                 </div>
               </div>
             </CardContent>
@@ -670,7 +670,7 @@ const RoleManagement = () => {
               <CardHeader className="bg-gradient-to-r from-card to-card/80">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-none">
+                    <div className="p-2 rounded-md">
                       <Users className="h-5 w-5 text-primary" />
                     </div>
                     <div>
@@ -740,7 +740,7 @@ const RoleManagement = () => {
                           <TableCell>
                             <Badge 
                               variant={user.status === 1 ? "default" : "secondary"}
-                              className={user.status === 1 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                              className={user.status === 1 ? "" : ""}
                             >
                               {user.status === 1 ? (
                                 <><CheckCircle className="h-3 w-3 mr-1" /> Active</>
@@ -784,9 +784,9 @@ const RoleManagement = () => {
                                 className="h-8 w-8 p-0"
                               >
                                 {user.status === 1 ? (
-                                  <UserX className="h-4 w-4 text-orange-600" />
+                                  <UserX className="h-4 w-4 text-muted-foreground" />
                                 ) : (
-                                  <UserCheck className="h-4 w-4 text-green-600" />
+                                  <UserCheck className="h-4 w-4 text-primary" />
                                 )}
                               </Button>
                               
@@ -796,7 +796,7 @@ const RoleManagement = () => {
                                   size="sm"
                                   onClick={() => handleDeleteClick(user)}
                                   title="Delete User"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -816,7 +816,7 @@ const RoleManagement = () => {
           <TabsContent value="analytics" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Role Distribution */}
-              <Card className="shadow-lg">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <PieChart className="h-5 w-5 text-primary" />
@@ -834,9 +834,9 @@ const RoleManagement = () => {
                             <span className="text-sm font-medium">{role.label}</span>
                             <span className="text-sm text-muted-foreground">{count} users ({percentage}%)</span>
                           </div>
-                          <div className="w-full bg-muted rounded-none h-2">
+                          <div className="w-full bg-muted rounded-full h-2">
                             <div 
-                              className=" h-2 rounded-none transition-all duration-300"
+                              className="h-2 rounded-full bg-primary transition-all duration-300"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
@@ -848,7 +848,7 @@ const RoleManagement = () => {
               </Card>
 
               {/* User Activity */}
-              <Card className="shadow-lg">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-primary" />
@@ -857,50 +857,50 @@ const RoleManagement = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-none">
+                    <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-500 rounded-none">
-                          <UserCheck className="h-4 w-4 text-white" />
+                        <div className="p-2 bg-primary rounded-md">
+                          <UserCheck className="h-4 w-4 text-primary-foreground" />
                         </div>
                         <div>
-                          <p className="font-medium text-green-900 dark:text-green-100">Active Users</p>
-                          <p className="text-sm text-green-600 dark:text-green-400">{analytics.activeUsers} users</p>
+                          <p className="font-medium text-foreground">Active Users</p>
+                          <p className="text-sm text-muted-foreground">{analytics.activeUsers} users</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-green-900 dark:text-green-100">{analytics.activePercentage}%</p>
+                        <p className="text-2xl font-bold text-foreground">{analytics.activePercentage}%</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-none">
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-md">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gray-500 rounded-none">
-                          <UserX className="h-4 w-4 text-white" />
+                        <div className="p-2 bg-muted rounded-md">
+                          <UserX className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">Inactive Users</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{analytics.inactiveUsers} users</p>
+                          <p className="font-medium text-foreground">Inactive Users</p>
+                          <p className="text-sm text-muted-foreground">{analytics.inactiveUsers} users</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        <p className="text-2xl font-bold text-foreground">
                           {100 - analytics.activePercentage}%
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950 rounded-none">
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-md">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-500 rounded-none">
-                          <TrendingUp className="h-4 w-4 text-white" />
+                        <div className="p-2 bg-primary rounded-md">
+                          <TrendingUp className="h-4 w-4 text-primary-foreground" />
                         </div>
                         <div>
-                          <p className="font-medium text-blue-900 dark:text-blue-100">Recent Signups</p>
-                          <p className="text-sm text-blue-600 dark:text-blue-400">Last 7 days</p>
+                          <p className="font-medium text-foreground">Recent Signups</p>
+                          <p className="text-sm text-muted-foreground">Last 7 days</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{analytics.recentUsers}</p>
+                        <p className="text-2xl font-bold text-foreground">{analytics.recentUsers}</p>
                       </div>
                     </div>
                   </div>
@@ -909,7 +909,7 @@ const RoleManagement = () => {
             </div>
 
             {/* Site Distribution */}
-            <Card className="shadow-lg">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users2 className="h-5 w-5 text-primary" />
@@ -923,7 +923,7 @@ const RoleManagement = () => {
                       u.assignedSites && u.assignedSites.includes(site.code)
                     ).length;
                     return (
-                      <div key={site.code} className="p-4 border rounded-none hover:bg-muted/20 transition-colors">
+                      <div key={site.code} className="p-4 border border-border rounded-md hover:bg-muted/20 transition-colors">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium text-sm">{site.name}</h4>
                           <Badge variant="outline" className="text-xs">{site.code}</Badge>
@@ -1029,7 +1029,6 @@ const RoleManagement = () => {
               <Button 
                 variant="destructive" 
                 onClick={handleDeleteUser}
-                className="bg-red-600 hover:bg-red-700"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete User

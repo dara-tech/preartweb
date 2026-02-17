@@ -280,7 +280,7 @@ const ImportTab = ({
       <div className="flex items-center justify-center space-x-2 md:space-x-4">
         {[1, 2, 3].map((step) => (
           <div key={step} className="flex items-center">
-            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-none flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300 ${
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-md flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300 ${
               currentStep >= step 
                 ? 'bg-primary text-primary-foreground' 
                 : 'bg-muted text-muted-foreground'
@@ -288,7 +288,7 @@ const ImportTab = ({
               {currentStep > step ? <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5" /> : step}
             </div>
             {step < 3 && (
-              <div className={`w-8 md:w-16 h-1 mx-1 md:mx-2 rounded-none transition-all duration-300 ${
+              <div className={`w-8 md:w-16 h-1 mx-1 md:mx-2 rounded-md transition-all duration-300 ${
                 currentStep > step ? 'bg-primary' : 'bg-muted'
               }`} />
             )}
@@ -300,7 +300,7 @@ const ImportTab = ({
       {currentStep === 1 && (
         <Card className="bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm border-border/50">
           <CardHeader className="text-center pb-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-none flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-md flex items-center justify-center mb-4">
               <CloudUpload className="h-8 w-8 text-primary" />
             </div>
             <CardTitle className="text-2xl font-bold">Upload Your SQL File</CardTitle>
@@ -308,11 +308,11 @@ const ImportTab = ({
           </CardHeader>
           <CardContent>
             <div
-              className={`relative border-2 border-dashed rounded-none p-12 text-center transition-all duration-300 group ${
+              className={`relative border-2 border-dashed rounded-md p-12 text-center transition-all duration-300 group ${
                 dragActive
                   ? 'border-primary/5 scale-105'
                   : selectedFile
-                  ? 'border-green-500 bg-green-50 dark:bg-green-950/20'
+                  ? 'border-primary bg-primary/10'
                   : 'border-border hover:border-primary/50 hover:bg-muted/20'
               }`}
               onDragEnter={handleDrag}
@@ -330,8 +330,8 @@ const ImportTab = ({
               
               {selectedFile ? (
                 <div className="space-y-4">
-                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-none flex items-center justify-center mx-auto">
-                    <CheckCircle className="h-8 w-8 text-green-600" />
+                  <div className="w-16 h-16 bg-primary/10 rounded-md flex items-center justify-center mx-auto">
+                    <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
                   <div>
                     <p className="text-lg font-semibold text-foreground">{selectedFile.name}</p>
@@ -347,7 +347,7 @@ const ImportTab = ({
                       setFileAnalysis(null);
                       setCurrentStep(1);
                     }}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="text-destructive hover:bg-destructive/10"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Remove file
@@ -355,7 +355,7 @@ const ImportTab = ({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-none flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-md flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
                     <Upload className="h-8 w-8 text-primary" />
                   </div>
                   <div>
@@ -392,29 +392,29 @@ const ImportTab = ({
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileCode className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <FileCode className="h-5 w-5 text-primary" />
                 File Analysis
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-none">
-                  <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-center p-4 bg-muted/50 rounded-md">
+                  <FileText className="h-6 w-6 text-primary mx-auto mb-2" />
                   <p className="text-2xl font-bold text-foreground">{fileAnalysis?.lines || 0}</p>
                   <p className="text-xs text-muted-foreground">Lines of Code</p>
                 </div>
-                <div className="text-center p-4 bg-muted/50 rounded-none">
-                  <Database className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-center p-4 bg-muted/50 rounded-md">
+                  <Database className="h-6 w-6 text-primary mx-auto mb-2" />
                   <p className="text-2xl font-bold text-foreground">{fileAnalysis?.tables || 0}</p>
                   <p className="text-xs text-muted-foreground">Tables</p>
                 </div>
-                <div className="text-center p-4 bg-muted/50 rounded-none">
-                  <Layers className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-center p-4 bg-muted/50 rounded-md">
+                  <Layers className="h-6 w-6 text-primary mx-auto mb-2" />
                   <p className="text-2xl font-bold text-foreground">{fileAnalysis?.inserts || 0}</p>
                   <p className="text-xs text-muted-foreground">Insert Statements</p>
                 </div>
-                <div className="text-center p-4 bg-muted/50 rounded-none">
-                  <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-center p-4 bg-muted/50 rounded-md">
+                  <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
                   <p className="text-2xl font-bold text-foreground">{estimatedTime}s</p>
                   <p className="text-xs text-muted-foreground">Est. Time</p>
                 </div>
@@ -442,8 +442,8 @@ const ImportTab = ({
                   onClick={() => setCreateNewDatabase(false)}
                 >
                   <CardContent className="p-6 text-center">
-                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-none flex items-center justify-center mx-auto mb-4">
-                      <Database className="h-6 w-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center mx-auto mb-4">
+                      <Database className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="font-semibold mb-2">Import to Existing Site</h3>
                     <p className="text-sm text-muted-foreground">Add data to an existing database</p>
@@ -462,8 +462,8 @@ const ImportTab = ({
                   onClick={() => setCreateNewDatabase(true)}
                 >
                   <CardContent className="p-6 text-center">
-                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-none flex items-center justify-center mx-auto mb-4">
-                      <Building className="h-6 w-6 text-green-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center mx-auto mb-4">
+                      <Building className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="font-semibold mb-2">Create New Site</h3>
                     <p className="text-sm text-muted-foreground">Set up a new database and site</p>
@@ -491,7 +491,7 @@ const ImportTab = ({
                         sites.map((site) => (
                           <SelectItem key={site.code} value={site.code}>
                             <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-green-500 rounded-none" />
+                              <div className="w-2 h-2 bg-primary rounded-md" />
                               <span className="font-medium">{site.code}</span>
                               <span className="text-muted-foreground">- {site.fileName || site.name}</span>
                             </div>
@@ -510,9 +510,9 @@ const ImportTab = ({
                   
                   {/* Site Selection Error */}
                   {validationErrors.some(error => error.includes('target site')) && (
-                    <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-none">
-                      <AlertCircle className="h-4 w-4 text-red-600" />
-                      <span className="text-sm text-red-600">
+                    <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                      <span className="text-sm text-destructive">
                         Please select a target site to import your data
                       </span>
                     </div>
@@ -520,9 +520,9 @@ const ImportTab = ({
                   
                   {/* Sites Loading State */}
                   {!sites && (
-                    <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-none">
-                      <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                      <span className="text-sm text-blue-600">Loading available sites...</span>
+                    <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/30 rounded-md">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <span className="text-sm text-primary">Loading available sites...</span>
                     </div>
                   )}
                 </div>
@@ -620,9 +620,9 @@ const ImportTab = ({
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Import Summary */}
-            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-none p-6 border border-primary/10">
+            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-md p-6 border border-primary/10">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-none flex items-center justify-center">
+                <div className="w-10 h-10 rounded-md flex items-center justify-center">
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -655,16 +655,16 @@ const ImportTab = ({
 
             {/* Extracted Site Info */}
             {extractedSiteInfo && (
-              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-none p-4">
+              <div className="bg-primary/10 border border-primary/30 rounded-md p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-none flex items-center justify-center">
-                    <Database className="h-4 w-4 text-blue-600" />
+                  <div className="w-8 h-8 bg-primary/10 rounded-md flex items-center justify-center">
+                    <Database className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                    <p className="text-sm font-medium text-foreground">
                       {extractedSiteInfo.message}
                     </p>
-                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                    <p className="text-xs text-primary">
                       Site information will be automatically processed
                     </p>
                   </div>
@@ -674,21 +674,21 @@ const ImportTab = ({
 
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
-              <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-none p-4">
+              <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-red-100 dark:bg-red-900/20 rounded-none flex items-center justify-center">
-                    <AlertCircle className="h-4 w-4 text-red-600" />
+                  <div className="w-8 h-8 bg-destructive/10 rounded-md flex items-center justify-center">
+                    <AlertCircle className="h-4 w-4 text-destructive" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-red-900 dark:text-red-100">
+                    <h4 className="text-sm font-medium text-foreground">
                       Please fix the following errors:
                     </h4>
                   </div>
                 </div>
-                <ul className="text-sm text-red-700 dark:text-red-300 space-y-1 ml-11">
+                <ul className="text-sm text-destructive space-y-1 ml-11">
                   {validationErrors.map((error, index) => (
                     <li key={index} className="flex items-center gap-2">
-                      <div className="w-1 h-1 bg-red-500 rounded-none" />
+                      <div className="w-1 h-1 bg-destructive rounded-md" />
                       {error}
                     </li>
                   ))}
@@ -698,16 +698,16 @@ const ImportTab = ({
 
             {/* Import Progress */}
             {importStatus !== 'idle' && (
-              <div className="bg-muted/50 rounded-none p-6 border border-border/50">
+              <div className="bg-muted/50 rounded-md p-6 border border-border/50">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-none flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-md flex items-center justify-center">
                       {importStatus === 'importing' ? (
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       ) : importStatus === 'success' ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="h-4 w-4 text-primary" />
                       ) : (
-                        <AlertCircle className="h-4 w-4 text-red-600" />
+                        <AlertCircle className="h-4 w-4 text-destructive" />
                       )}
                     </div>
                     <div>
@@ -726,9 +726,9 @@ const ImportTab = ({
                 
                 {/* Debug Information for Errors */}
                 {importStatus === 'error' && (
-                  <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-none">
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Debug Information:</p>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                  <div className="mt-4 p-3 bg-muted/50 border border-border rounded-md">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Debug Information:</p>
+                    <div className="text-xs text-muted-foreground space-y-1">
                       <p>Selected Site: {selectedImportSite || 'None'}</p>
                       <p>Create New: {createNewDatabase ? 'Yes' : 'No'}</p>
                       <p>File: {selectedFile?.name || 'None'}</p>

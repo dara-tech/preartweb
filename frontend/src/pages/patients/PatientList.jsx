@@ -31,14 +31,14 @@ function PatientList() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Minimalistic Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Patient Management</h1>
-              <p className="text-sm text-gray-500 mt-1">Select patient type to manage</p>
+              <h1 className="text-2xl font-semibold text-foreground">Patient Management</h1>
+              <p className="text-sm text-muted-foreground mt-1">Select patient type to manage</p>
             </div>
             <div className="flex items-center gap-3">
             <Button 
@@ -64,7 +64,7 @@ function PatientList() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="border border-gray-200 shadow-none bg-white">
+              <Card key={i} className="border border-border bg-card">
                 <CardHeader className="text-center">
                   <Skeleton className="h-12 w-12 mx-auto rounded" />
                   <Skeleton className="h-6 w-32 mx-auto mt-4" />
@@ -79,17 +79,17 @@ function PatientList() {
                 ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card 
-              className="border border-gray-200 shadow-none bg-white hover:border-gray-300 transition-colors cursor-pointer" 
+              className="border border-border bg-card hover:border-primary/50 transition-colors cursor-pointer" 
               onClick={() => navigate('/patients/adult')}
             >
               <CardHeader className="text-center pb-4">
-                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-blue-50 flex items-center justify-center">
-                  <Users className="h-8 w-8 text-blue-600" />
+                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users className="h-8 w-8 text-primary" />
               </div>
                 <CardTitle className="text-xl">Adult Patients</CardTitle>
             </CardHeader>
               <CardContent className="text-center pt-0">
-                <p className="text-sm text-gray-500 mb-6">Manage adult patients (15+ years)</p>
+                <p className="text-sm text-muted-foreground mb-6">Manage adult patients (15+ years)</p>
                 <Button className="w-full h-9">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Adult Form
@@ -98,17 +98,17 @@ function PatientList() {
           </Card>
 
             <Card 
-              className="border border-gray-200 shadow-none bg-white hover:border-gray-300 transition-colors cursor-pointer" 
+              className="border border-border bg-card hover:border-primary/50 transition-colors cursor-pointer" 
               onClick={() => navigate('/patients/child')}
             >
               <CardHeader className="text-center pb-4">
-                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
-                  <Users className="h-8 w-8 text-green-600" />
+                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users className="h-8 w-8 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Child Patients</CardTitle>
             </CardHeader>
               <CardContent className="text-center pt-0">
-                <p className="text-sm text-gray-500 mb-6">Manage child patients (2-14 years)</p>
+                <p className="text-sm text-muted-foreground mb-6">Manage child patients (2-14 years)</p>
                 <Button className="w-full h-9" variant="outline">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Child Form
@@ -117,17 +117,17 @@ function PatientList() {
           </Card>
 
             <Card 
-              className="border border-gray-200 shadow-none bg-white hover:border-gray-300 transition-colors cursor-pointer" 
+              className="border border-border bg-card hover:border-primary/50 transition-colors cursor-pointer" 
               onClick={() => navigate('/patients/infant')}
             >
               <CardHeader className="text-center pb-4">
-                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-purple-50 flex items-center justify-center">
-                  <Baby className="h-8 w-8 text-purple-600" />
+                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                  <Baby className="h-8 w-8 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Infant Patients</CardTitle>
             </CardHeader>
               <CardContent className="text-center pt-0">
-                <p className="text-sm text-gray-500 mb-6">Manage exposed infants (0-24 months)</p>
+                <p className="text-sm text-muted-foreground mb-6">Manage exposed infants (0-24 months)</p>
                 <Button className="w-full h-9" variant="outline">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Infant Form

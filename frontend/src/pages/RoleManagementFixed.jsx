@@ -203,15 +203,15 @@ const RoleManagement = () => {
 
   const getRoleBadgeColor = (role) => {
     const colors = {
-      super_admin: 'bg-red-100 text-red-800',
-      admin: 'bg-purple-100 text-purple-800',
-      doctor: 'bg-blue-100 text-blue-800',
-      nurse: 'bg-green-100 text-green-800',
-      data_entry: 'bg-yellow-100 text-yellow-800',
-      viewer: 'bg-gray-100 text-gray-800',
-      site_manager: 'bg-indigo-100 text-indigo-800'
+      super_admin: 'bg-destructive/10 text-destructive border-transparent',
+      admin: 'bg-primary/10 text-primary border-transparent',
+      doctor: 'bg-secondary text-secondary-foreground',
+      nurse: 'bg-secondary text-secondary-foreground',
+      data_entry: 'bg-muted text-muted-foreground',
+      viewer: 'bg-muted text-muted-foreground',
+      site_manager: 'bg-secondary text-secondary-foreground'
     };
-    return colors[role] || 'bg-gray-100 text-gray-800';
+    return colors[role] || 'bg-muted text-muted-foreground';
   };
 
   if (!canManageRoles) {
@@ -237,8 +237,8 @@ const RoleManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen ">
+      <div className=" space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -252,7 +252,7 @@ const RoleManagement = () => {
                 Create User
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md bg-background">
               <DialogHeader>
                 <DialogTitle>Create New User</DialogTitle>
                 <DialogDescription>Add a new user with specific role and permissions</DialogDescription>
@@ -419,9 +419,9 @@ const RoleManagement = () => {
                           title={user.status === 1 ? "Deactivate User" : "Activate User"}
                         >
                           {user.status === 1 ? (
-                            <ToggleRight className="h-4 w-4 text-green-600" />
+                            <ToggleRight className="h-4 w-4 text-primary" />
                           ) : (
-                            <ToggleLeft className="h-4 w-4 text-gray-400" />
+                            <ToggleLeft className="h-4 w-4 text-muted-foreground" />
                           )}
                         </Button>
                         
@@ -431,7 +431,7 @@ const RoleManagement = () => {
                             size="sm"
                             onClick={() => handleDeleteClick(user)}
                             title="Delete User"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -529,7 +529,6 @@ const RoleManagement = () => {
               <Button 
                 variant="destructive" 
                 onClick={handleDeleteUser}
-                className="bg-red-600 hover:bg-red-700"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete User

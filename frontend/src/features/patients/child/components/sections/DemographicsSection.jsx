@@ -4,7 +4,7 @@ import React from 'react';
 function DemographicsSection({ formData, handleInputChange, dropdownOptions }) {
   return (
     <div className="space-y-6">
-      <div className="border-b border-gray-200 pb-3">
+      <div className="border-b border-border pb-3">
         <h3 className="text-base font-semibold text-gray-900">ព័ត៌មានប្រជាជន</h3>
         <p className="text-xs text-gray-500 mt-0.5">Demographics</p>
       </div>

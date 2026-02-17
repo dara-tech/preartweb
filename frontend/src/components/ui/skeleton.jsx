@@ -4,7 +4,7 @@ import { cn } from "../../lib/utils"
 const Skeleton = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("animate-pulse rounded-none bg-muted", className)}
+    className={cn("animate-pulse rounded-md bg-muted", className)}
     {...props}
   />
 ))

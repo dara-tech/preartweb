@@ -267,22 +267,22 @@ const SmartForm = ({
           <div className="space-y-4">
             <div>
               <Label htmlFor="clinicId">
-                Clinic ID {isFieldRequired('clinicId') && <span className="text-red-500">*</span>}
+                Clinic ID {isFieldRequired('clinicId') && <span className="text-destructive">*</span>}
               </Label>
               <Input
                 id="clinicId"
                 value={formData.clinicId}
                 onChange={(e) => handleInputChange('clinicId', e.target.value)}
-                className={hasError('clinicId') ? 'border-red-500' : ''}
+                className={hasError('clinicId') ? 'border-destructive' : ''}
               />
               {hasError('clinicId') && (
-                <p className="text-sm text-red-500 mt-1">{errors.clinicId[0]}</p>
+                <p className="text-sm text-destructive mt-1">{errors.clinicId[0]}</p>
               )}
             </div>
 
             <div>
               <Label htmlFor="visitDate">
-                Visit Date {isFieldRequired('visitDate') && <span className="text-red-500">*</span>}
+                Visit Date {isFieldRequired('visitDate') && <span className="text-destructive">*</span>}
               </Label>
               <Input
                 id="visitDate"
@@ -290,16 +290,16 @@ const SmartForm = ({
                 value={formData.visitDate}
                 onChange={(e) => handleInputChange('visitDate', e.target.value)}
                 onBlur={() => validateField('visitDate', formData.visitDate)}
-                className={hasError('visitDate') ? 'border-red-500' : ''}
+                className={hasError('visitDate') ? 'border-destructive' : ''}
               />
               {hasError('visitDate') && (
-                <p className="text-sm text-red-500 mt-1">{errors.visitDate[0]}</p>
+                <p className="text-sm text-destructive mt-1">{errors.visitDate[0]}</p>
               )}
             </div>
 
             <div>
               <Label htmlFor="birthDate">
-                Birth Date {isFieldRequired('birthDate') && <span className="text-red-500">*</span>}
+                Birth Date {isFieldRequired('birthDate') && <span className="text-destructive">*</span>}
               </Label>
               <Input
                 id="birthDate"
@@ -307,10 +307,10 @@ const SmartForm = ({
                 value={formData.birthDate}
                 onChange={(e) => handleInputChange('birthDate', e.target.value)}
                 onBlur={() => validateField('birthDate', formData.birthDate)}
-                className={hasError('birthDate') ? 'border-red-500' : ''}
+                className={hasError('birthDate') ? 'border-destructive' : ''}
               />
               {hasError('birthDate') && (
-                <p className="text-sm text-red-500 mt-1">{errors.birthDate[0]}</p>
+                <p className="text-sm text-destructive mt-1">{errors.birthDate[0]}</p>
               )}
             </div>
 
@@ -318,7 +318,7 @@ const SmartForm = ({
             {formData.ageDisplay && (
               <div>
                 <Label>Calculated Age</Label>
-                <div className="p-2 bg-muted rounded-none">
+                <div className="p-2 bg-muted rounded-md">
                   <span className="font-medium">{formData.ageDisplay}</span>
                 </div>
               </div>
@@ -331,7 +331,7 @@ const SmartForm = ({
               <>
                 <div>
                   <Label htmlFor="weight">
-                    Weight (kg) {isFieldRequired('weight') && <span className="text-red-500">*</span>}
+                    Weight (kg) {isFieldRequired('weight') && <span className="text-destructive">*</span>}
                   </Label>
                   <Input
                     id="weight"
@@ -339,13 +339,13 @@ const SmartForm = ({
                     step="0.1"
                     value={formData.weight}
                     onChange={(e) => handleInputChange('weight', e.target.value)}
-                    className={hasError('weight') ? 'border-red-500' : ''}
+                    className={hasError('weight') ? 'border-destructive' : ''}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="height">
-                    Height (cm) {isFieldRequired('height') && <span className="text-red-500">*</span>}
+                    Height (cm) {isFieldRequired('height') && <span className="text-destructive">*</span>}
                   </Label>
                   <Input
                     id="height"
@@ -353,19 +353,19 @@ const SmartForm = ({
                     step="0.1"
                     value={formData.height}
                     onChange={(e) => handleInputChange('height', e.target.value)}
-                    className={hasError('height') ? 'border-red-500' : ''}
+                    className={hasError('height') ? 'border-destructive' : ''}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="motherHIVStatus">
-                    Mother HIV Status {isFieldRequired('motherHIVStatus') && <span className="text-red-500">*</span>}
+                    Mother HIV Status {isFieldRequired('motherHIVStatus') && <span className="text-destructive">*</span>}
                   </Label>
                   <select
                     id="motherHIVStatus"
                     value={formData.motherHIVStatus}
                     onChange={(e) => handleInputChange('motherHIVStatus', e.target.value)}
-                    className="w-full p-2 border rounded-none"
+                    className="w-full p-2 border rounded-md"
                   >
                     <option value="">Select Status</option>
                     <option value="positive">Positive</option>
@@ -378,25 +378,25 @@ const SmartForm = ({
                   <>
                     <div>
                       <Label htmlFor="motherClinicID">
-                        Mother Clinic ID {isFieldRequired('motherClinicID') && <span className="text-red-500">*</span>}
+                        Mother Clinic ID {isFieldRequired('motherClinicID') && <span className="text-destructive">*</span>}
                       </Label>
                       <Input
                         id="motherClinicID"
                         value={formData.motherClinicID}
                         onChange={(e) => handleInputChange('motherClinicID', e.target.value)}
-                        className={hasError('motherClinicID') ? 'border-red-500' : ''}
+                        className={hasError('motherClinicID') ? 'border-destructive' : ''}
                       />
                     </div>
 
                     <div>
                       <Label htmlFor="motherARTNumber">
-                        Mother ART Number {isFieldRequired('motherARTNumber') && <span className="text-red-500">*</span>}
+                        Mother ART Number {isFieldRequired('motherARTNumber') && <span className="text-destructive">*</span>}
                       </Label>
                       <Input
                         id="motherARTNumber"
                         value={formData.motherARTNumber}
                         onChange={(e) => handleInputChange('motherARTNumber', e.target.value)}
-                        className={hasError('motherARTNumber') ? 'border-red-500' : ''}
+                        className={hasError('motherARTNumber') ? 'border-destructive' : ''}
                       />
                     </div>
                   </>
@@ -413,10 +413,10 @@ const SmartForm = ({
                 value={formData.nextAppointment}
                 onChange={(e) => handleInputChange('nextAppointment', e.target.value)}
                 onBlur={() => validateField('nextAppointment', formData.nextAppointment)}
-                className={hasError('nextAppointment') ? 'border-red-500' : ''}
+                className={hasError('nextAppointment') ? 'border-destructive' : ''}
               />
               {hasError('nextAppointment') && (
-                <p className="text-sm text-red-500 mt-1">{errors.nextAppointment[0]}</p>
+                <p className="text-sm text-destructive mt-1">{errors.nextAppointment[0]}</p>
               )}
             </div>
           </div>

@@ -476,20 +476,20 @@ function InfantInitialForm() {
           // Form View - Show tabs and action buttons
           <>
             {/* Minimalistic Header */}
-            <div className="bg-white border-b border-gray-200">
+            <div className="bg-card border-b border-border">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3">
                 <div className="flex items-center gap-3">
                   <Button 
                     onClick={backToList} 
                     variant="ghost" 
                     size="sm" 
-                    className="h-8 w-8 p-0 hover:bg-gray-100"
+                    className="h-8 w-8 p-0 hover:bg-accent"
                   >
                     <ArrowLeft className="w-4 h-4" />
                   </Button>
                   <div>
-                    <h1 className="text-lg font-semibold text-gray-900">Infant Patient</h1>
-                    <p className="text-xs text-gray-500">ការគ្រប់គ្រងអ្នកជំងឺទារក</p>
+                    <h1 className="text-lg font-semibold text-foreground">Infant Patient</h1>
+                    <p className="text-xs text-muted-foreground">ការគ្រប់គ្រងអ្នកជំងឺទារក</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -506,7 +506,7 @@ function InfantInitialForm() {
                     onClick={handleSave} 
                     disabled={loading} 
                     size="sm" 
-                    className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                    className="h-8 text-xs bg-primary hover:bg-primary/90"
                   >
                     <Save className="w-3.5 h-3.5 mr-1.5" />
                     {loading ? 'Saving...' : 'Save'}
@@ -516,7 +516,7 @@ function InfantInitialForm() {
                       onClick={handleDelete} 
                       variant="ghost" 
                       size="sm" 
-                      className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="h-8 text-xs text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="w-3.5 h-3.5 mr-1.5" />
                       Delete
@@ -528,17 +528,17 @@ function InfantInitialForm() {
 
             {/* Minimalistic Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="border-b border-gray-200 bg-white">
+              <div className="border-b border-border bg-card">
                 <TabsList className="h-10 bg-transparent p-0 w-auto">
                   <TabsTrigger 
                     value="information" 
-                    className="px-4 py-2 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 rounded-none"
+                    className="px-4 py-2 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-md"
                   >
                     Information
                   </TabsTrigger>
                   <TabsTrigger 
                     value="treatment"
-                    className="px-4 py-2 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 rounded-none"
+                    className="px-4 py-2 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-md"
                   >
                     Medical History
                   </TabsTrigger>

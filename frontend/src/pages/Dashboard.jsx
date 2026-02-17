@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from 'react-router-dom'
@@ -6,6 +7,7 @@ import { Users, UserPlus, FileText, Activity } from 'lucide-react'
 import api from '../services/api'
 
 function Dashboard() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [stats, setStats] = useState({
     totalAdults: 0,
@@ -53,42 +55,42 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">PreART Medical Management System</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+        <p className="text-gray-600">{t('common.appName')}</p>
       </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Adult Patients</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('nav.adultPatients')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalAdults}</div>
-            <p className="text-xs text-muted-foreground">Total registered adults</p>
+            <p className="text-xs text-muted-foreground">{t('patients.totalPatients')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Child Patients</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('nav.childPatients')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalChildren}</div>
-            <p className="text-xs text-muted-foreground">Total registered children</p>
+            <p className="text-xs text-muted-foreground">{t('patients.totalPatients')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Infant Patients</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('nav.infantPatients')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalInfants}</div>
-            <p className="text-xs text-muted-foreground">Total registered infants</p>
+            <p className="text-xs text-muted-foreground">{t('patients.totalPatients')}</p>
           </CardContent>
         </Card>
       </div>
@@ -96,7 +98,7 @@ function Dashboard() {
       {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle>{t('dashboard.quickActions')}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button 
@@ -104,7 +106,7 @@ function Dashboard() {
             onClick={() => navigate('/patients/adult')}
           >
             <UserPlus className="h-6 w-6" />
-            <span>New Adult Patient</span>
+            <span>{t('nav.newAdultPatient')}</span>
           </Button>
           
           <Button 
@@ -113,7 +115,7 @@ function Dashboard() {
             onClick={() => navigate('/patients/child')}
           >
             <UserPlus className="h-6 w-6" />
-            <span>New Child Patient</span>
+            <span>{t('nav.newChildPatient')}</span>
           </Button>
           
           <Button 
@@ -122,7 +124,7 @@ function Dashboard() {
             onClick={() => navigate('/patients/infant')}
           >
             <UserPlus className="h-6 w-6" />
-            <span>New Infant Patient</span>
+            <span>{t('nav.newInfantPatient')}</span>
           </Button>
         </CardContent>
       </Card>
@@ -130,13 +132,12 @@ function Dashboard() {
       {/* System Information */}
       <Card>
         <CardHeader>
-          <CardTitle>System Information</CardTitle>
+          <CardTitle>{t('dashboard.systemStatus')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-600">
-            <p>PreART Medical Management System</p>
-            <p>Web-based version of the VB.NET PreART system</p>
-            <p>All data is synchronized with the existing database</p>
+            <p>{t('common.appName')}</p>
+            <p>{t('dashboard.welcome')}</p>
           </div>
         </CardContent>
       </Card>

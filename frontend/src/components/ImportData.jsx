@@ -304,9 +304,9 @@ const ImportData = () => {
       case 'importing':
         return <Loader2 className="h-4 w-4 animate-spin" />;
       case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-primary" />;
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
+        return <AlertCircle className="h-4 w-4 text-destructive" />;
       default:
         return null;
     }
@@ -316,8 +316,8 @@ const ImportData = () => {
     <div className="max-w-2xl mx-auto  space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Import Data</h1>
-        <p className="text-gray-600">Upload SQL files to import data into your system</p>
+        <h1 className="text-2xl font-semibold text-foreground mb-2">Import Data</h1>
+        <p className="text-muted-foreground">Upload SQL files to import data into your system</p>
         
         {/* Active/Inactive Status Controls */}
         <div className="mt-4 flex justify-center gap-3">
@@ -326,7 +326,7 @@ const ImportData = () => {
             size="sm"
             onClick={() => handleToggleActive(true)}
             disabled={importStatus === 'importing'}
-            className={`flex items-center gap-2 ${isActive ? 'bg-green-600 hover:bg-green-700 text-white' : 'border-green-600 text-green-600 hover:bg-green-50'} ${importStatus === 'importing' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`flex items-center gap-2 ${isActive ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10'} ${importStatus === 'importing' ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <Play className="h-4 w-4" />
             Active
@@ -336,7 +336,7 @@ const ImportData = () => {
             size="sm"
             onClick={() => handleToggleActive(false)}
             disabled={importStatus === 'importing'}
-            className={`flex items-center gap-2 ${!isActive ? 'bg-red-600 hover:bg-red-700 text-white' : 'border-red-600 text-red-600 hover:bg-red-50'} ${importStatus === 'importing' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`flex items-center gap-2 ${!isActive ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : 'border-destructive text-destructive hover:bg-destructive/10'} ${importStatus === 'importing' ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <Pause className="h-4 w-4" />
             Inactive
@@ -345,15 +345,15 @@ const ImportData = () => {
         
         {/* Status Indicator */}
         <div className="mt-2">
-          <span className={`inline-flex items-center px-3 py-1 rounded-none text-sm font-medium ${
+          <span className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${
             isActive 
-              ? 'bg-green-100 text-green-800 border border-green-200' 
-              : 'bg-red-100 text-red-800 border border-red-200'
+              ? 'bg-primary/10 text-primary border border-primary/30' 
+              : 'bg-destructive/10 text-destructive border border-destructive/30'
           }`}>
             {isActive ? 'Import is Active' : 'Import is Inactive'}
           </span>
           {importStatus === 'importing' && (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               Status controls disabled during import process
             </p>
           )}
@@ -367,7 +367,7 @@ const ImportData = () => {
         </CardHeader>
         <CardContent>
           <div
-            className="border-2 border-dashed border-gray-300 rounded-none p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+            className="border-2 border-dashed border-border rounded-md p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onClick={() => fileInputRef.current?.click()}
@@ -382,7 +382,7 @@ const ImportData = () => {
             
             {selectedFile ? (
               <div className="space-y-2">
-                <FileText className="h-8 w-8 mx-auto text-gray-600" />
+                <FileText className="h-8 w-8 mx-auto text-muted-foreground" />
                 <div className="flex items-center justify-center gap-2">
                   <span className="font-medium">{selectedFile.name}</span>
                   <Button
@@ -397,15 +397,15 @@ const ImportData = () => {
                     <X className="h-3 w-3" />
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
             ) : (
               <div className="space-y-2">
-                <Upload className="h-8 w-8 mx-auto text-gray-400" />
+                <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
                 <p className="font-medium">Drop SQL file here or click to browse</p>
-                <p className="text-sm text-gray-500">Maximum file size: 500MB</p>
+                <p className="text-sm text-muted-foreground">Maximum file size: 500MB</p>
               </div>
             )}
           </div>
@@ -425,7 +425,7 @@ const ImportData = () => {
                 name="target"
                 checked={!createNewDatabase}
                 onChange={() => setCreateNewDatabase(false)}
-                className="text-blue-600"
+                className="text-primary"
               />
               <span>Import to existing site</span>
             </label>
@@ -436,7 +436,7 @@ const ImportData = () => {
                 name="target"
                 checked={createNewDatabase}
                 onChange={() => setCreateNewDatabase(true)}
-                className="text-blue-600"
+                className="text-primary"
               />
               <span>Create new site</span>
             </label>
@@ -529,21 +529,21 @@ const ImportData = () => {
       )}
 
       {importStatus !== 'idle' && (
-        <Alert className={importStatus === 'error' ? 'border-red-200 bg-red-50' : importStatus === 'success' ? 'border-green-200 bg-green-50' : 'border-blue-200 bg-blue-50'}>
+        <Alert className={importStatus === 'error' ? 'border-destructive/50 bg-destructive/10' : importStatus === 'success' ? 'border-primary/50 bg-primary/10' : 'border-border bg-muted/30'}>
           <div className="flex items-center gap-2">
             {getStatusIcon()}
-            <AlertDescription className={importStatus === 'error' ? 'text-red-800' : importStatus === 'success' ? 'text-green-800' : 'text-blue-800'}>
+            <AlertDescription className={importStatus === 'error' ? 'text-destructive' : importStatus === 'success' ? 'text-primary' : 'text-foreground'}>
               {importMessage}
             </AlertDescription>
           </div>
           {importStatus === 'importing' && (
             <div className="mt-3 space-y-2">
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Progress</span>
                 <span>{importProgress}%</span>
               </div>
               <Progress value={importProgress} className="w-full h-2" />
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Uploading & Processing</span>
                 <span>{importProgress < 50 ? 'Uploading...' : importProgress < 90 ? 'Processing...' : 'Finalizing...'}</span>
               </div>
@@ -556,7 +556,7 @@ const ImportData = () => {
       <Button
         onClick={handleImport}
         disabled={importStatus === 'importing' || !selectedFile || !isActive}
-        className={`w-full ${importStatus === 'importing' ? 'bg-blue-600 hover:bg-blue-700' : importStatus === 'success' ? 'bg-green-600 hover:bg-green-700' : importStatus === 'error' ? 'bg-red-600 hover:bg-red-700' : !isActive ? 'bg-gray-400 hover:bg-gray-500' : ''}`}
+        className={`w-full ${importStatus === 'importing' ? 'bg-primary hover:bg-primary/90' : importStatus === 'success' ? 'bg-primary hover:bg-primary/90' : importStatus === 'error' ? 'bg-destructive hover:bg-destructive/90' : !isActive ? 'bg-muted hover:bg-muted/80' : ''}`}
       >
         {importStatus === 'importing' ? (
           <>

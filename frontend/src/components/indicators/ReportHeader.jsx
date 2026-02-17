@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import siteApi from '../../services/siteApi';
 
-const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter }) => {
+const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, titleEn, titleKh }) => {
+  const displayTitleEn = titleEn ?? 'Quarterly Report on ART';
+  const displayTitleKh = titleKh ?? 'របាយការណ៍ស្តីពីការព្យាបាលអ្នកជំងឺអេដស៍';
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,64 +75,65 @@ const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter }) => {
 
   if (loading) {
     return (
-      <div className="bg-card shadow-sm p-6 mb-6">
+      <div className="bg-card border border-border p-6 mb-6">
         <div className="text-center">
-          <div className="animate-spin rounded-none h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading site data...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted border-t-primary mx-auto" />
+          <p className="mt-2 text-sm text-muted-foreground">Loading site data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-card border border-border shadow-sm p-6 mb-6">
-      {/* Main Title */}
-      <div className="text-center mb-1">
-        <h1 className="text-2xl font-bold text-foreground mb-1">
-          របាយការណ៍ស្តីពីការព្យាបាលអ្នកជំងឺអេដស៍ Quarterly Report on ART
+    <div className="bg-card border border-border overflow-hidden mb-6">
+      {/* Title — blue-800 header, white text (consistent across all reports) */}
+      <div className="w-full px-6 pt-2 pb-4 text-center border-b border-blue-900/50 bg-blue-800 rounded-none">
+        <div className="h-0.5 w-12 mx-auto mb-3 rounded-none" />
+        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight text-center">
+          {displayTitleKh} {displayTitleEn}
         </h1>
       </div>
 
-      {/* Report Parameters Table */}
-      <div className="border border-border overflow-hidden">
-        <table className="w-full">
-          <tbody>
+      {/* Report Parameters Table — label cells with subtle background */}
+      <div className="border-t-0 overflow-hidden">
+        <table className="w-full border-collapse">
+          <tbody className="text-sm">
             <tr className="border-b border-border">
-              <td className="px-4 py-3 font-semibold text-foreground border-r border-border w-1/4">
+              <td className="px-4 py-3 font-semibold text-foreground bg-muted/40 border-b border-r border-border w-1/4">
                 Facility:
               </td>
-              <td className="px-4 py-3 text-foreground border-r border-border w-1/4">
+              <td className="px-4 py-3 text-foreground border-b border-r border-border w-1/4">
                 {selectedSite ? selectedSite.name : 'All Facilities'}
               </td>
-              <td className="px-4 py-3 font-semibold text-foreground border-r border-border w-1/4">
-                 File Name:
+              <td className="px-4 py-3 font-semibold text-foreground bg-muted/40 border-b border-r border-border w-1/4">
+                File Name:
               </td>
-              <td className="px-4 py-3 text-foreground w-1/4">
+              <td className="px-4 py-3 text-foreground border-b w-1/4">
                 {selectedSite ? (selectedSite.fileName || selectedSite.file_name || selectedSite.code) : 'All Facilities'}
               </td>
             </tr>
             <tr className="border-b border-border">
-              <td className="px-4 py-3 font-semibold text-foreground border-r border-border">
+              <td className="px-4 py-3 font-semibold text-foreground bg-muted/40 border-b border-r border-border">
                 Operational District:
               </td>
-              <td className="px-4 py-3 text-foreground border-r border-border">
+              <td className="px-4 py-3 text-foreground border-b border-r border-border">
                 {selectedSite ? getOperationalDistrict(selectedSite) : getAllOperationalDistricts()}
               </td>
-              <td className="px-4 py-3 font-semibold text-foreground border-r border-border">
-               Province:
+              <td className="px-4 py-3 font-semibold text-foreground bg-muted/40 border-b border-r border-border">
+                Province:
               </td>
-              <td className="px-4 py-3 text-foreground">
+              <td className="px-4 py-3 text-foreground border-b">
                 {selectedSite ? getProvinceName(selectedSite) : getAllProvinces()}
               </td>
             </tr>
             <tr>
-              <td className="px-4 py-3 font-semibold text-foreground border-r border-border">
+              <td className="px-4 py-3 font-semibold text-foreground bg-muted/40 border-r border-border">
                 Year:
               </td>
               <td className="px-4 py-3 text-foreground border-r border-border">
                 {selectedYear}
               </td>
-              <td className="px-4 py-3 font-semibold text-foreground border-r border-border">
+              <td className="px-4 py-3 font-semibold text-foreground bg-muted/40 border-r border-border">
                 Quarter:
               </td>
               <td className="px-4 py-3 text-foreground">

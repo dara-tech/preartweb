@@ -514,12 +514,12 @@ const QueryEditorAdmin = () => {
                             )}
                             
                             {result.success && result.data && result.data.length > 0 && (
-                              <div className="border-2 border-gray-300 rounded-lg overflow-auto max-h-[300px] mt-2">
+                              <div className="border-2 border-border rounded-lg overflow-auto max-h-[300px] mt-2">
                                 <table className="w-full border-collapse text-xs">
                                   <thead>
-                                    <tr className="border-b-2 border-gray-300 bg-gray-50">
+                                    <tr className="border-b-2 border-border bg-gray-50">
                                       {Object.keys(result.data[0]).map((key) => (
-                                        <th key={key} className="font-mono font-bold border-r border-gray-300 px-2 py-1 text-left">
+                                        <th key={key} className="font-mono font-bold border-r border-border px-2 py-1 text-left">
                                           {key}
                                         </th>
                                       ))}
@@ -527,9 +527,9 @@ const QueryEditorAdmin = () => {
                                   </thead>
                                   <tbody>
                                     {result.data.map((row, rowIdx) => (
-                                      <tr key={rowIdx} className="border-b border-gray-200 hover:bg-gray-50">
+                                      <tr key={rowIdx} className="border-b border-border hover:bg-gray-50">
                                         {Object.keys(result.data[0]).map((key) => (
-                                          <td key={key} className="font-mono border-r border-gray-300 px-2 py-1">
+                                          <td key={key} className="font-mono border-r border-border px-2 py-1">
                                             {row[key] !== null && row[key] !== undefined
                                               ? String(row[key])
                                               : <span className="text-gray-400 italic">NULL</span>}
@@ -583,12 +583,12 @@ const QueryEditorAdmin = () => {
                             <div className="text-sm text-muted-foreground">
                               {executionResult.data.length} row(s) returned
                             </div>
-                            <div className="border-2 border-gray-300 rounded-lg overflow-auto max-h-[500px]">
+                            <div className="border-2 border-border rounded-lg overflow-auto max-h-[500px]">
                               <Table className="border-collapse">
                                 <TableHeader>
-                                  <TableRow className="border-b-2 border-gray-300 bg-gray-50">
+                                  <TableRow className="border-b-2 border-border bg-gray-50">
                                     {Object.keys(executionResult.data[0]).map((key) => (
-                                      <TableHead key={key} className="font-mono text-xs font-bold border-r border-gray-300 px-3 py-2 text-left">
+                                      <TableHead key={key} className="font-mono text-xs font-bold border-r border-border px-3 py-2 text-left">
                                         {key}
                                       </TableHead>
                                     ))}
@@ -596,9 +596,9 @@ const QueryEditorAdmin = () => {
                                 </TableHeader>
                                 <TableBody>
                                   {executionResult.data.map((row, idx) => (
-                                    <TableRow key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                                    <TableRow key={idx} className="border-b border-border hover:bg-gray-50">
                                       {Object.keys(executionResult.data[0]).map((key) => (
-                                        <TableCell key={key} className="font-mono text-xs border-r border-gray-300 px-3 py-2">
+                                        <TableCell key={key} className="font-mono text-xs border-r border-border px-3 py-2">
                                           {row[key] !== null && row[key] !== undefined
                                             ? String(row[key])
                                             : <span className="text-gray-400 italic">NULL</span>}

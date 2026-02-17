@@ -92,110 +92,9 @@ const getDisplayIndicatorName = (backendName) => {
 const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, selectedYear, selectedQuarter, isViewer }) => {
   if (loading) {
     return (
-      <div className="space-y-4 sm:space-y-6">
-        {/* Indicators Table Skeleton */}
-        <div className="bg-card border border-border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              {/* Table Header Skeleton */}
-              <thead className="bg-muted border-b-2 border-border">
-                <tr>
-                  <th className="px-4 py-4 text-center text-sm font-bold text-foreground border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded-none w-32 mx-auto animate-pulse"></div>
-                  </th>
-                  <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
-                  </th>
-                  <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                  </th>
-                  <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
-                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                  </th>
-                  <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24">
-                    <div className="h-4 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                  </th>
-                </tr>
-              </thead>
-
-              {/* Table Body Skeleton */}
-              <tbody className="bg-card divide-y divide-border">
-                {[...Array(5)].map((_, i) => (
-                  <React.Fragment key={i}>
-                    {/* Indicator Header Row Skeleton */}
-                    <tr className="border-b border-border">
-                      {/* Indicator Name - spans 3 rows */}
-                      <td className="px-4 py-4 text-sm text-foreground align-middle text-left border-r border-border" rowSpan="3">
-                        <div className="h-4 bg-muted-foreground/20 rounded-none w-48 mb-2 animate-pulse"></div>
-                        <div className="h-3 bg-muted-foreground/20 rounded-none w-32 animate-pulse"></div>
-                      </td>
-
-                      {/* Age 0-14 */}
-                      <td className="px-3 py-4 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded-none w-8 mx-auto animate-pulse"></div>
-                      </td>
-
-                      {/* Male 0-14 */}
-                      <td className="px-3 py-4 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
-                      </td>
-
-                      {/* Female 0-14 */}
-                      <td className="px-3 py-4 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
-                      </td>
-
-                      {/* Total 0-14 */}
-                      <td className="px-3 py-4 text-right">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-12 ml-auto animate-pulse"></div>
-                      </td>
-                    </tr>
-
-                    {/* 15+ Age Group Row Skeleton */}
-                    <tr className="bg-muted border-b border-border">
-                      <td className="px-3 py-3 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded-none w-8 mx-auto animate-pulse"></div>
-                      </td>
-                      <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                      </td>
-                      <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                      </td>
-                      <td className="px-3 py-3 text-right">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                      </td>
-                    </tr>
-
-                    {/* Sub-Total Row Skeleton */}
-                    <tr className="bg-muted border-b-2 border-border font-bold">
-                      <td className="px-3 py-3 text-center text-sm font-bold text-muted-foreground bg-muted/50 border-r border-border">
-                        <div className="h-4 bg-muted-foreground/20 rounded-none w-12 mx-auto animate-pulse"></div>
-                      </td>
-                      <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                      </td>
-                      <td className="px-3 py-3 text-right border-r border-border">
-                        <div className="h-6 bg-muted-foreground/20 rounded-none w-16 ml-auto animate-pulse"></div>
-                      </td>
-                      <td className="px-3 py-3 text-right">
-                        <div className="h-7 bg-muted-foreground/20 rounded-none w-20 ml-auto animate-pulse"></div>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Report Footer Skeleton */}
-        <div className="bg-muted border border-border rounded-none p-4 sm:p-6 mt-6 sm:mt-8">
-          <div className="text-right text-muted-foreground">
-            <div className="h-4 bg-muted-foreground/20 rounded-none w-3/4 ml-auto animate-pulse"></div>
-            <div className="h-3 bg-muted-foreground/20 rounded-none w-1/2 ml-auto mt-2 animate-pulse"></div>
-          </div>
-        </div>
+      <div className="border border-border p-10 text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted border-t-primary mx-auto" />
+        <p className="mt-3 text-sm text-muted-foreground">Loading report...</p>
       </div>
     );
   }
@@ -252,40 +151,40 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Indicators Table - Matching the image layout */}
-      <div className="bg-card border border-border overflow-hidden">
+      <div className="bg-card overflow-hidden rounded-none">
         <div className="overflow-x-auto">
           <table className="w-full">
             {/* Table Header */}
-            <thead className="bg-muted border-b-2 border-border">
+            <thead className="bg-blue-800 border-b border-muted">
               <tr>
-                <th className="px-4 py-4 text-center text-sm font-bold text-foreground border-r border-border">
+                <th className="px-4 py-4 text-center text-sm font-bold text-white border-r border-muted">
                   សុចនាករ Indicator
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
+                <th className="px-3 py-4 text-right text-sm font-bold text-white w-32 border-r border-muted">
                   អាយុ Age
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24 border-r border-border">
+                <th className="px-3 py-4 text-right text-sm font-bold text-white w-24 border-r border-muted">
                   ប្រុស Male
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-32 border-r border-border">
+                <th className="px-3 py-4 text-right text-sm font-bold text-white w-32 border-r border-muted">
                   ស្រី Female
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-foreground w-24">
+                <th className="px-3 py-4 text-right text-sm font-bold text-white w-24">
                   សរុប Total
                 </th>
               </tr>
             </thead>
 
             {/* Table Body */}
-            <tbody className="bg-card divide-y divide-border">
+            <tbody className="bg-card divide-y divide-border/50">
               {indicators.map((indicator, index) => (
                 <React.Fragment key={index}>
                   {/* Indicator Header Row with Name */}
                   <tr 
-                    className="border-b border-border"
+                    className="border-b border-border/50"
                   >
                     {/* Indicator Name - spans 3 rows */}
-                    <td className="px-4 py-4 text-sm text-foreground align-middle text-left border-r border-border" rowSpan="3">
+                    <td className="px-4 py-4 text-sm text-foreground align-middle text-left border-r border-border/50" rowSpan="3">
                       <div 
                         className={`font-medium leading-tight text-left transition-colors ${
                           (indicator.TOTAL || 0) > 0 
@@ -306,17 +205,17 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
 
                     {/* Age 0-14 */}
-                    <td className="px-3 py-4 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border hover:bg-muted/70 hover:font-bold transition-all duration-200">
+                    <td className="px-3 py-4 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border/50 hover:bg-muted/70 hover:font-bold transition-all duration-200">
                       0-14
                     </td>
 
                     {/* Male 0-14 */}
-                    <td className="px-3 py-4 text-right border-r border-border">
+                    <td className="px-3 py-4 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal transition-colors ${
+                        className={`text-lg font-normal underline transition-colors ${
                           (indicator.Male_0_14 || 0) > 0 
-                            ? 'text-blue-600 cursor-pointer underline hover:text-blue-800' 
-                            : 'text-muted-foreground cursor-not-allowed'
+                            ? 'text-blue-600 cursor-pointer hover:text-blue-800' 
+                            : 'text-blue-600/60 cursor-not-allowed'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -329,12 +228,12 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
 
                     {/* Female 0-14 */}
-                    <td className="px-3 py-4 text-right border-r border-border">
+                    <td className="px-3 py-4 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal transition-colors ${
+                        className={`text-lg font-normal underline transition-colors ${
                           (indicator.Female_0_14 || 0) > 0 
-                            ? 'text-pink-600 cursor-pointer underline hover:text-pink-800' 
-                            : 'text-muted-foreground cursor-not-allowed'
+                            ? 'text-pink-600 cursor-pointer hover:text-pink-800' 
+                            : 'text-pink-600/60 cursor-not-allowed'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -346,7 +245,7 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                       </div>
                     </td>
 
-                    {/* Total 0-14 */}
+                    {/* Total 0-14 — no underline, dark text */}
                     <td className="px-3 py-4 text-right">
                       <div className="text-lg text-foreground">
                         {(Number(indicator.Male_0_14 || 0) + Number(indicator.Female_0_14 || 0)).toLocaleString()}
@@ -356,16 +255,16 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                   </tr>
 
                   {/* 15+ Age Group Row */}
-                  <tr className="bg-muted border-b border-border">
-                    <td className="px-3 py-3 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border hover:bg-muted/70 hover:font-bold transition-all duration-200">
+                  <tr className="bg-muted border-b border-border/50">
+                    <td className="px-3 py-3 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border/50 hover:bg-muted/70 hover:font-bold transition-all duration-200">
                       {'>'}14
                     </td>
-                    <td className="px-3 py-3 text-right border-r border-border">
+                    <td className="px-3 py-3 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal transition-colors ${
+                        className={`text-lg font-normal underline transition-colors ${
                           (indicator.Male_over_14 || 0) > 0 
-                            ? 'text-blue-600 cursor-pointer underline hover:text-blue-800' 
-                            : 'text-muted-foreground cursor-not-allowed'
+                            ? 'text-blue-600 cursor-pointer hover:text-blue-800' 
+                            : 'text-blue-600/60 cursor-not-allowed'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -376,12 +275,12 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                         {(indicator.Male_over_14 || 0).toLocaleString()}
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-right border-r border-border">
+                    <td className="px-3 py-3 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal transition-colors ${
+                        className={`text-lg font-normal underline transition-colors ${
                           (indicator.Female_over_14 || 0) > 0 
-                            ? 'text-pink-600 cursor-pointer underline hover:text-pink-800' 
-                            : 'text-muted-foreground cursor-not-allowed'
+                            ? 'text-pink-600 cursor-pointer hover:text-pink-800' 
+                            : 'text-pink-600/60 cursor-not-allowed'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -399,25 +298,24 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
                   </tr>
 
-                  {/* Sub-Total Row for this indicator */}
-                  <tr className="bg-muted border-b-2 border-border font-bold">
-                    <td className="px-3 py-3 text-center text-sm font-bold text-muted-foreground bg-muted/50 border-r border-border hover:bg-muted/70 hover:font-bold transition-all duration-200">
+                  {/* Sub-Total Row — Male/Female blue/pink + underline; Total bold + underline */}
+                  <tr className="bg-muted border-b border-border/50 font-bold">
+                    <td className="px-3 py-3 text-center text-sm font-bold text-muted-foreground bg-muted/50 border-r border-border/50 hover:bg-muted/70 hover:font-bold transition-all duration-200">
                       សរុប
                     </td>
-                    <td className="px-3 py-3 text-right border-r border-border">
-                      <div className="text-lg font-bold text-blue-700">
+                    <td className="px-3 py-3 text-right border-r border-border/50">
+                      <div className="text-lg font-bold text-blue-600 underline">
                         {(Number(indicator.Male_0_14 || 0) + Number(indicator.Male_over_14 || 0)).toLocaleString()}
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-right border-r border-border">
-                      <div className="text-lg font-bold text-pink-700">
+                    <td className="px-3 py-3 text-right border-r border-border/50">
+                      <div className="text-lg font-bold text-pink-600 underline">
                         {(Number(indicator.Female_0_14 || 0) + Number(indicator.Female_over_14 || 0)).toLocaleString()}
                       </div>
                     </td>
                     <td className="px-3 py-3 text-right">
-                      <div className="text-xl font-bold text-foreground hover:text-primary underline cursor-pointer" onClick={() => onIndicatorClick && onIndicatorClick(indicator)}>
+                      <div className="text-xl font-bold text-foreground underline hover:text-primary cursor-pointer" onClick={() => onIndicatorClick && onIndicatorClick(indicator)}>
                         {(indicator.TOTAL || 0).toLocaleString()}
-    
                       </div>
                     </td>
                   </tr>

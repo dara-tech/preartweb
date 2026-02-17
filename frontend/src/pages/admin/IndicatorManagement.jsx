@@ -189,7 +189,7 @@ const IndicatorManagement = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 ">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -233,9 +233,9 @@ const IndicatorManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Active</p>
-                <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+                <p className="text-2xl font-bold text-primary">{activeCount}</p>
               </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
+              <CheckCircle className="h-8 w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -245,9 +245,9 @@ const IndicatorManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Inactive</p>
-                <p className="text-2xl font-bold text-red-600">{inactiveCount}</p>
+                <p className="text-2xl font-bold text-destructive">{inactiveCount}</p>
               </div>
-              <XCircle className="h-8 w-8 text-red-600" />
+              <XCircle className="h-8 w-8 text-destructive" />
             </div>
           </CardContent>
         </Card>
@@ -399,11 +399,11 @@ const IndicatorManagement = () => {
                     return (
                       <TableRow 
                         key={indicator.id}
-                        className={hasPendingChange ? 'border-orange-600' : ''}
+                        className={hasPendingChange ? 'border-warning' : ''}
                       >
                         <TableCell>
                           {hasPendingChange && (
-                            <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
                           )}
                         </TableCell>
                         <TableCell className="font-mono text-sm">{indicator.id}</TableCell>
@@ -414,7 +414,7 @@ const IndicatorManagement = () => {
                         <TableCell className="text-center">
                           <Badge 
                             variant={isActive ? "default" : "outline"}
-                            className={isActive ? "bg-green-600" : "text-gray-500"}
+                            className={isActive ? "bg-primary" : "text-muted-foreground"}
                           >
                             {isActive ? (
                               <>

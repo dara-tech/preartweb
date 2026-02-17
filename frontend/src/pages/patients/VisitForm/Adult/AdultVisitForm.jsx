@@ -554,7 +554,7 @@ function AdultVisitForm() {
           {/* Tab 1: Visit Information */}
           <TabsContent value="visit-info" className="space-y-6 mt-0">
             {/* Patient Information - Visit Specific */}
-            <Card className="border border-border shadow-none bg-card">
+            <Card className="border border-border bg-card">
               <CardContent className="p-5 sm:p-6">
                 <div className="border-b border-border pb-3 mb-4">
                   <h3 className="text-lg font-semibold text-foreground">Patient Information</h3>

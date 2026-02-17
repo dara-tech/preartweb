@@ -29,8 +29,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        'sans': ['Hanuman', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
-        'hanuman': ['Hanuman', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'sans': ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'hanuman': ['Hanuman', 'Noto Sans Khmer', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

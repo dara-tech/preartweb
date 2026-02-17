@@ -15,7 +15,7 @@ const ReportHeader = ({ siteInfo, period }) => {
   }
 
   return (
-    <Card className="border-2 shadow-lg">
+    <Card className="border-2">
       <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-blue-100">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-blue-800 mb-2">
@@ -32,17 +32,17 @@ const ReportHeader = ({ siteInfo, period }) => {
       <CardContent>
         {/* Site Information */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center mb-4">
-          <div className="flex flex-col items-center p-3 bg-white rounded-none shadow-sm">
+          <div className="flex flex-col items-center p-3 bg-white rounded-none">
             <Building className="h-6 w-6 text-blue-600 mb-2" />
             <p className="text-sm text-gray-600">ឈ្មោះមន្ទីរពេទ្យ</p>
             <p className="font-semibold text-lg text-gray-800">{siteInfo?.SiteName || 'មិនមាន'}</p>
           </div>
-          <div className="flex flex-col items-center p-3 bg-white rounded-none shadow-sm">
+          <div className="flex flex-col items-center p-3 bg-white rounded-none">
             <MapPin className="h-6 w-6 text-green-600 mb-2" />
             <p className="text-sm text-gray-600">ខេត្ត</p>
             <p className="font-semibold text-lg text-gray-800">{siteInfo?.Province || 'មិនមាន'}</p>
           </div>
-          <div className="flex flex-col items-center p-3 bg-white rounded-none shadow-sm">
+          <div className="flex flex-col items-center p-3 bg-white rounded-none">
             <MapPin className="h-6 w-6 text-purple-600 mb-2" />
             <p className="text-sm text-gray-600">ស្រុក</p>
             <p className="font-semibold text-lg text-gray-800">{siteInfo?.District || 'មិនមាន'}</p>

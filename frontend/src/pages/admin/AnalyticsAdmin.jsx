@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import YearlyAnalytics from '../../components/analytics/YearlyAnalytics';
 import analyticsApi from '../../services/analyticsApi';
+import api from '../../services/api';
 import { 
   RefreshCw,
   Activity,
@@ -247,6 +248,29 @@ const AnalyticsAdmin = () => {
   };
 
 
+  // Download SQL Workbench folder as zip
+  const [downloadingWorkbench, setDownloadingWorkbench] = useState(false);
+  const downloadSqlWorkbench = async () => {
+    try {
+      setDownloadingWorkbench(true);
+      const res = await api.get('/apiv1/scripts/scripts/download-sql-workbench', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sql-workbench.zip';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download sql-workbench failed:', err);
+      const msg = err.response?.data instanceof Blob
+        ? 'Download failed (check console)'
+        : (err.response?.data?.message || err.message || 'Failed to download sql-workbench');
+      alert(msg);
+    } finally {
+      setDownloadingWorkbench(false);
+    }
+  };
+
   // Export analytics data
   const exportAnalyticsData = () => {
     const csvContent = [
@@ -361,7 +385,7 @@ const AnalyticsAdmin = () => {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center space-y-4">
           <div className="relative">
-            <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-none animate-spin"></div>
+            <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-md animate-spin"></div>
             <BarChart3 className="w-8 h-8 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
           </div>
           <div className="text-center">
@@ -374,12 +398,12 @@ const AnalyticsAdmin = () => {
   }
 
   return (
-    <div className="space-y-6 p-1">
+    <div className="space-y-6 ">
       {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-none p-6 border border-primary/20">
+      <div className="rounded-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="p-3 rounded-none">
+            <div className="p-3 rounded-md">
               <BarChart3 className="h-8 w-8 text-primary" />
             </div>
             <div>
@@ -388,7 +412,7 @@ const AnalyticsAdmin = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-3 bg-background/80 backdrop-blur-sm rounded-none px-4 py-2 border border-border/50">
+            <div className="flex items-center space-x-3 bg-background/80 backdrop-blur-sm rounded-md px-4 py-2 border border-border/50">
               <Activity className="h-5 w-5 text-primary" />
               <div className="text-sm">
                 <span className="font-medium text-foreground">{summary?.completedRecords || 0}</span>
@@ -398,8 +422,8 @@ const AnalyticsAdmin = () => {
                 {summary?.successRate || 0}%
               </Badge>
             </div>
-            <div className="flex items-center space-x-2 bg-background/80 backdrop-blur-sm rounded-none px-3 py-2 border border-border/50">
-              <TrendingUp className="h-4 w-4 text-green-500" />
+            <div className="flex items-center space-x-2 bg-background/80 backdrop-blur-sm rounded-md px-3 py-2 border border-border/50">
+              <TrendingUp className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium text-foreground">Active</span>
             </div>
           </div>
@@ -407,12 +431,12 @@ const AnalyticsAdmin = () => {
       </div>
 
       <Tabs defaultValue="data" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1 rounded-none">
-          <TabsTrigger value="data" className="flex items-center space-x-2 data-[state=active]:!bg-[hsl(var(--primary))] data-[state=active]:!text-[hsl(var(--primary-foreground))] data-[state=active]:shadow-sm rounded-none">
+        <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1 rounded-md">
+          <TabsTrigger value="data" className="flex items-center space-x-2 data-[state=active]:!bg-[hsl(var(--primary))] data-[state=active]:!text-[hsl(var(--primary-foreground))]  rounded-md">
             <Database className="w-4 h-4" />
             <span>Analytics Data</span>
           </TabsTrigger>
-          <TabsTrigger value="yearly" className="flex items-center space-x-2 data-[state=active]:!bg-[hsl(var(--primary))] data-[state=active]:!text-[hsl(var(--primary-foreground))] data-[state=active]:shadow-sm rounded-none">
+          <TabsTrigger value="yearly" className="flex items-center space-x-2 data-[state=active]:!bg-[hsl(var(--primary))] data-[state=active]:!text-[hsl(var(--primary-foreground))]  rounded-md">
             <TrendingUp className="w-4 h-4" />
             <span>Yearly Analytics</span>
           </TabsTrigger>
@@ -421,7 +445,7 @@ const AnalyticsAdmin = () => {
         {/* Enhanced Analytics Data Tab */}
         <TabsContent value="data" className="space-y-6">
           {/* Enhanced Filters Card */}
-          <Card className="border-border/50 shadow-sm bg-gradient-to-r from-background to-muted/20">
+          <Card className="border-border/50 bg-gradient-to-r from-background to-muted/20">
             <CardHeader className="pb-4">
               <div className="flex items-center space-x-2">
                 <Filter className="w-5 h-5 text-primary" />
@@ -440,7 +464,7 @@ const AnalyticsAdmin = () => {
                     <SelectContent className="overflow-y-auto max-h-48 bg-background backdrop-blur-sm">
                       <SelectItem value="all" className="font-medium">
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-none"></div>
+                          <div className="w-2 h-2 rounded-md"></div>
                           <span>សុចនាករទាំងអស់ All Indicators</span>
                         </div>
                       </SelectItem>
@@ -463,7 +487,7 @@ const AnalyticsAdmin = () => {
                     <SelectContent className="overflow-y-auto max-h-48 scrollbar-hide bg-background backdrop-blur-sm">
                       <SelectItem value="all" className="font-medium">
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-none"></div>
+                          <div className="w-2 h-2 rounded-md"></div>
                           <span>All Sites</span>
                         </div>
                       </SelectItem>
@@ -487,7 +511,7 @@ const AnalyticsAdmin = () => {
                       type="text"
                       value={filters.periodYear === 'all' ? 'All Years' : `${filters.periodYear}-Q${filters.periodQuarter}`}
                       readOnly
-                      className="w-full h-10 px-3 pr-10 text-sm bg-background border border-border/50 rounded-none hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer transition-all"
+                      className="w-full h-10 px-3 pr-10 text-sm bg-background border border-border/50 rounded-md hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer transition-all"
                       onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -496,7 +520,7 @@ const AnalyticsAdmin = () => {
 
                     {/* Enhanced Period Picker Panel */}
                     {isPeriodPickerOpen && (
-                      <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border/50 rounded-none shadow-2xl p-6 min-w-[320px] backdrop-blur-sm">
+                      <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border/50 rounded-md p-6 min-w-[320px] backdrop-blur-sm">
                         {/* Year Navigation */}
                         <div className="flex items-center justify-between mb-6">
                           <Button
@@ -504,7 +528,7 @@ const AnalyticsAdmin = () => {
                             onClick={() => setCurrentDecade(currentDecade - 10)}
                             variant="ghost"
                             size="sm"
-                            className="p-2 rounded-none hover: transition-colors"
+                            className="p-2 rounded-md hover: transition-colors"
                           >
                             <ChevronLeft className="w-4 h-4 text-primary" />
                           </Button>
@@ -513,7 +537,7 @@ const AnalyticsAdmin = () => {
                             type="button"
                             onClick={() => setShowYearGrid(!showYearGrid)}
                             variant="ghost"
-                            className="px-4 py-2 text-base font-semibold hover:text-primary hover: rounded-none transition-colors cursor-pointer"
+                            className="px-4 py-2 text-base font-semibold hover:text-primary hover: rounded-md transition-colors cursor-pointer"
                           >
                             {filters.periodYear === 'all' ? 'All Years' : filters.periodYear}
                           </Button>
@@ -523,7 +547,7 @@ const AnalyticsAdmin = () => {
                             onClick={() => setCurrentDecade(currentDecade + 10)}
                             variant="ghost"
                             size="sm"
-                            className="p-2 rounded-none hover: transition-colors"
+                            className="p-2 rounded-md hover: transition-colors"
                           >
                             <ChevronRight className="w-4 h-4 text-primary" />
                           </Button>
@@ -539,9 +563,9 @@ const AnalyticsAdmin = () => {
                               variant={filters.periodYear === 'all' ? "default" : "ghost"}
                               size="sm"
                               className={`
-                                px-3 py-2 text-sm rounded-none transition-all duration-200
+                                px-3 py-2 text-sm rounded-md transition-all duration-200
                                 ${filters.periodYear === 'all'
-                                  ? ' text-primary-foreground shadow-md'
+                                  ? ' text-primary-foreground'
                                   : 'text-foreground hover:bg-muted hover:border-border'
                                 }
                               `}
@@ -567,9 +591,9 @@ const AnalyticsAdmin = () => {
                                   variant={isSelected ? "default" : "ghost"}
                                   size="sm"
                                   className={`
-                                    px-3 py-2 text-sm rounded-none transition-all duration-200 relative
+                                    px-3 py-2 text-sm rounded-md transition-all duration-200 relative
                                     ${isSelected
-                                      ? ' text-primary-foreground shadow-md'
+                                      ? ' text-primary-foreground'
                                       : isCurrentYear && isAvailable && isInCurrentDecade
                                       ? 'bg-muted text-foreground border border-border hover:bg-muted/80'
                                       : isAvailable && isInCurrentDecade
@@ -582,7 +606,7 @@ const AnalyticsAdmin = () => {
                                 >
                                   {year}
                                   {isCurrentYear && isAvailable && !isSelected && isInCurrentDecade && (
-                                    <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-none"></div>
+                                    <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-md"></div>
                                   )}
                                 </Button>
                               );
@@ -601,9 +625,9 @@ const AnalyticsAdmin = () => {
                               variant={filters.periodQuarter === quarter.value ? "default" : "outline"}
                               size="sm"
                               className={`
-                                px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
+                                px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
                                 ${filters.periodQuarter === quarter.value
-                                  ? ' text-primary-foreground shadow-md'
+                                  ? ' text-primary-foreground'
                                   : quarter.disabled
                                   ? 'bg-muted text-muted-foreground cursor-not-allowed'
                                   : 'bg-background text-foreground hover:bg-muted hover:border-border'
@@ -625,7 +649,7 @@ const AnalyticsAdmin = () => {
                     <Button 
                       onClick={fetchAnalyticsData} 
                       disabled={loading} 
-                      className="flex-1 hover:/90 text-primary-foreground shadow-sm"
+                      className="flex-1 hover:/90 text-primary-foreground"
                     >
                       <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                       Apply Filters
@@ -646,7 +670,7 @@ const AnalyticsAdmin = () => {
           </Card>
 
           {/* Enhanced Data Table */}
-          <Card className="border-border/50 shadow-sm">
+          <Card className="border-border/50">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -656,15 +680,27 @@ const AnalyticsAdmin = () => {
                     {analyticsData.length} records
                   </Badge>
                 </div>
-                <Button 
-                  onClick={exportAnalyticsData} 
-                  variant="outline" 
-                  size="sm"
-                  className="hover: hover:text-primary hover:border-primary/30"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export CSV
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    onClick={downloadSqlWorkbench}
+                    variant="outline" 
+                    size="sm"
+                    disabled={downloadingWorkbench}
+                    className="hover: hover:text-primary hover:border-primary/30"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    {downloadingWorkbench ? 'Downloading…' : 'Download SQL Workbench'}
+                  </Button>
+                  <Button 
+                    onClick={exportAnalyticsData} 
+                    variant="outline" 
+                    size="sm"
+                    className="hover: hover:text-primary hover:border-primary/30"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export CSV
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -685,7 +721,7 @@ const AnalyticsAdmin = () => {
                         <td colSpan="5" className="p-12 text-center">
                           <div className="flex flex-col items-center space-y-4">
                             <div className="relative">
-                              <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-none animate-spin"></div>
+                              <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-md animate-spin"></div>
                             </div>
                             <p className="text-muted-foreground">Loading analytics data...</p>
                           </div>
@@ -695,7 +731,7 @@ const AnalyticsAdmin = () => {
                       <tr>
                         <td colSpan="5" className="p-12 text-center">
                           <div className="flex flex-col items-center space-y-4">
-                            <div className="w-16 h-16 bg-muted/50 rounded-none flex items-center justify-center">
+                            <div className="w-16 h-16 bg-muted/50 rounded-md flex items-center justify-center">
                               <Search className="w-8 h-8 text-muted-foreground" />
                             </div>
                             <div>
@@ -711,7 +747,7 @@ const AnalyticsAdmin = () => {
                           <td className="p-4">
                             <div className="space-y-1">
                               <div className="font-medium text-foreground leading-tight">{getDisplayIndicatorName(record.indicator_name)}</div>
-                              <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-none inline-block">{record.indicator_id}</div>
+                              <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md inline-block">{record.indicator_id}</div>
                             </div>
                           </td>
                           <td className="p-4">
@@ -723,7 +759,7 @@ const AnalyticsAdmin = () => {
                           <td className="p-4">
                             <div className="space-y-1">
                               <div className="font-medium text-foreground">{record.period_type} {record.period_year}</div>
-                              <div className="text-xs text-muted-foreground text-primary px-2 py-1 rounded-none inline-block">
+                              <div className="text-xs text-muted-foreground text-primary px-2 py-1 rounded-md inline-block">
                                 Q{record.period_quarter}
                               </div>
                             </div>
@@ -732,8 +768,8 @@ const AnalyticsAdmin = () => {
                             <div className="space-y-1">
                               <div className="text-lg font-bold text-foreground">{record.total.toLocaleString()}</div>
                               <div className="text-xs text-muted-foreground">
-                                <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-none mr-1">M: {record.male_0_14 + record.male_over_14}</span>
-                                <span className="bg-pink-50 text-pink-700 px-2 py-1 rounded-none">F: {record.female_0_14 + record.female_over_14}</span>
+                                <span className="bg-primary/10 text-primary px-2 py-1 rounded-md mr-1">M: {record.male_0_14 + record.male_over_14}</span>
+                                <span className="bg-muted text-muted-foreground px-2 py-1 rounded-md">F: {record.female_0_14 + record.female_over_14}</span>
                               </div>
                             </div>
                           </td>
@@ -742,8 +778,8 @@ const AnalyticsAdmin = () => {
                               variant={record.calculation_status === 'completed' ? 'default' : 'secondary'} 
                               className={`text-xs font-medium ${
                                 record.calculation_status === 'completed' 
-                                  ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                                  : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                  ? 'bg-primary/10 text-primary hover:bg-primary/20' 
+                                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
                               }`}
                             >
                               {record.calculation_status}

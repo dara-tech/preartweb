@@ -19,7 +19,18 @@ import {
   ArrowDown,
   Baby,
   Dna,
-  AlertTriangle
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+  X,
+  Check,
+  XCircle,
+  Minus,
+  FileText,
+  User,
+  Heart,
+  Weight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -259,7 +270,7 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <TestTube className="h-8 w-8 text-blue-600" />
+              <TestTube className="h-8 w-8 text-primary" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-muted-foreground">Lab Records</p>
                 <p className="text-2xl font-bold">{totalLabRecords}</p>
@@ -271,7 +282,7 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Baby className="h-8 w-8 text-green-600" />
+              <Baby className="h-8 w-8 text-primary" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-muted-foreground">Database Records</p>
                 <p className="text-2xl font-bold">{totalInfantRecords}</p>
@@ -283,7 +294,7 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+              <CheckCircle className="h-8 w-8 text-primary" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-muted-foreground">Complete</p>
                 <p className="text-2xl font-bold">{completeEntries}</p>
@@ -295,7 +306,7 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <AlertTriangle className="h-8 w-8 text-orange-600" />
+              <AlertTriangle className="h-8 w-8 text-warning-foreground" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-muted-foreground">Issues</p>
                 <p className="text-2xl font-bold">{incompleteEntries + missingLabWorkflow + resultMismatches}</p>
@@ -333,7 +344,7 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         >
           <CheckCircle className="h-4 w-4" />
           Complete
-          <Badge variant="secondary" className="ml-1 bg-green-100 text-green-800">
+          <Badge variant="secondary" className="ml-1 bg-primary/10 text-primary">
             {completeEntries}
           </Badge>
         </Button>
@@ -348,7 +359,7 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         >
           <AlertTriangle className="h-4 w-4" />
           Incomplete
-          <Badge variant="secondary" className="ml-1 bg-orange-100 text-orange-800">
+          <Badge variant="secondary" className="ml-1 bg-warning/10 text-warning-foreground">
             {incompleteEntries}
           </Badge>
         </Button>
@@ -363,7 +374,7 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         >
           <TestTube className="h-4 w-4" />
           Missing Lab Data
-          <Badge variant="secondary" className="ml-1 bg-yellow-100 text-yellow-800">
+          <Badge variant="secondary" className="ml-1 bg-muted text-muted-foreground">
             {missingLabWorkflow}
           </Badge>
         </Button>
@@ -378,14 +389,14 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
         >
           <AlertCircle className="h-4 w-4" />
           Result Mismatches
-          <Badge variant="secondary" className="ml-1 bg-red-100 text-red-800">
+          <Badge variant="secondary" className="ml-1 bg-destructive/10 text-destructive">
             {resultMismatches}
           </Badge>
         </Button>
       </div>
 
       {/* Comparison Table */}
-      <div className="rounded-none border">
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -424,12 +435,12 @@ const LabDataComparison = ({ infantTests, labData, filters }) => {
                   </TableCell>
                   <TableCell>
                     {item.missingFields.length > 0 ? (
-                      <div className="text-xs text-orange-600">
+                      <div className="text-xs text-warning-foreground">
                         {item.missingFields.slice(0, 2).join(', ')}
                         {item.missingFields.length > 2 && ` +${item.missingFields.length - 2} more`}
                       </div>
                     ) : (
-                      <span className="text-xs text-green-600">Complete</span>
+                      <span className="text-xs text-primary">Complete</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -501,6 +512,24 @@ const InfantTests = () => {
   const [insights, setInsights] = useState(null);
   const [trends, setTrends] = useState(null);
   const [performance, setPerformance] = useState(null);
+  
+  // Enhanced UI states
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [quickViewDrawer, setQuickViewDrawer] = useState({
+    isOpen: false,
+    data: null
+  });
+  const [visibleColumns, setVisibleColumns] = useState({
+    clinic_id: true,
+    visit_date: true,
+    age: true,
+    sex: true,
+    weight: true,
+    height: true,
+    test_types: true,
+    result: true,
+    actions: true
+  });
 
   // Helper function to get current fiscal quarter dates
   const getCurrentFiscalQuarter = () => {
@@ -1375,6 +1404,78 @@ const InfantTests = () => {
     }
   };
 
+  // Classify test result with visual indicators
+  const classifyTestResult = (testResultDesc) => {
+    if (!testResultDesc || testResultDesc === 'Not Tested') {
+      return { label: 'Not Tested', color: 'gray', bgColor: 'bg-muted', textColor: 'text-muted-foreground', icon: Minus };
+    }
+    
+    const result = testResultDesc.toLowerCase();
+    if (result === 'positive') {
+      return { label: 'Positive', color: 'red', bgColor: 'bg-destructive/10', textColor: 'text-destructive', icon: XCircle };
+    }
+    if (result === 'negative') {
+      return { label: 'Negative', color: 'green', bgColor: 'bg-primary/10', textColor: 'text-primary', icon: CheckCircle };
+    }
+    return { label: testResultDesc, color: 'gray', bgColor: 'bg-muted', textColor: 'text-muted-foreground', icon: Minus };
+  };
+  
+  // Calculate enhanced summary statistics
+  const calculateEnhancedStats = () => {
+    if (!infantTests || infantTests.length === 0) {
+      return {
+        total: 0,
+        positive: 0,
+        negative: 0,
+        dnaTests: 0,
+        oiTests: 0,
+        confirmed: 0,
+        avgAge: 0,
+        positivityRate: 0
+      };
+    }
+    
+    let positive = 0;
+    let negative = 0;
+    let dnaTests = 0;
+    let oiTests = 0;
+    let confirmed = 0;
+    let ageSum = 0;
+    let ageCount = 0;
+    
+    infantTests.forEach(test => {
+      // Count test results
+      if (test.testResultDesc === 'Positive') positive++;
+      if (test.testResultDesc === 'Negative') negative++;
+      
+      // Count test types
+      if (test.dnaTestType !== null && test.dnaTestType !== -1) dnaTests++;
+      if (test.hasOISymptom) oiTests++;
+      if (test.isConfirmedTest) confirmed++;
+      
+      // Calculate average age
+      const age = calculateAgeInMonths(test.dateOfBirth, test.visitDate);
+      if (age !== null) {
+        ageSum += age;
+        ageCount++;
+      }
+    });
+    
+    const avgAge = ageCount > 0 ? Math.round(ageSum / ageCount) : 0;
+    const positivityRate = infantTests.length > 0 ? ((positive / infantTests.length) * 100).toFixed(1) : 0;
+    
+    return {
+      total: infantTests.length,
+      positive,
+      negative,
+      dnaTests,
+      oiTests,
+      confirmed,
+      avgAge,
+      positivityRate
+    };
+  };
+
   const formatTestValue = (value, type) => {
     if (value === null || value === undefined || value === '') return '-';
     
@@ -1439,14 +1540,28 @@ const InfantTests = () => {
   const FilterPanel = () => {
     return (
     <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Filter className="h-5 w-5" />
-          Search Filters
-        </CardTitle>
-        <CardDescription>
-          Filter infant test results by various criteria
-        </CardDescription>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Search Filters
+            </CardTitle>
+            <CardDescription>
+              Filter infant test results by various criteria
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className="gap-2"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Advanced
+            {showAdvancedFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1465,7 +1580,7 @@ const InfantTests = () => {
                 {sites.map(site => (
                   <SelectItem key={site.siteCode || site.code} value={site.siteCode || site.code}>
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span>{site.name}</span>
                     </div>
                   </SelectItem>
@@ -1507,7 +1622,7 @@ const InfantTests = () => {
                     ? 'Custom Range' 
                     : `FY${selectedFiscalYear}-Q${selectedQuarterNum}`}
                   readOnly
-                  className="w-full h-9 sm:h-9 px-3 pr-10 text-sm border shadow-sm rounded-none cursor-pointer transition-colors"
+                  className="w-full h-9 sm:h-9 px-3 pr-10 text-sm border border-border rounded-md cursor-pointer transition-colors"
                   onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -1517,7 +1632,7 @@ const InfantTests = () => {
 
               {/* Custom Period Picker Panel */}
               {isPeriodPickerOpen && (
-                <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border rounded-none shadow-xl p-6 min-w-[320px]">
+                <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-2 bg-background border border-border rounded-md p-6 min-w-[320px]">
                   {/* Year Navigation */}
                   <div className="flex items-center justify-between mb-6">
                     <Button
@@ -1525,7 +1640,7 @@ const InfantTests = () => {
                       onClick={() => setCurrentDecade(currentDecade - 10)}
                       variant="ghost"
                       size="sm"
-                      className="p-2 rounded-none hover: transition-colors"
+                      className="p-2 rounded-md hover: transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4 text-primary" />
                     </Button>
@@ -1534,7 +1649,7 @@ const InfantTests = () => {
                       type="button"
                       onClick={() => setShowYearGrid(!showYearGrid)}
                       variant="ghost"
-                      className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-none transition-colors cursor-pointer"
+                      className="px-4 py-2 text-base font-semibold hover:text-primary rounded-md transition-colors cursor-pointer"
                     >
                       FY {selectedFiscalYear}
                     </Button>
@@ -1544,7 +1659,7 @@ const InfantTests = () => {
                       onClick={() => setCurrentDecade(currentDecade + 10)}
                       variant="ghost"
                       size="sm"
-                      className="p-2 rounded-none hover: transition-colors text-primary"
+                      className="p-2 rounded-md hover: transition-colors text-primary"
                     >
                       <ChevronRight className="w-4 h-4 text-primary" />
                     </Button>
@@ -1569,20 +1684,20 @@ const InfantTests = () => {
                             variant={isSelected ? "default" : "ghost"}
                             size="sm"
                             className={`
-                              px-3 py-2 text-sm rounded-none transition-all duration-200 relative
+                              px-3 py-2 text-sm rounded-md transition-all duration-200 relative
                               ${isSelected
-                                ? 'bg-blue-500 text-white shadow-md'
+                                ? 'bg-primary text-primary-foreground'
                                 : isCurrentYear && isInCurrentDecade
-                                ? 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                                ? 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
                                 : isInCurrentDecade
-                                ? 'text-gray-700 hover:bg-gray-100 hover:border-gray-300'
-                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                                ? 'text-muted-foreground hover:bg-muted hover:border-border'
+                                : 'text-muted-foreground hover:text-muted-foreground hover:bg-muted'
                               }
                             `}
                           >
                             {year}
                             {isCurrentYear && !isSelected && isInCurrentDecade && (
-                              <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-none"></div>
+                              <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary/60 rounded-full"></div>
                             )}
                           </Button>
                         );
@@ -1609,10 +1724,10 @@ const InfantTests = () => {
                         variant={selectedQuarterNum === q ? "default" : "outline"}
                         size="sm"
                         className={`
-                          px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
+                          px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
                           ${selectedQuarterNum === q
-                            ? 'bg-blue-500 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:border-gray-300'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'
                           }
                         `}
                         title={label}
@@ -1709,53 +1824,152 @@ const InfantTests = () => {
               </div>
             </div>
           </div>
+          
+          {/* Advanced Filters - Collapsible */}
+          {showAdvancedFilters && (
+            <div className="mt-6 pt-6 border-t animate-in slide-in-from-top-2 duration-300">
+              <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                Advanced Filtering Options
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Test Result Filter */}
+                <div className="space-y-2">
+                  <Label>Test Result</Label>
+                  <Select defaultValue="all">
+                    <SelectTrigger>
+                      <SelectValue placeholder="All results" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Results</SelectItem>
+                      <SelectItem value="positive">Positive</SelectItem>
+                      <SelectItem value="negative">Negative</SelectItem>
+                      <SelectItem value="not_tested">Not Tested</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Age Range */}
+                <div className="space-y-2">
+                  <Label>Age Range (Months)</Label>
+                  <Select defaultValue="all">
+                    <SelectTrigger>
+                      <SelectValue placeholder="All ages" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Ages</SelectItem>
+                      <SelectItem value="0-3">0-3 months</SelectItem>
+                      <SelectItem value="4-6">4-6 months</SelectItem>
+                      <SelectItem value="7-12">7-12 months</SelectItem>
+                      <SelectItem value="12+">12+ months</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Gender */}
+                <div className="space-y-2">
+                  <Label>Gender</Label>
+                  <Select defaultValue="all">
+                    <SelectTrigger>
+                      <SelectValue placeholder="All genders" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Genders</SelectItem>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
   };
 
   const StatsCards = () => {
-    if (!stats) return null;
-
+    const enhancedStats = calculateEnhancedStats();
+    
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tests</CardTitle>
-            <TestTube className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalTests?.toLocaleString() || 0}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        {/* Total Tests */}
+        <Card className="transition-all duration-300 border-l-4 border-l-primary">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Tests</p>
+                <h3 className="text-3xl font-bold text-foreground mt-2">{enhancedStats.total}</h3>
+                <p className="text-xs text-muted-foreground mt-1">Infants tested</p>
+              </div>
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Baby className="h-6 w-6 text-primary" />
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">DNA PCR Tests</CardTitle>
-            <Dna className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.dnaTests?.toLocaleString() || 0}</div>
+        
+        {/* Positive Tests */}
+        <Card className="transition-all duration-300 border-l-4 border-l-destructive">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Positive</p>
+                <h3 className="text-3xl font-bold text-destructive mt-2">{enhancedStats.positive}</h3>
+                <p className="text-xs text-destructive font-medium mt-1">{enhancedStats.positivityRate}% rate</p>
+              </div>
+              <div className="h-12 w-12 bg-destructive/10 rounded-lg flex items-center justify-center">
+                <XCircle className="h-6 w-6 text-destructive" />
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">OI Symptoms</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.oiTests?.toLocaleString() || 0}</div>
+        
+        {/* Negative Tests */}
+        <Card className="transition-all duration-300 border-l-4 border-l-success">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Negative</p>
+                <h3 className="text-3xl font-bold text-primary mt-2">{enhancedStats.negative}</h3>
+                <p className="text-xs text-primary mt-1">HIV Negative</p>
+              </div>
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-primary" />
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Confirmed Tests</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{stats.confirmedTests?.toLocaleString() || 0}</div>
+        
+        {/* DNA PCR Tests */}
+        <Card className="transition-all duration-300 border-l-4 border-l-info">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">DNA PCR</p>
+                <h3 className="text-3xl font-bold text-purple-600 mt-2">{enhancedStats.dnaTests}</h3>
+                <p className="text-xs text-purple-600 mt-1">Tests done</p>
+              </div>
+              <div className="h-12 w-12 bg-muted rounded-lg flex items-center justify-center">
+                <Dna className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* OI Symptoms */}
+        <Card className="transition-all duration-300 border-l-4 border-l-warning">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">OI Symptoms</p>
+                <h3 className="text-3xl font-bold text-warning-foreground mt-2">{enhancedStats.oiTests}</h3>
+                <p className="text-xs text-warning-foreground mt-1">Avg age: {enhancedStats.avgAge}m</p>
+              </div>
+              <div className="h-12 w-12 bg-warning/10 rounded-lg flex items-center justify-center">
+                <Heart className="h-6 w-6 text-warning-foreground" />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -1766,7 +1980,7 @@ const InfantTests = () => {
     if (totalPages <= 1) return null;
 
     return (
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-end gap-4 flex-wrap">
         <div className="text-sm text-muted-foreground">
           Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, totalCount)} of {totalCount} results
         </div>
@@ -1811,35 +2025,49 @@ const InfantTests = () => {
     );
   };
 
-  if (error) {
-    return (
-      <div className="container mx-auto p-6">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Baby className="h-8 w-8 text-blue-500" />
-          Infant Test Results
-        </h1>
-        <p className="text-muted-foreground">
-          View and manage infant laboratory test results including DNA PCR, OI symptoms, and confirmed tests
-        </p>
-      </div>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <Baby className="h-8 w-8 text-primary" />
+              Infant Test Results
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              View and manage infant laboratory test results including DNA PCR, OI symptoms, and confirmed tests
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Button
+              variant="outline"
+              onClick={exportResults}
+              disabled={infantTests.length === 0 || loading}
+              className="gap-2"
+            >
+              {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              Export CSV
+            </Button>
+            <Button variant="outline" onClick={fetchInfantTests} disabled={loading} className="gap-2">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+        </div>
 
-      <Tabs defaultValue="results" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="results">Test Results</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
-        </TabsList>
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <Tabs defaultValue="results" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="results">Test Results</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
+          </TabsList>
 
         <TabsContent value="results" className="space-y-6">
           <FilterPanel />
@@ -1849,7 +2077,7 @@ const InfantTests = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Infant Test Results</CardTitle>
+                  <CardTitle>Test Results</CardTitle>
                   <CardDescription>
                     {totalCount.toLocaleString()} test results found
                   </CardDescription>
@@ -1881,19 +2109,20 @@ const InfantTests = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Search Bar */}
-                <div className="flex gap-2">
+                {/* Enhanced Search Bar */}
+                <div className="flex gap-2 bg-muted/30 p-4 rounded-lg border border-border">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
-                      placeholder="Search by Clinic ID..."
+                      placeholder="🔍 Search by Clinic ID, Lab ID, or Test ID..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                      className="pl-10"
+                      className="pl-10 bg-background border border-border rounded-md focus:border-primary focus:ring-2 focus:ring-ring/20 transition-colors"
                     />
                   </div>
-                  <Button onClick={handleSearch} disabled={loading}>
+                  <Button onClick={handleSearch} disabled={loading} className="px-6 rounded-md">
+                    <Search className="h-4 w-4 mr-2" />
                     Search
                   </Button>
                 </div>
@@ -1910,70 +2139,133 @@ const InfantTests = () => {
                     No infant test results found
                   </div>
                 ) : (
-                  <div className="rounded-none border">
+                  <div className="rounded-lg border overflow-hidden">
                     <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TestResultTableHead field="clinicId">Clinic ID</TestResultTableHead>
-                          <TestResultTableHead field="visitDate">Visit Date</TestResultTableHead>
-                          <TestResultTableHead field="age">Age (Months)</TestResultTableHead>
-                          <TestResultTableHead field="sex">Sex</TestResultTableHead>
-                          <TestResultTableHead field="weight">Weight (kg)</TestResultTableHead>
-                          <TestResultTableHead field="height">Height (cm)</TestResultTableHead>
-                          <TestResultTableHead field="testTypes">Test Types</TestResultTableHead>
-                          <TestResultTableHead field="result">Test Results</TestResultTableHead>
-                          <TableHead>Actions</TableHead>
+                      <TableHeader className="sticky top-0 bg-muted z-10">
+                        <TableRow className="hover:bg-muted">
+                          {visibleColumns.clinic_id && <TestResultTableHead field="clinicId">Clinic ID</TestResultTableHead>}
+                          {visibleColumns.visit_date && <TestResultTableHead field="visitDate">Visit Date</TestResultTableHead>}
+                          {visibleColumns.age && <TestResultTableHead field="age">Age (Months)</TestResultTableHead>}
+                          {visibleColumns.sex && <TestResultTableHead field="sex">Sex</TestResultTableHead>}
+                          {visibleColumns.weight && <TestResultTableHead field="weight">Weight (kg)</TestResultTableHead>}
+                          {visibleColumns.height && <TestResultTableHead field="height">Height (cm)</TestResultTableHead>}
+                          {visibleColumns.test_types && <TestResultTableHead field="testTypes">Test Types</TestResultTableHead>}
+                          {visibleColumns.result && <TableHead className="font-semibold">Test Results</TableHead>}
+                          <TableHead className="font-semibold">Status</TableHead>
+                          {visibleColumns.actions && <TableHead className="font-semibold">Actions</TableHead>}
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {getSortedInfantTests().map((test) => (
-                          <TableRow key={`${test.ClinicID}-${test.visitDate}`}>
-                            <TableCell className="font-medium">{test.ClinicID}</TableCell>
-                            <TableCell>
-                              {test.visitDate ? new Date(test.visitDate).toLocaleDateString() : '-'}
-                            </TableCell>
-                            <TableCell>{formatTestValue(calculateAgeInMonths(test.dateOfBirth, test.visitDate))}</TableCell>
-                            <TableCell>
-                              {test.patientSex === 1 ? 'Male' : test.patientSex === 0 ? 'Female' : '-'}
-                            </TableCell>
-                            <TableCell>{formatTestValue(test.weight, 'number')}</TableCell>
-                            <TableCell>{formatTestValue(test.height, 'number')}</TableCell>
-                            <TableCell>
-                              <Badge variant="secondary">
-                                {getTestTypeBadge(test)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex flex-col gap-1">
-                                {test.dnaTestTypeDesc && test.dnaTestTypeDesc !== 'Not Tested' && (
-                                  <Badge variant={test.dnaTestTypeDesc === 'Confirm' ? 'default' : 'secondary'} className="text-xs">
-                                    {test.dnaTestTypeDesc}
+                        {getSortedInfantTests().map((test, index) => {
+                          const classification = classifyTestResult(test.testResultDesc);
+                          const StatusIcon = classification.icon;
+                          const hasAnomalies = test.hasOISymptom || test.testResultDesc === 'Positive';
+                          const ageInMonths = calculateAgeInMonths(test.dateOfBirth, test.visitDate);
+                          
+                          return (
+                            <TableRow 
+                              key={`${test.ClinicID}-${test.visitDate}`}
+                              className={`
+                                ${classification.bgColor}
+                                hover:brightness-95
+                                transition-all duration-200
+                                cursor-pointer
+                                ${index % 2 === 0 ? 'bg-opacity-30' : 'bg-opacity-50'}
+                                ${hasAnomalies ? 'border-l-4 border-l-destructive' : ''}
+                              `}
+                              onClick={() => setQuickViewDrawer({ isOpen: true, data: test })}
+                            >
+                              {visibleColumns.clinic_id && (
+                                <TableCell className="font-medium font-mono text-sm">
+                                  {test.ClinicID}
+                                </TableCell>
+                              )}
+                              {visibleColumns.visit_date && (
+                                <TableCell className="text-sm">
+                                  {test.visitDate ? new Date(test.visitDate).toLocaleDateString() : '-'}
+                                </TableCell>
+                              )}
+                              {visibleColumns.age && (
+                                <TableCell className="font-semibold">
+                                  <div className="flex items-center gap-2">
+                                    <Baby className="h-4 w-4 text-primary" />
+                                    {formatTestValue(ageInMonths)} mo
+                                  </div>
+                                </TableCell>
+                              )}
+                              {visibleColumns.sex && (
+                                <TableCell>
+                                  <Badge variant="outline" className={test.patientSex === 1 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}>
+                                    {test.patientSex === 1 ? '👦 Male' : test.patientSex === 0 ? '👧 Female' : '-'}
                                   </Badge>
-                                )}
-                                {test.testResultDesc && test.testResultDesc !== 'Not Tested' && (
-                                  <Badge variant={test.testResultDesc === 'Positive' ? 'destructive' : test.testResultDesc === 'Negative' ? 'secondary' : 'outline'} className="text-xs">
-                                    {test.testResultDesc}
+                                </TableCell>
+                              )}
+                              {visibleColumns.weight && (
+                                <TableCell className="font-semibold">
+                                  <div className="flex items-center gap-1">
+                                    <Weight className="h-3 w-3 text-muted-foreground" />
+                                    {formatTestValue(test.weight, 'number')}
+                                  </div>
+                                </TableCell>
+                              )}
+                              {visibleColumns.height && (
+                                <TableCell className="font-semibold">
+                                  {formatTestValue(test.height, 'number')} cm
+                                </TableCell>
+                              )}
+                              {visibleColumns.test_types && (
+                                <TableCell>
+                                  <Badge variant="outline" className="font-medium">
+                                    {getTestTypeBadge(test)}
                                   </Badge>
-                                )}
-                                {test.hasOISymptom && (
-                                  <Badge variant="destructive" className="text-xs">
-                                    OI
-                                  </Badge>
-                                )}
-                                {(!test.dnaTestTypeDesc || test.dnaTestTypeDesc === 'Not Tested') && 
-                                 (!test.testResultDesc || test.testResultDesc === 'Not Tested') && 
-                                 !test.hasOISymptom && (
-                                  <span className="text-xs text-muted-foreground">No Results</span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                                </TableCell>
+                              )}
+                              {visibleColumns.result && (
+                                <TableCell>
+                                  <div className="flex flex-col gap-1">
+                                    {test.dnaTestTypeDesc && test.dnaTestTypeDesc !== 'Not Tested' && (
+                                      <Badge variant={test.dnaTestTypeDesc === 'Confirm' ? 'default' : 'secondary'} className="text-xs w-fit">
+                                        {test.dnaTestTypeDesc}
+                                      </Badge>
+                                    )}
+                                    {test.hasOISymptom && (
+                                      <Badge className="text-xs w-fit bg-warning/10 text-warning-foreground border-0">
+                                        <AlertTriangle className="h-3 w-3 mr-1" />
+                                        OI Symptom
+                                      </Badge>
+                                    )}
+                                    {(!test.dnaTestTypeDesc || test.dnaTestTypeDesc === 'Not Tested') && 
+                                     (!test.testResultDesc || test.testResultDesc === 'Not Tested') && 
+                                     !test.hasOISymptom && (
+                                      <span className="text-xs text-muted-foreground">No Results</span>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              )}
+                              <TableCell>
+                                <Badge className={`${classification.bgColor} ${classification.textColor} border-0 gap-1 font-medium`}>
+                                  <StatusIcon className="h-3 w-3" />
+                                  {classification.label}
+                                </Badge>
+                              </TableCell>
+                              {visibleColumns.actions && (
+                                <TableCell>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="hover:bg-primary/10"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setQuickViewDrawer({ isOpen: true, data: test });
+                                    }}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </TableCell>
+                              )}
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
@@ -2004,7 +2296,7 @@ const InfantTests = () => {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <TestTube className="h-5 w-5 text-green-500" />
+                        <TestTube className="h-5 w-5 text-primary" />
                         Lab Tests Comparison
                       </CardTitle>
                     </CardHeader>
@@ -2016,11 +2308,11 @@ const InfantTests = () => {
                         </div>
                       ) : labTestStats ? (
                         <div className="space-y-4">
-                          <div className="text-center p-4 bg-green-50 rounded-none">
-                            <div className="text-3xl font-bold text-green-600">
+                          <div className="text-center p-4 bg-primary/10 rounded-md">
+                            <div className="text-3xl font-bold text-primary">
                               {labTestStats.totalTests?.toLocaleString() || 0}
                             </div>
-                            <div className="text-sm text-green-600">{labTestStats.testType}</div>
+                            <div className="text-sm text-primary">{labTestStats.testType}</div>
                           </div>
                           <div className="text-xs text-muted-foreground text-center">
                             DNA lab tests for the same period and site
@@ -2047,21 +2339,21 @@ const InfantTests = () => {
                     {stats ? (
                       <div className="space-y-4">
                         <div className={`grid grid-cols-1 ${labTestStats ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4`}>
-                          <div className="text-center p-4 bg-blue-50 rounded-none">
-                            <div className="text-2xl font-bold text-blue-600">
+                          <div className="text-center p-4 bg-primary/10 rounded-md">
+                            <div className="text-2xl font-bold text-primary">
                               {stats.dnaTests || 0}
                             </div>
-                                <div className="text-sm text-blue-600">Infant DNA PCR Tests</div>
+                                <div className="text-sm text-primary">Infant DNA PCR Tests</div>
                           </div>
                           {labTestStats ? (
                             <>
-                              <div className="text-center p-4 bg-green-50 rounded-none">
-                                <div className="text-2xl font-bold text-green-600">
+                              <div className="text-center p-4 bg-primary/10 rounded-md">
+                                <div className="text-2xl font-bold text-primary">
                                   {labTestStats.totalTests || 0}
                                 </div>
-                                <div className="text-sm text-green-600">Lab DNA Tests</div>
+                                <div className="text-sm text-primary">Lab DNA Tests</div>
                               </div>
-                              <div className="text-center p-4 bg-purple-50 rounded-none">
+                              <div className="text-center p-4 bg-muted rounded-md">
                                 <div className="text-2xl font-bold text-purple-600">
                                   {((stats.dnaTests || 0) + (labTestStats.totalTests || 0)).toLocaleString()}
                                 </div>
@@ -2069,16 +2361,16 @@ const InfantTests = () => {
                               </div>
                             </>
                           ) : (
-                            <div className="text-center p-4 bg-gray-50 rounded-none">
-                              <div className="text-2xl font-bold text-gray-600">
+                            <div className="text-center p-4 bg-muted rounded-md">
+                              <div className="text-2xl font-bold text-muted-foreground">
                                 {stats.dnaTests || 0}
                               </div>
-                              <div className="text-sm text-gray-600">Total Infant DNA PCR Tests</div>
+                              <div className="text-sm text-muted-foreground">Total Infant DNA PCR Tests</div>
                             </div>
                           )}
                         </div>
                         
-                        <div className="mt-6 p-4 bg-muted/50 rounded-none">
+                        <div className="mt-6 p-4 bg-muted/50 rounded-md">
                           <h4 className="font-medium mb-2">Key Insights:</h4>
                           <ul className="text-sm space-y-1 text-muted-foreground">
                             <li>• Infant DNA PCR tests: {stats.dnaTests || 0} tests performed</li>
@@ -2142,25 +2434,25 @@ const InfantTests = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-4 bg-blue-50 rounded-none">
-                      <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-center p-4 bg-primary/10 rounded-md">
+                      <div className="text-2xl font-bold text-primary">
                         {insights.positivityRate}%
                       </div>
-                      <div className="text-sm text-blue-600">Positivity Rate</div>
+                      <div className="text-sm text-primary">Positivity Rate</div>
                     </div>
-                    <div className="text-center p-4 bg-green-50 rounded-none">
-                      <div className="text-2xl font-bold text-green-600">
+                    <div className="text-center p-4 bg-primary/10 rounded-md">
+                      <div className="text-2xl font-bold text-primary">
                         {insights.confirmationRate}%
                       </div>
-                      <div className="text-sm text-green-600">Confirmation Rate</div>
+                      <div className="text-sm text-primary">Confirmation Rate</div>
                     </div>
-                    <div className="text-center p-4 bg-orange-50 rounded-none">
-                      <div className="text-2xl font-bold text-orange-600">
+                    <div className="text-center p-4 bg-warning/10 rounded-md">
+                      <div className="text-2xl font-bold text-warning-foreground">
                         {insights.oiRate}%
                       </div>
-                      <div className="text-sm text-orange-600">OI Rate</div>
+                      <div className="text-sm text-warning-foreground">OI Rate</div>
                     </div>
-                    <div className="text-center p-4 bg-purple-50 rounded-none">
+                    <div className="text-center p-4 bg-muted rounded-md">
                       <div className="text-2xl font-bold text-purple-600">
                         {insights.keyMetrics.totalTests}
                       </div>
@@ -2184,9 +2476,9 @@ const InfantTests = () => {
                       <div key={ageGroup} className="flex justify-between items-center">
                         <span className="text-sm font-medium">{ageGroup}</span>
                         <div className="flex items-center gap-2">
-                          <div className="w-24 bg-gray-200 rounded-none h-2">
+                          <div className="w-24 bg-muted rounded-md h-2">
                             <div 
-                              className="bg-blue-500 h-2 rounded-none" 
+                              className="bg-primary/100 h-2 rounded-md" 
                               style={{ width: `${(count / insights.keyMetrics.totalTests) * 100}%` }}
                             ></div>
                           </div>
@@ -2212,9 +2504,9 @@ const InfantTests = () => {
                       <div key={testType} className="flex justify-between items-center">
                         <span className="text-sm font-medium">{testType}</span>
                         <div className="flex items-center gap-2">
-                          <div className="w-24 bg-gray-200 rounded-none h-2">
+                          <div className="w-24 bg-muted rounded-md h-2">
                             <div 
-                              className="bg-green-500 h-2 rounded-none" 
+                              className="bg-primary/100 h-2 rounded-md" 
                               style={{ width: `${(count / insights.keyMetrics.totalTests) * 100}%` }}
                             ></div>
                           </div>
@@ -2240,22 +2532,22 @@ const InfantTests = () => {
                       .sort(([,a], [,b]) => b.total - a.total)
                       .slice(0, 10)
                       .map(([site, data]) => (
-                      <div key={site} className="p-3 border rounded-none">
+                      <div key={site} className="p-3 border rounded-md">
                         <div className="flex justify-between items-start mb-2">
                           <span className="font-medium">{site}</span>
                           <span className="text-sm text-muted-foreground">{data.total} tests</span>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-xs">
                           <div className="text-center">
-                            <div className="font-bold text-blue-600">{data.positivityRate}%</div>
+                            <div className="font-bold text-primary">{data.positivityRate}%</div>
                             <div className="text-muted-foreground">Positive</div>
                           </div>
                           <div className="text-center">
-                            <div className="font-bold text-green-600">{data.confirmationRate}%</div>
+                            <div className="font-bold text-primary">{data.confirmationRate}%</div>
                             <div className="text-muted-foreground">Confirmed</div>
                           </div>
                           <div className="text-center">
-                            <div className="font-bold text-orange-600">{data.oiRate}%</div>
+                            <div className="font-bold text-warning-foreground">{data.oiRate}%</div>
                             <div className="text-muted-foreground">OI</div>
                           </div>
                         </div>
@@ -2278,33 +2570,33 @@ const InfantTests = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="text-center p-4 bg-blue-50 rounded-none">
-                    <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-center p-4 bg-primary/10 rounded-md">
+                    <div className="text-2xl font-bold text-primary">
                       {trends.averageMonthlyTests}
                     </div>
-                    <div className="text-sm text-blue-600">Avg Monthly Tests</div>
+                    <div className="text-sm text-primary">Avg Monthly Tests</div>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-none">
-                    <div className="text-2xl font-bold text-green-600">
+                  <div className="text-center p-4 bg-primary/10 rounded-md">
+                    <div className="text-2xl font-bold text-primary">
                       {trends.peakMonth.total}
                     </div>
-                    <div className="text-sm text-green-600">Peak Month ({trends.peakMonth.month})</div>
+                    <div className="text-sm text-primary">Peak Month ({trends.peakMonth.month})</div>
                   </div>
-                  <div className="text-center p-4 bg-orange-50 rounded-none">
-                    <div className="text-2xl font-bold text-orange-600">
+                  <div className="text-center p-4 bg-warning/10 rounded-md">
+                    <div className="text-2xl font-bold text-warning-foreground">
                       {trends.lowestMonth.total}
                     </div>
-                    <div className="text-sm text-orange-600">Lowest Month ({trends.lowestMonth.month})</div>
+                    <div className="text-sm text-warning-foreground">Lowest Month ({trends.lowestMonth.month})</div>
                   </div>
                 </div>
                 
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {trends.monthlyTrends.slice(-6).map((month) => (
-                    <div key={month.month} className="flex justify-between items-center p-2 border rounded-none">
+                    <div key={month.month} className="flex justify-between items-center p-2 border rounded-md">
                       <span className="font-medium">{month.month}</span>
                       <div className="flex items-center gap-4">
                         <span className="text-sm">{month.total} tests</span>
-                        <span className={`text-sm ${month.growthRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <span className={`text-sm ${month.growthRate >= 0 ? 'text-primary' : 'text-destructive'}`}>
                           {month.growthRate >= 0 ? '+' : ''}{month.growthRate}%
                         </span>
                       </div>
@@ -2328,11 +2620,11 @@ const InfantTests = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h4 className="font-medium">Turnaround Time</h4>
-                    <div className="text-center p-4 bg-blue-50 rounded-none">
-                      <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-center p-4 bg-primary/10 rounded-md">
+                      <div className="text-2xl font-bold text-primary">
                         {performance.avgTurnaround} days
                       </div>
-                      <div className="text-sm text-blue-600">Average Turnaround</div>
+                      <div className="text-sm text-primary">Average Turnaround</div>
                     </div>
                     <div className="space-y-2">
                       {Object.entries(performance.turnaroundDistribution).map(([range, count]) => (
@@ -2362,7 +2654,7 @@ const InfantTests = () => {
                     </div>
                     
                     {performance.labComparison && (
-                      <div className="mt-4 p-3 bg-muted rounded-none">
+                      <div className="mt-4 p-3 bg-muted rounded-md">
                         <h5 className="font-medium mb-2">Lab Data Integration</h5>
                         <div className="space-y-1 text-sm">
                           <div className="flex justify-between">
@@ -2390,6 +2682,7 @@ const InfantTests = () => {
           )}
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };

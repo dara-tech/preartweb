@@ -1,10 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  Download, RefreshCw, Eye, Printer, Calendar, ChevronLeft, ChevronRight
+  Download, RefreshCw, Eye, Printer, Calendar, ChevronLeft, ChevronRight, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 import SiteFilter from '../common/SiteFilter';
+
+const REPORT_TYPE_OPTIONS = [
+  { value: '/reports/adult-child', label: 'Adult and Child' },
+  { value: '/reports/infants', label: 'Infants' },
+  { value: '/reports/pntt', label: 'PNTT' },
+];
+
+function pathToReportValue(pathname) {
+  if (pathname === '/reports/adult-child' || pathname === '/indicators') return '/reports/adult-child';
+  if (pathname === '/reports/infants' || pathname === '/infant-report') return '/reports/infants';
+  if (pathname === '/reports/pntt') return '/reports/pntt';
+  return '/reports/adult-child';
+}
 
 const ReportConfiguration = ({
   sites,
@@ -25,10 +40,13 @@ const ReportConfiguration = ({
   isSuperAdmin,
   isViewer
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isPeriodPickerOpen, setIsPeriodPickerOpen] = useState(false);
   const [showYearGrid, setShowYearGrid] = useState(false);
   const [currentDecade, setCurrentDecade] = useState(Math.floor(parseInt(selectedYear) / 10) * 10);
   const pickerRef = useRef(null);
+  const reportTypeValue = pathToReportValue(location.pathname);
 
   // Smart year navigation functions
   const navigateToPreviousYear = () => {
@@ -195,6 +213,24 @@ const ReportConfiguration = ({
   return (
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4 lg:gap-3">
+          {/* Report type (viewer only) — left with period selector */}
+          {isViewer && (
+            <div className="flex items-center gap-2 shrink-0">
+            
+              <Select value={reportTypeValue} onValueChange={(value) => value && navigate(value)}>
+                <SelectTrigger className="w-[200px] border border-border rounded-md bg-background h-10 sm:h-11">
+                  <SelectValue placeholder="Select report type" />
+                </SelectTrigger>
+                <SelectContent className="border-border">
+                  {REPORT_TYPE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {/* Health Facility Selection */}
           <div className="flex-1 min-w-0">
             <div className="space-y-1 sm:space-y-2">
@@ -204,7 +240,7 @@ const ReportConfiguration = ({
                 onSiteChange={onSiteChange}
                 disabled={sitesLoading}
                 showAllOption={!isViewer}
-                className="w-full h-10 sm:h-11 text-sm border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                className="w-full h-10 sm:h-11 text-sm border-input focus:border-primary focus:ring-2 focus:ring-ring rounded-md"
               />
             </div>
           </div>
@@ -219,7 +255,7 @@ const ReportConfiguration = ({
                     type="text"
                     value={`${selectedYear}-Q${selectedQuarter}`}
                     readOnly
-                    className="w-full h-10 sm:h-11 px-3 pr-10 text-sm border border-gray-300 rounded-none  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 cursor-pointer transition-colors"
+                    className="w-full h-10 sm:h-11 px-3 pr-10 text-sm border border-input rounded-md focus:border-primary focus:ring-2 focus:ring-ring cursor-pointer transition-colors"
                     onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -229,7 +265,7 @@ const ReportConfiguration = ({
 
                 {/* Custom Period Picker Panel */}
                 {isPeriodPickerOpen && (
-                  <div ref={pickerRef} className="absolute bg-card top-full left-0 right-0 z-50 mt-2 border border-border rounded-none shadow-xl p-6 min-w-[320px]">
+                  <div ref={pickerRef} className="absolute bg-card top-full left-0 right-0 z-50 mt-2 border border-border rounded-md p-6 min-w-[320px]">
                     {/* Year Navigation */}
                     <div className="flex items-center justify-between mb-6">
                       <Button
@@ -238,10 +274,10 @@ const ReportConfiguration = ({
                         variant="ghost"
                         size="sm"
                         disabled={!canNavigatePreviousYear}
-                        className={`p-2 rounded-none transition-colors ${
+                        className={`p-2 rounded-md transition-colors ${
                           canNavigatePreviousYear 
-                            ? 'hover: text-primary' 
-                            : 'text-gray-300 cursor-not-allowed'
+                            ? 'hover:text-primary' 
+                            : 'text-muted-foreground cursor-not-allowed'
                         }`}
                         title={canNavigatePreviousYear ? "Previous year (Shift+Click for decade)" : "No previous year available"}
                         onContextMenu={(e) => {
@@ -258,7 +294,7 @@ const ReportConfiguration = ({
                         type="button"
                         onClick={() => setShowYearGrid(!showYearGrid)}
                         variant="ghost"
-                        className="px-4 py-2 text-base font-semibold hover:text-blue-500 rounded-none transition-colors cursor-pointer"
+                        className="px-4 py-2 text-base font-semibold hover:text-primary rounded-md transition-colors cursor-pointer"
                         title="Click to show year grid"
                       >
                         {selectedYear}
@@ -270,10 +306,10 @@ const ReportConfiguration = ({
                         variant="ghost"
                         size="sm"
                         disabled={!canNavigateNextYear}
-                        className={`p-2 rounded-none transition-colors ${
+                        className={`p-2 rounded-md transition-colors ${
                           canNavigateNextYear 
-                            ? 'hover: text-primary' 
-                            : 'text-gray-300 cursor-not-allowed'
+                            ? 'hover:text-primary' 
+                            : 'text-muted-foreground cursor-not-allowed'
                         }`}
                         title={canNavigateNextYear ? "Next year (Shift+Click for decade)" : "No next year available"}
                         onContextMenu={(e) => {
@@ -310,22 +346,22 @@ const ReportConfiguration = ({
                               variant={isSelected ? "default" : "ghost"}
                               size="sm"
                               className={`
-                                px-3 py-2 text-sm rounded-none transition-all duration-200 relative
+                                px-3 py-2 text-sm rounded-md transition-all duration-200 relative
                                 ${isSelected
-                                  ? 'bg-blue-500 text-white shadow-md'
+                                  ? 'bg-primary text-primary-foreground'
                                   : isCurrentYear && isAvailable && isInCurrentDecade
-                                  ? 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                                  ? 'bg-muted text-muted-foreground border border-border hover:bg-muted/80'
                                   : isAvailable && isInCurrentDecade
-                                  ? 'text-gray-700 hover:bg-gray-100 hover:border-gray-300'
+                                  ? 'text-muted-foreground hover:bg-muted hover:border-border'
                                   : isAvailable && !isInCurrentDecade
-                                  ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-                                  : 'text-gray-300 cursor-not-allowed'
+                                  ? 'text-muted-foreground hover:bg-muted/80'
+                                  : 'text-muted-foreground/60 cursor-not-allowed'
                                 }
                               `}
                             >
                               {year}
                               {isCurrentYear && isAvailable && !isSelected && isInCurrentDecade && (
-                                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-400 rounded-none"></div>
+                                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary/60 rounded-full"></div>
                               )}
                             </Button>
                           );
@@ -348,12 +384,12 @@ const ReportConfiguration = ({
                           variant={selectedQuarter === quarter.value ? "default" : "outline"}
                           size="sm"
                           className={`
-                            px-4 py-2 text-sm rounded-none transition-all duration-200 font-medium
+                            px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
                             ${selectedQuarter === quarter.value
-                              ? 'bg-blue-500 text-white shadow-md'
+                              ? 'bg-primary text-primary-foreground'
                               : quarter.disabled
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:border-gray-300'
+                              ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                              : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'
                             }
                           `}
                         >
@@ -374,7 +410,7 @@ const ReportConfiguration = ({
               disabled={loading} 
               variant="outline" 
               size="sm" 
-              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group rounded-none"
+              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-border hover:border-primary hover:bg-primary/10 transition-all duration-200 group rounded-md"
               title={loading ? 'Refreshing...' : 'Refresh'}
             >
               <RefreshCw className={`h-4 w-4 transition-transform duration-200 ${loading ? 'animate-spin' : 'group-hover:rotate-180'}`} />
@@ -384,7 +420,7 @@ const ReportConfiguration = ({
               onClick={onExport} 
               variant="outline" 
               size="sm" 
-              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-red-300 text-red-700 hover:border-red-500 hover:bg-red-50 transition-all duration-200 group rounded-none"
+              className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/10 transition-all duration-200 group rounded-md"
               disabled={loading}
               title="Download"
             >
@@ -396,7 +432,7 @@ const ReportConfiguration = ({
                   onClick={onPreview} 
                   variant="outline" 
                   size="sm" 
-                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group rounded-none"
+                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 border-border text-muted-foreground hover:bg-muted transition-all duration-200 group rounded-md"
                   disabled={loading}
                   title="Preview"
                 >
@@ -405,7 +441,7 @@ const ReportConfiguration = ({
                 {/* <Button 
                   onClick={onPrint} 
                   size="sm" 
-                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 bg-green-600 hover:bg-green-700 text-white transition-all duration-200 group rounded-none"
+                  className="h-10 sm:h-11 w-10 sm:w-11 p-0 bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 group rounded-md"
                   disabled={loading}
                   title="Print"
                 >

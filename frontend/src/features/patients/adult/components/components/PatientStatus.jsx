@@ -45,7 +45,7 @@ function PatientStatus({ formData, handleInputChange, showKhmer = false, dropdow
 
 
   return (
-    <Card className="border border-border shadow-none bg-card">
+    <Card className="border border-border bg-card">
       <CardContent className="p-5 sm:p-6">
         <div className="border-b border-border pb-3 mb-4">
           <h3 className="text-lg font-semibold text-foreground">

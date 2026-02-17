@@ -209,7 +209,7 @@ function ChildVisitList() {
         {/* Search and Filters */}
         <div className="space-y-4 mb-6">
           {/* Search Bar */}
-          <Card className="shadow-none">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex gap-3">
                 <div className="flex-1 relative">
@@ -239,7 +239,7 @@ function ChildVisitList() {
           </Card>
 
           {/* Filters */}
-          <Card className="shadow-none">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Filter className="h-4 w-4 text-muted-foreground" />
@@ -333,7 +333,7 @@ function ChildVisitList() {
         {loading ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <Card key={i} className="shadow-none">
+              <Card key={i} className="">
                 <CardContent className="p-5">
                   <div className="flex items-center space-x-4">
                     <Skeleton className="h-12 w-12 rounded" />
@@ -348,7 +348,7 @@ function ChildVisitList() {
             ))}
           </div>
         ) : visits.length === 0 ? (
-          <Card className="shadow-none">
+          <Card className="">
             <CardContent className="p-12 text-center">
               <h3 className="text-lg font-medium text-foreground mb-2">No visits found</h3>
               <p className="text-sm text-muted-foreground mb-6">
@@ -365,7 +365,7 @@ function ChildVisitList() {
             {visits.map((visit, index) => (
               <Card 
                 key={`${visit.visitId || visit.id}-${visit.site_code || visit.siteName || index}`} 
-                className="shadow-none transition-colors"
+                className="transition-colors"
               >
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-4">

@@ -193,9 +193,9 @@ const RealTimeLogViewer = () => {
   };
 
   return (
-    <div className="h-96 bg-black border border-gray-800 rounded-none overflow-hidden shadow-2xl">
+    <div className="h-96 bg-black border border-border rounded-none overflow-hidden">
       {/* Terminal Header */}
-      <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
+      <div className="bg-gray-900 border-b border-border px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex gap-1">
             <div className="w-3 h-3 bg-red-500 rounded-none"></div>
@@ -219,7 +219,7 @@ const RealTimeLogViewer = () => {
       </div>
 
       {/* Terminal Controls */}
-      <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center gap-2">
+      <div className="bg-gray-800 border-b border-border px-4 py-2 flex items-center gap-2">
         <button
           onClick={clearLogs}
           className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-mono rounded-none transition-colors"
@@ -244,7 +244,7 @@ const RealTimeLogViewer = () => {
             id="autoScroll"
             checked={autoScroll}
             onChange={(e) => setAutoScroll(e.target.checked)}
-            className="w-3 h-3 text-green-500 bg-gray-700 border-gray-600 rounded-none focus:ring-green-500"
+            className="w-3 h-3 text-green-500 bg-gray-700 border-border rounded-none focus:ring-green-500"
           />
           <label htmlFor="autoScroll" className="text-gray-400 text-xs font-mono">
             auto-scroll
@@ -288,7 +288,7 @@ const RealTimeLogViewer = () => {
                       <summary className="cursor-pointer hover:text-green-400 transition-colors">
                         [details]
                       </summary>
-                      <pre className="mt-1 p-2 bg-gray-900 border border-gray-700 rounded-none text-xs overflow-x-auto text-gray-300">
+                      <pre className="mt-1 p-2 bg-gray-900 border border-border rounded-none text-xs overflow-x-auto text-gray-300">
                         {JSON.stringify(log.data, null, 2)}
                       </pre>
                     </details>

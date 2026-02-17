@@ -43,10 +43,10 @@ function MedicalTreatmentHistory({
   return (
     <div className="space-y-5">
       {/* TB Past Medical History and Treatment Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ប្រវត្តិជំងឺរបេង</h3>
               <p className="text-xs text-gray-500 mt-0.5">TB Past Medical History</p>
             </div>
@@ -88,7 +88,7 @@ function MedicalTreatmentHistory({
             </div>
 
             {(safeFormData.inh === 1) && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-border">
                 <div className="space-y-1.5">
                   <Label htmlFor="tptDateStart" className="text-xs font-medium text-gray-700">
                     ថ្ងៃខែឆ្នាំចាប់ផ្តើម
@@ -138,7 +138,7 @@ function MedicalTreatmentHistory({
             )}
 
             {safeFormData.tbPast === 1 && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-border">
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium text-gray-700">ប្រភេទជំងឺរបេង</Label>
                   <RadioGroup
@@ -198,7 +198,7 @@ function MedicalTreatmentHistory({
             )}
 
             {safeFormData.tbPast === 1 && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-border">
                 <div className="space-y-1.5">
                   <Label htmlFor="dateOnset" className="text-xs font-medium text-gray-700">
                     ពេលវេលាចាប់ផ្តើមឈឺ
@@ -245,17 +245,17 @@ function MedicalTreatmentHistory({
       </Card>
 
       {/* ARV Treatment History Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ប្រវត្តិនៃការប្រើប្រាស់ថ្នាំARV</h3>
               <p className="text-xs text-gray-500 mt-0.5">ARV Treatment History</p>
             </div>
             <div className="overflow-x-auto -mx-6 px-6">
               <table className="w-full border-collapse min-w-[800px]">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
+                  <tr className="border-b border-border bg-gray-50">
                     <th className="text-left py-2 px-3 text-xs font-semibold text-gray-700">ថ្នាំ</th>
                     <th className="text-left py-2 px-3 text-xs font-semibold text-gray-700">មន្ទីរពេទ្យ</th>
                     <th className="text-left py-2 px-3 text-xs font-semibold text-gray-700">ចាប់ផ្តើម</th>
@@ -265,7 +265,7 @@ function MedicalTreatmentHistory({
                 </thead>
                 <tbody>
                   {treatmentHistory.drugTreatments.map((treatment, index) => (
-                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={index} className="border-b border-border hover:bg-gray-50">
                       <td className="py-2 px-3">
                         <Select
                           value={treatment.drugDetails || "none"}
@@ -332,7 +332,7 @@ function MedicalTreatmentHistory({
               </table>
             </div>
 
-            <div className="space-y-1.5 pt-4 border-t border-gray-100">
+            <div className="space-y-1.5 pt-4 border-t border-border">
               <Label className="text-xs font-medium text-gray-700">ឱសថ ARV ដែលប្រើកន្លងមក</Label>
               <RadioGroup
                 value={safeFormData.arvMedication === -1 || safeFormData.arvMedication === null || safeFormData.arvMedication === undefined ? "" : safeFormData.arvMedication.toString()}
@@ -354,10 +354,10 @@ function MedicalTreatmentHistory({
       </Card>
 
       {/* Drug Allergy Section */}
-      <Card className="border border-gray-200 shadow-none bg-white">
+      <Card className="border border-border bg-white">
         <CardContent className="p-5 sm:p-6">
           <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-3">
+            <div className="border-b border-border pb-3">
               <h3 className="text-base font-semibold text-gray-900">ប្រតិកម្មឱសថ</h3>
               <p className="text-xs text-gray-500 mt-0.5">Drug Allergy</p>
             </div>
@@ -380,9 +380,9 @@ function MedicalTreatmentHistory({
             </div>
 
             {safeFormData.allergy === 1 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border">
                 {[0, 1, 2].map((index) => (
-                  <div key={index} className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 space-y-2">
+                  <div key={index} className="p-3 border border-border rounded-lg bg-gray-50/50 space-y-2">
                     <div className="grid grid-cols-3 gap-2">
                       <div className="space-y-1">
                         <Label className="text-xs font-medium text-gray-600">ថ្នាំ</Label>

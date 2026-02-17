@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle } from 'lucide-react';
 import siteApi from '../../services/siteApi';
 import reportingApi from '../../services/reportingApi';
-import IndicatorsReportSkeleton from '../../components/common/IndicatorsReportSkeleton';
 import { IndicatorDetailsModal } from '../../components/modals';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -569,7 +568,7 @@ const IndicatorsReport = () => {
     }
   };
 
-  const exportToCSV = () => {
+  const exportToCSV = useCallback(() => {
     const timestamp = new Date().toISOString().split('T')[0];
     const reportTitle = `National ART Indicators Report - ${dateRange.startDate} to ${dateRange.endDate}`;
     
@@ -602,7 +601,19 @@ const IndicatorsReport = () => {
     a.download = `national-art-report-${timestamp}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-  };
+  }, [dateRange, summaryStats, indicators]);
+
+  // Allow global viewer download button to trigger export
+  useEffect(() => {
+    if (!isViewer) return
+    const handle = () => {
+      exportToCSV()
+    }
+    window.addEventListener('viewer-download', handle)
+    return () => {
+      window.removeEventListener('viewer-download', handle)
+    }
+  }, [isViewer, exportToCSV]);
 
   // Helper functions for print
   const getProvinceName = (site) => {
@@ -695,13 +706,8 @@ const IndicatorsReport = () => {
    };
 
 
-  // Show loading skeleton only on initial load or when no data exists
-  if (loading && (isInitialLoad || indicators.length === 0)) {
-    return <IndicatorsReportSkeleton />;
-  }
-
   return (
-    <div className="min-h-screen bg-background mx-auto lg:max-w-[300mm]">
+    <div className="min-h-screen bg-background mx-auto lg:max-w-[300mm] px-4 sm:px-6 py-4 sm:py-6">
       <div className="space-y-4">
         {/* Report Configuration Panel */}
         <ReportConfiguration
@@ -734,7 +740,7 @@ const IndicatorsReport = () => {
 
         {/* Error Message */}
         {error && (
-          <Card className="border-destructive bg-destructive/10 shadow-lg">
+          <Card className="border-destructive bg-destructive/10">
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
@@ -745,7 +751,7 @@ const IndicatorsReport = () => {
         )}
 
         {/* Main Indicators Table */}
-        <div className="bg-card rounded-none">
+        <div className="bg-card border border-border overflow-hidden rounded-none">
           <div className="p-0">
               <IndicatorsTable 
                 indicators={indicators} 

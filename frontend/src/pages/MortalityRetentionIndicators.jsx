@@ -421,24 +421,24 @@ const MortalityRetentionIndicators = () => {
 
   function getIndicatorCategory(indicatorName) {
     if (indicatorName.includes('died') || indicatorName.includes('lost') || indicatorName.includes('reengaged')) {
-      return { category: 'Mortality & Re-engagement', color: 'bg-red-100 text-red-800' };
+      return { category: 'Mortality & Re-engagement', color: 'bg-destructive/10 text-destructive' };
     }
     if (indicatorName.includes('visit') || indicatorName.includes('schedule') || indicatorName.includes('early')) {
-      return { category: 'Visit Status', color: 'bg-blue-100 text-blue-800' };
+      return { category: 'Visit Status', color: 'bg-primary/10 text-primary' };
     }
     if (indicatorName.includes('ART') || indicatorName.includes('CD4') || indicatorName.includes('Cotrimoxazole') || indicatorName.includes('Fluconazole') || indicatorName.includes('MMD') || indicatorName.includes('TLD') || indicatorName.includes('TPT')) {
-      return { category: 'Treatment & Prevention', color: 'bg-green-100 text-green-800' };
+      return { category: 'Treatment & Prevention', color: 'bg-primary/10 text-primary' };
     }
     if (indicatorName.includes('viral load') || indicatorName.includes('VL') || indicatorName.includes('suppression')) {
-      return { category: 'Viral Load', color: 'bg-purple-100 text-purple-800' };
+      return { category: 'Viral Load', color: 'bg-secondary text-secondary-foreground' };
     }
     if (indicatorName.includes('adherence') || indicatorName.includes('counseling')) {
-      return { category: 'Adherence Counseling', color: 'bg-orange-100 text-orange-800' };
+      return { category: 'Adherence Counseling', color: 'bg-muted text-muted-foreground' };
     }
     if (indicatorName.includes('switching') || indicatorName.includes('retention') || indicatorName.includes('line')) {
-      return { category: 'Switching & Retention', color: 'bg-yellow-100 text-yellow-800' };
+      return { category: 'Switching & Retention', color: 'bg-muted text-muted-foreground' };
     }
-    return { category: 'Other', color: 'bg-gray-100 text-gray-800' };
+    return { category: 'Other', color: 'bg-muted text-muted-foreground' };
   }
 
   function getIndicatorValue(indicator) {
@@ -826,8 +826,8 @@ const MortalityRetentionIndicators = () => {
 
   return (
     <>
-    <div className="min-h-screen mx-auto lg:max-w-[300mm]  dark:bg-gray-900">
-      <div className="space-y-6 p-6">
+    <div className="min-h-screen bg-background mx-auto lg:max-w-[300mm] px-4 sm:px-6 py-4 sm:py-6">
+      <div className="space-y-6">
         {/* Configuration */}
         <ReportConfiguration
           sites={sites}
@@ -857,10 +857,10 @@ const MortalityRetentionIndicators = () => {
 
         {/* Error */}
         {error && (
-          <div className=" dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400" />
-              <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+<div className="bg-destructive/10 border border-destructive/30 p-4 rounded-md">
+              <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-destructive" />
+              <p className="text-destructive text-sm">{error}</p>
             </div>
           </div>
         )}
@@ -1519,7 +1519,7 @@ const MortalityRetentionIndicators = () => {
                                     TX_CURR Current: {formatNumber(indicator.TX_CURR_Current || 0)}
                                   </div>
                                   {indicator.Retention_Annualized_Percentage !== undefined && (
-                                    <div className="mt-1 text-xs font-semibold text-green-600">
+                                    <div className="mt-1 text-xs font-semibold text-primary">
                                       Annualized Retention: {formatNumber(indicator.Retention_Annualized_Percentage || 0)}%
                                     </div>
                                   )}
@@ -1546,7 +1546,7 @@ const MortalityRetentionIndicators = () => {
                                 </div>
                               )}
                               {(isArtInitiationIndicator ? (calculatedPercentage !== null && calculatedPercentage !== undefined) : (percentage !== undefined && percentage !== null)) && (
-                                <div className="mt-1 text-xs font-semibold text-green-600">
+                                <div className="mt-1 text-xs font-semibold text-primary">
                                   {formatNumber(isArtInitiationIndicator ? calculatedPercentage : percentage)}%
                                 </div>
                               )}
@@ -1581,10 +1581,10 @@ const MortalityRetentionIndicators = () => {
 
                             {/* Male 0-14 */}
                             <td className="px-3 py-4 text-right border-r border-border">
-                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : (isVLIndicator || isTPTIndicator ? 'text-blue-600 dark:text-blue-400' : 'text-blue-600 dark:text-blue-400')}`}>
+                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : (isVLIndicator || isTPTIndicator ? 'text-primary' : 'text-primary')}`}>
                                 {formatNumber(male014)}
                                 {isReengagementIndicator && male014Reengaged !== null && male014 > 0 && (
-                                  <div className="text-xs text-blue-600 dark:text-blue-400">
+                                  <div className="text-xs text-primary">
                                     ({formatNumber(male014Reengaged)} returned)
                             </div>
                                 )}
@@ -1593,10 +1593,10 @@ const MortalityRetentionIndicators = () => {
 
                             {/* Female 0-14 */}
                             <td className="px-3 py-4 text-right border-r border-border">
-                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : (isVLIndicator || isTPTIndicator ? 'text-pink-600 dark:text-pink-400' : 'text-pink-600 dark:text-pink-400')}`}>
+                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : (isVLIndicator || isTPTIndicator ? 'text-muted-foreground' : 'text-muted-foreground')}`}>
                                 {formatNumber(female014)}
                                 {isReengagementIndicator && female014Reengaged !== null && female014 > 0 && (
-                                  <div className="text-xs text-pink-600 dark:text-pink-400">
+                                  <div className="text-xs text-muted-foreground">
                                     ({formatNumber(female014Reengaged)} returned)
                             </div>
                                 )}
@@ -1637,11 +1637,11 @@ const MortalityRetentionIndicators = () => {
                             ) && (
                               <td className="px-3 py-4 text-right">
                                 {isReengagementIndicator && total014 > 0 && total014Reengaged !== null ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round((total014Reengaged / total014) * 100)}%
                                   </div>
                                 ) : isBaselineCD4Indicator && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {(() => {
                                       // For baseline CD4 indicator, calculate percentage using _Total fields as denominator
                                       const total014Denominator = (Number(indicator.Male_0_14_Total || 0) + Number(indicator.Female_0_14_Total || 0));
@@ -1649,9 +1649,9 @@ const MortalityRetentionIndicators = () => {
                                     })()}%
                                   </div>
                                 ) : isBaselineCD4Indicator ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isProphylaxisIndicator && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {(() => {
                                       // For prophylaxis indicators, calculate percentage using _Total fields as denominator
                                       const total014Denominator = (Number(indicator.Male_0_14_Total || 0) + Number(indicator.Female_0_14_Total || 0));
@@ -1659,59 +1659,59 @@ const MortalityRetentionIndicators = () => {
                                     })()}%
                                   </div>
                                 ) : isProphylaxisIndicator ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isMMDIndicator && total014MMD !== null && total014MMD > 0 && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round((total014 / total014MMD) * 100)}%
                             </div>
                                 ) : isMMDIndicator && total014MMD !== null && total014MMD > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isMMDIndicator && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isTLDInitiationIndicator && total014TLDInitiationDenominator !== null && total014TLDInitiationDenominator > 0 && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round((total014 / total014TLDInitiationDenominator) * 100)}%
                                   </div>
                                 ) : isTLDInitiationIndicator && total014TLDInitiationDenominator !== null && total014TLDInitiationDenominator > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isTLDCumulativeIndicator && total014TLDCumulativeDenominator !== null && total014TLDCumulativeDenominator > 0 && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round((total014 / total014TLDCumulativeDenominator) * 100)}%
                                   </div>
                                 ) : isTLDCumulativeIndicator && total014TLDCumulativeDenominator !== null && total014TLDCumulativeDenominator > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isTLDIndicator && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isTPTIndicator && total014TPTDenominator !== null && total014TPTDenominator > 0 && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round((total014 / total014TPTDenominator) * 100)}%
                                   </div>
                                 ) : isTPTIndicator && total014TPTDenominator !== null && total014TPTDenominator > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isTPTIndicator && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isVLIndicator && total014VLDenominator !== null && total014VLDenominator > 0 && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round((total014 / total014VLDenominator) * 100)}%
                                   </div>
                                 ) : isVLIndicator && total014VLDenominator !== null && total014VLDenominator > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isVLIndicator && total014 > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : isSwitchingIndicator && percentage !== null && percentage !== undefined ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round(percentage)}%
                                   </div>
                                 ) : isRetentionIndicator && percentage !== null && percentage !== undefined ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round(percentage)}%
                                   </div>
                                 ) : isArtInitiationIndicator && total014NewlyInitiated > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {Math.round((total014 / total014NewlyInitiated) * 100)}%
                           </div>
                                 ) : isArtInitiationIndicator ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                 ) : (
                                   <div className="text-sm text-muted-foreground">—</div>
                                 )}
@@ -1725,20 +1725,20 @@ const MortalityRetentionIndicators = () => {
                               {'>'}14
                             </td>
                             <td className="px-3 py-3 text-right border-r border-border">
-                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : 'text-blue-600 dark:text-blue-400'}`}>
+                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : 'text-primary'}`}>
                                 {formatNumber(male15Plus)}
                                 {isReengagementIndicator && male15PlusReengaged !== null && male15Plus > 0 && (
-                                  <div className="text-xs text-blue-600 dark:text-blue-400">
+                                  <div className="text-xs text-primary">
                                     ({formatNumber(male15PlusReengaged)} returned)
                         </div>
                                 )}
                               </div>
                             </td>
                             <td className="px-3 py-3 text-right border-r border-border">
-                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : 'text-pink-600 dark:text-pink-400'}`}>
+                              <div className={`text-lg font-normal ${isReengagementIndicator ? 'text-foreground' : 'text-muted-foreground'}`}>
                                 {formatNumber(female15Plus)}
                                 {isReengagementIndicator && female15PlusReengaged !== null && female15Plus > 0 && (
-                                  <div className="text-xs text-pink-600 dark:text-pink-400">
+                                  <div className="text-xs text-muted-foreground">
                                     ({formatNumber(female15PlusReengaged)} returned)
                                   </div>
                                 )}
@@ -1775,11 +1775,11 @@ const MortalityRetentionIndicators = () => {
                               ) && (
                                 <td className="px-3 py-3 text-right">
                                   {isReengagementIndicator && total15Plus > 0 && total15PlusReengaged !== null ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round((total15PlusReengaged / total15Plus) * 100)}%
                                     </div>
                                   ) : isBaselineCD4Indicator && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {(() => {
                                         // For baseline CD4 indicator, calculate percentage using _Total fields as denominator
                                         const total15PlusDenominator = (Number(indicator.Male_over_14_Total || 0) + Number(indicator.Female_over_14_Total || 0));
@@ -1787,9 +1787,9 @@ const MortalityRetentionIndicators = () => {
                                       })()}%
                                     </div>
                                   ) : isBaselineCD4Indicator ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isProphylaxisIndicator && total15Plus > 0 ? (
-                                  <div className="text-sm font-semibold text-green-600">
+                                  <div className="text-sm font-semibold text-primary">
                                     {(() => {
                                       // For prophylaxis indicators, calculate percentage using _Total fields as denominator
                                       const total15PlusDenominator = (Number(indicator.Male_over_14_Total || 0) + Number(indicator.Female_over_14_Total || 0));
@@ -1797,59 +1797,59 @@ const MortalityRetentionIndicators = () => {
                                     })()}%
                                   </div>
                                 ) : isProphylaxisIndicator ? (
-                                  <div className="text-sm font-semibold text-green-600">0%</div>
+                                  <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isMMDIndicator && total15PlusMMD !== null && total15PlusMMD > 0 && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round((total15Plus / total15PlusMMD) * 100)}%
                                     </div>
                                   ) : isMMDIndicator && total15PlusMMD !== null && total15PlusMMD > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isMMDIndicator && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isTLDInitiationIndicator && total15PlusTLDInitiationDenominator !== null && total15PlusTLDInitiationDenominator > 0 && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round((total15Plus / total15PlusTLDInitiationDenominator) * 100)}%
                                     </div>
                                   ) : isTLDInitiationIndicator && total15PlusTLDInitiationDenominator !== null && total15PlusTLDInitiationDenominator > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isTLDCumulativeIndicator && total15PlusTLDCumulativeDenominator !== null && total15PlusTLDCumulativeDenominator > 0 && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round((total15Plus / total15PlusTLDCumulativeDenominator) * 100)}%
                                     </div>
                                   ) : isTLDCumulativeIndicator && total15PlusTLDCumulativeDenominator !== null && total15PlusTLDCumulativeDenominator > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isTLDIndicator && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isTPTIndicator && total15PlusTPTDenominator !== null && total15PlusTPTDenominator > 0 && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round((total15Plus / total15PlusTPTDenominator) * 100)}%
                                     </div>
                                   ) : isTPTIndicator && total15PlusTPTDenominator !== null && total15PlusTPTDenominator > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isTPTIndicator && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isVLIndicator && total15PlusVLDenominator !== null && total15PlusVLDenominator > 0 && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round((total15Plus / total15PlusVLDenominator) * 100)}%
                                     </div>
                                   ) : isVLIndicator && total15PlusVLDenominator !== null && total15PlusVLDenominator > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isVLIndicator && total15Plus > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : isSwitchingIndicator && percentage !== null && percentage !== undefined ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round(percentage)}%
                                     </div>
                                   ) : isRetentionIndicator && percentage !== null && percentage !== undefined ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round(percentage)}%
                                     </div>
                                   ) : isArtInitiationIndicator && total15PlusNewlyInitiated > 0 ? (
-                                    <div className="text-sm font-semibold text-green-600">
+                                    <div className="text-sm font-semibold text-primary">
                                       {Math.round((total15Plus / total15PlusNewlyInitiated) * 100)}%
                                     </div>
                                   ) : isArtInitiationIndicator ? (
-                                    <div className="text-sm font-semibold text-green-600">0%</div>
+                                    <div className="text-sm font-semibold text-primary">0%</div>
                                   ) : (
                                     <div className="text-sm text-muted-foreground">—</div>
                                   )}
@@ -1866,7 +1866,7 @@ const MortalityRetentionIndicators = () => {
                               <div className={`text-lg font-bold ${isReengagementIndicator ? 'text-foreground' : 'text-blue-700 dark:text-blue-400'}`}>
                                 {formatNumber(totalMale)}
                                 {isReengagementIndicator && totalMaleReengaged !== null && totalMale > 0 && (
-                                  <div className="text-xs text-blue-600 dark:text-blue-400">
+                                  <div className="text-xs text-primary">
                                     ({formatNumber(totalMaleReengaged)} returned)
                             </div>
                                 )}
@@ -1876,7 +1876,7 @@ const MortalityRetentionIndicators = () => {
                               <div className={`text-lg font-bold ${isReengagementIndicator ? 'text-foreground' : 'text-pink-700 dark:text-pink-400'}`}>
                                 {formatNumber(totalFemale)}
                                 {isReengagementIndicator && totalFemaleReengaged !== null && totalFemale > 0 && (
-                                  <div className="text-xs text-pink-600 dark:text-pink-400">
+                                  <div className="text-xs text-muted-foreground">
                                     ({formatNumber(totalFemaleReengaged)} returned)
                             </div>
                                 )}

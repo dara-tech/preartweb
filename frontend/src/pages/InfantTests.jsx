@@ -3,7 +3,7 @@ import InfantTests from '../components/InfantTests';
 
 const InfantTestsPage = () => {
   return (
-    <div className="container mx-auto p-6">
+    <div >
       <InfantTests />
     </div>
   );
