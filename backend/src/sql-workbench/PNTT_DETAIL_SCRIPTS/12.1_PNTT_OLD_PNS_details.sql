@@ -8,12 +8,10 @@
 SET @StartDate = '2025-04-01';
 SET @EndDate   = '2025-06-30';
 
--- Aggregate pattern:
--- adultactive (new patients in quarter) RIGHT JOIN tblapntt, then filter
--- WHERE tblapntt.DaVisit BETWEEN dates
---   AND (adultactive.ClinicID is null OR adultactive.OffIn=1 OR adultactive.TypeofReturn<>-1)
+-- Aggregate pattern: one row per tblapntt visit (old patients).
+-- Detail must return one row per visit so count matches aggregate.
 
-SELECT DISTINCT
+SELECT
     'PNTT_OLD_PNS' AS indicator_code,
     ai.ClinicID AS clinicid,
     ai.Sex AS sex,
@@ -27,7 +25,8 @@ SELECT DISTINCT
     TIMESTAMPDIFF(YEAR, ai.DaBirth, @EndDate) AS age,
     ai.TypeofReturn,
     ai.OffIn,
-    ai.DafirstVisit AS pntt_visit_date
+    pntt.AsID AS pntt_asid,
+    pntt.DaVisit AS pntt_visit_date
 FROM (
     SELECT ClinicID, Sex, TypeofReturn, OffIn, DaBirth, DafirstVisit
     FROM tblaimain

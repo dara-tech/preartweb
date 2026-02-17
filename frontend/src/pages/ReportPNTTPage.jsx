@@ -98,36 +98,101 @@ function getDisplayIndicatorNumber(sectionNumber) {
   return sectionNumber + 8
 }
 
-/** Partners block (14–18): structure with sub-indicators. Section numbers match backend sorted script order. */
+/** Partners block (14–18): structure with sub-indicators.
+ *  Uses scriptId as the primary lookup so backend sectionNumber changes (e.g. adding 11.1)
+ *  do not break the mapping.
+ */
 const PARTNERS_STRUCTURE = [
-  { displayNum: 14, labelKh: 'ចំនួនដៃគូដែលបានចុះបញ្ជី', newSec: 8, oldSec: 9 },
+  {
+    displayNum: 14,
+    labelKh: 'ចំនួនដៃគូដែលបានចុះបញ្ជី',
+    newSec: 8,
+    oldSec: 9,
+    newScriptId: '14_PNTT_NEW_PART_REG_aggregate',
+    oldScriptId: '14.1_PNTT_OLD_PART_REG_aggregate'
+  },
   {
     displayNum: 15,
     labelKh: 'ចំនួនដៃគូដែលបានជួបជូនព័ត៌មាន',
     subRows: [
-      { labelKh: 'ដោយអ្នកជំងឺ', newSec: 10, oldSec: 11 },
-      { labelKh: 'ដោយអ្នកផ្តល់សេវា', newSec: 16, oldSec: 17 },
-      { labelKh: 'ដោយមានលក្ខខណ្ឌ', newSec: 33, oldSec: 35 },
-      { labelKh: 'ដោយអ្នកជំងឺ និងអ្នកផ្តល់សេវា', newSec: 37, oldSec: 39 }
+      {
+        labelKh: 'ដោយអ្នកជំងឺ',
+        newSec: 10,
+        oldSec: 11,
+        newScriptId: '15_PNTT_NEW_PART_REF_aggregate',
+        oldScriptId: '15.1_PNTT_OLD_PART_REF_aggregate'
+      },
+      {
+        labelKh: 'ដោយអ្នកផ្តល់សេវា',
+        newSec: 16,
+        oldSec: 17,
+        newScriptId: '18_PNTT_NEW_PART_PROV_aggregate',
+        oldScriptId: '18.1_PNTT_OLD_PART_PROV_aggregate'
+      },
+      {
+        labelKh: 'ដោយមានលក្ខខណ្ឌ',
+        newSec: 33,
+        oldSec: 35,
+        newScriptId: '21_PNTT_NEW_PART_CONT_aggregate',
+        oldScriptId: '21.1_PNTT_OLD_PART_CONT_aggregate'
+      },
+      {
+        labelKh: 'ដោយអ្នកជំងឺ និងអ្នកផ្តល់សេវា',
+        newSec: 37,
+        oldSec: 39,
+        newScriptId: '22_PNTT_NEW_PART_DUAL_aggregate',
+        oldScriptId: '22.1_PNTT_OLD_PART_DUAL_aggregate'
+      }
     ]
   },
   {
     displayNum: 16,
     labelKh: 'ចំនួនដៃគូដែលបានធ្វើតេស្តរកមេរោគអេដស៍',
     subRows: [
-      { labelKh: 'ដៃគូដែលបានធ្វើតេស្តតាម HTS', newSec: 12, oldSec: 13 },
-      { labelKh: 'ដៃគូដែលបានធ្វើតេស្តតាមរយៈ HIVST', newSec: 19, oldSec: 21 }
+      {
+        labelKh: 'ដៃគូដែលបានធ្វើតេស្តតាម HTS',
+        newSec: 12,
+        oldSec: 13,
+        newScriptId: '16_PNTT_NEW_PART_HTS_aggregate',
+        oldScriptId: '16.1_PNTT_OLD_PART_HTS_aggregate'
+      },
+      {
+        labelKh: 'ដៃគូដែលបានធ្វើតេស្តតាមរយៈ HIVST',
+        newSec: 19,
+        oldSec: 21,
+        newScriptId: '19_PNTT_NEW_PART_HIVST_aggregate',
+        oldScriptId: '19.1_PNTT_OLD_PART_HIVST_aggregate'
+      }
     ]
   },
   {
     displayNum: 17,
     labelKh: 'ចំនួនដៃគូដែលបានធ្វើតេស្តរកមេរោគអេដស៍ ហើយមានលទ្ធផលវិជ្ជមាន',
     subRows: [
-      { labelKh: 'ដៃគូដែលបានធ្វើតេស្តដំបូងតាម HTS', newSec: 14, oldSec: 15 },
-      { labelKh: 'ដៃគូដែលបានធ្វើតេស្តដំបូងតាមរយៈ HIVST', newSec: 25, oldSec: 31 }
+      {
+        labelKh: 'ដៃគូដែលបានធ្វើតេស្តដំបូងតាម HTS',
+        newSec: 14,
+        oldSec: 15,
+        newScriptId: '17_PNTT_NEW_PART_HTS_POS_aggregate',
+        oldScriptId: '17.1_PNTT_OLD_PART_HTS_POS_aggregate'
+      },
+      {
+        labelKh: 'ដៃគូដែលបានធ្វើតេស្តដំបូងតាមរយៈ HIVST',
+        newSec: 25,
+        oldSec: 31,
+        newScriptId: '20_PNTT_NEW_PART_HIVST_POS_aggregate',
+        oldScriptId: '20.1_PNTT_OLD_PART_HIVST_POS_aggregate'
+      }
     ]
   },
-  { displayNum: 18, labelKh: 'ចំនួនដៃគូដែលមានលទ្ធផលវិជ្ជមានបានចុះឈ្មោះទទួលការព្យាបាល សរុប', newSec: 41, oldSec: 43 }
+  {
+    displayNum: 18,
+    labelKh: 'ចំនួនដៃគូដែលមានលទ្ធផលវិជ្ជមានបានចុះឈ្មោះទទួលការព្យាបាល សរុប',
+    newSec: 41,
+    oldSec: 43,
+    newScriptId: '23_PNTT_NEW_PART_POS_REG_aggregate',
+    oldScriptId: '23.1_PNTT_OLD_PART_POS_REG_aggregate'
+  }
 ]
 
 /** Children block (19–23): section numbers + scriptIds for lookup (scriptId fallback when API order differs). */
@@ -216,7 +281,7 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
         displayNum: 11,
         labelKh: PNTT_INDICATOR_KHMER[3] || 'ចំនួនអ្នកជំងឺតម្រុយ (>១៤ ឆ្នាំ) ក្នុងត្រីមាស',
         newScriptId: '11_PNTT_NEW_REG_aggregate',
-        oldScriptId: null
+        oldScriptId: '11.1_PNTT_OLD_REG_aggregate'
       },
       {
         displayNum: 12,
@@ -485,10 +550,15 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
   /** Block 3 (Partners): indicators 14–18 with sub-indicators and សរុប rows */
   const renderPartnersSectionRows = () => {
     const sectionByNum = Object.fromEntries((sections || []).map((s) => [s.sectionNumber, s]))
+    const sectionByScriptId = Object.fromEntries(
+      (sections || [])
+        .filter((s) => s.scriptId)
+        .map((s) => [s.scriptId, s])
+    )
 
-    const getRowData = (newSec, oldSec) => {
-      const newS = sectionByNum[newSec]
-      const oldS = sectionByNum[oldSec]
+    const getRowData = (newSec, oldSec, newScriptId, oldScriptId) => {
+      const newS = (newScriptId ? sectionByScriptId[newScriptId] : null) ?? sectionByNum[newSec]
+      const oldS = (oldScriptId ? sectionByScriptId[oldScriptId] : null) ?? sectionByNum[oldSec]
       const newR = newS?.rows?.[0] || {}
       const oldR = oldS?.rows?.[0] || {}
       return {
@@ -601,7 +671,9 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
     const rows = []
     PARTNERS_STRUCTURE.forEach((item) => {
       if (item.subRows) {
-        const subDatas = item.subRows.map((sub) => getRowData(sub.newSec, sub.oldSec))
+        const subDatas = item.subRows.map((sub) =>
+          getRowData(sub.newSec, sub.oldSec, sub.newScriptId, sub.oldScriptId)
+        )
         const spanCount = item.subRows.length + 1
         item.subRows.forEach((sub, i) => {
           rows.push(renderDataRow(
@@ -641,12 +713,11 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
           false
         ))
       } else {
-        const data = getRowData(item.newSec, item.oldSec)
         rows.push(renderDataRow(
           `p-${item.displayNum}`,
           `${item.displayNum}. ${item.labelKh}`,
           '',
-          data,
+          getRowData(item.newSec, item.oldSec, item.newScriptId, item.oldScriptId),
           false,
           false,
           1,
@@ -667,8 +738,8 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
       if (newSec === 0 || oldSec === 0) {
         return { newMale: 0, newFemale: 0, newTotal: 0, followupMale: 0, followupFemale: 0, followupTotal: 0, newSection: null, newRow: {}, oldSection: null, oldRow: {} }
       }
-      const newS = sectionByNum[newSec] ?? (newScriptId ? sectionByScriptId[newScriptId] : null)
-      const oldS = sectionByNum[oldSec] ?? (oldScriptId ? sectionByScriptId[oldScriptId] : null)
+      const newS = (newScriptId ? sectionByScriptId[newScriptId] : null) ?? sectionByNum[newSec]
+      const oldS = (oldScriptId ? sectionByScriptId[oldScriptId] : null) ?? sectionByNum[oldSec]
       const newR = newS?.rows?.[0] || {}
       const oldR = oldS?.rows?.[0] || {}
       return {

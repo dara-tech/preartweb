@@ -15,19 +15,64 @@ import {
 } from '@/components/ui'
 import { Download, AlertTriangle, Loader2, FileText, Users } from 'lucide-react'
 
+// Helper to prefer child sex when present (PNTT children 19–23)
+const getChildSexCode = (r) => {
+  const sex = r.child_sex ?? r.Child_sex
+  const display = String(r.child_sex_display ?? r.Child_sex_display ?? '').toLowerCase()
+  if (sex !== undefined && sex !== null && sex !== '') {
+    const n = Number(sex)
+    if (!Number.isNaN(n)) return n
+  }
+  if (display === 'male') return 1
+  if (display === 'female') return 0
+  return null
+}
+
+// Helper to prefer partner sex when present (PNTT partners 14–18)
+const getPartnerSexCode = (r) => {
+  const sex = r.partner_sex ?? r.Partner_sex
+  const display = String(r.partner_sex_display ?? r.Partner_sex_display ?? '').toLowerCase()
+  if (sex !== undefined && sex !== null && sex !== '') {
+    const n = Number(sex)
+    if (!Number.isNaN(n)) return n
+  }
+  if (display === 'male') return 1
+  if (display === 'female') return 0
+  return null
+}
+
 // Support Index/Partner (PNTT) and Caregiver/Child (PNTT Children) and generic Sex/sex_display
-const isMale = (r) =>
-  Number(r.Sex) === 1 || Number(r.sex) === 1 || String(r.sex_display || '').toLowerCase() === 'male' ||
-  Number(r.index_sex ?? r.Index_sex) === 1 || String((r.index_sex_display ?? r.Index_sex_display) || '').toLowerCase() === 'male' ||
-  Number(r.partner_sex ?? r.Partner_sex) === 1 || String((r.partner_sex_display ?? r.Partner_sex_display) || '').toLowerCase() === 'male' ||
-  Number(r.caregiver_sex ?? r.Caregiver_sex) === 1 || String((r.caregiver_sex_display ?? r.Caregiver_sex_display) || '').toLowerCase() === 'male' ||
-  Number(r.child_sex ?? r.Child_sex) === 1 || String((r.child_sex_display ?? r.Child_sex_display) || '').toLowerCase() === 'male'
-const isFemale = (r) =>
-  Number(r.Sex) === 0 || Number(r.sex) === 0 || String(r.sex_display || '').toLowerCase() === 'female' ||
-  Number(r.index_sex ?? r.Index_sex) === 0 || String((r.index_sex_display ?? r.Index_sex_display) || '').toLowerCase() === 'female' ||
-  Number(r.partner_sex ?? r.Partner_sex) === 0 || String((r.partner_sex_display ?? r.Partner_sex_display) || '').toLowerCase() === 'female' ||
-  Number(r.caregiver_sex ?? r.Caregiver_sex) === 0 || String((r.caregiver_sex_display ?? r.Caregiver_sex_display) || '').toLowerCase() === 'female' ||
-  Number(r.child_sex ?? r.Child_sex) === 0 || String((r.child_sex_display ?? r.Child_sex_display) || '').toLowerCase() === 'female'
+const isMale = (r) => {
+  const childSex = getChildSexCode(r)
+  if (childSex !== null) {
+    return childSex === 1
+  }
+  const partnerSex = getPartnerSexCode(r)
+  if (partnerSex !== null) {
+    return partnerSex === 1
+  }
+  return (
+    Number(r.Sex) === 1 || Number(r.sex) === 1 || String(r.sex_display || '').toLowerCase() === 'male' ||
+    Number(r.index_sex ?? r.Index_sex) === 1 || String((r.index_sex_display ?? r.Index_sex_display) || '').toLowerCase() === 'male' ||
+    Number(r.caregiver_sex ?? r.Caregiver_sex) === 1 || String((r.caregiver_sex_display ?? r.Caregiver_sex_display) || '').toLowerCase() === 'male'
+  )
+}
+
+const isFemale = (r) => {
+  const childSex = getChildSexCode(r)
+  if (childSex !== null) {
+    return childSex === 0
+  }
+  const partnerSex = getPartnerSexCode(r)
+  if (partnerSex !== null) {
+    return partnerSex === 0
+  }
+  return (
+    Number(r.Sex) === 0 || Number(r.sex) === 0 || String(r.sex_display || '').toLowerCase() === 'female' ||
+    Number(r.index_sex ?? r.Index_sex) === 0 || String((r.index_sex_display ?? r.Index_sex_display) || '').toLowerCase() === 'female' ||
+    Number(r.caregiver_sex ?? r.Caregiver_sex) === 0 || String((r.caregiver_sex_display ?? r.Caregiver_sex_display) || '').toLowerCase() === 'female'
+  )
+}
 
 const formatCell = (value) => {
   if (value == null || value === '') return '—'
