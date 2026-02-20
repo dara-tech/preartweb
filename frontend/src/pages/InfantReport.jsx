@@ -245,13 +245,14 @@ const InfantReport = () => {
     return null
   }, [])
 
-  /** Map row label to logical result category used in details (e.g. Negative vs Positive) */
+  /** Map row label to logical result category used in details (Negative / Positive / Pending) */
   const getResultCategoryFilter = useCallback((row) => {
     if (!row) return null
     const en = (row.labelEn || '').toLowerCase()
     const kh = (row.labelKh || '').toLowerCase()
-    if (en.includes('negative') || kh.includes('អវិជ្ជមាន')) return 'negative'
-    if (en.includes('positive') || kh.includes('វិជ្ជមាន')) return 'positive'
+    if (en.includes('negative') || kh.includes('អវិជ្ជមាន') || kh.includes('លទ្ធផល(-)')) return 'negative'
+    if (en.includes('positive') || kh.includes('វិជ្ជមាន') || kh.includes('លទ្ធផល(+)')) return 'positive'
+    if (en.includes('pending') || en.includes('waiting') || kh.includes('រង់ចាំ')) return 'pending'
     return null
   }, [])
 

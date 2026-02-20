@@ -19,11 +19,7 @@ SELECT
   COUNT(IF(c.Sex = 1 AND c.DNAPcr = 0 AND c.Result IS NULL, 1, NULL)) as m_w_B,
   COUNT(IF(c.Sex = 0 AND c.DNAPcr = 0 AND c.Result IS NULL, 1, NULL)) as f_w_B
 FROM (
-  SELECT DISTINCT
-    re.ClinicID,
-    re.Sex,
-    re.DNAPcr,
-    re.Result
+  SELECT DISTINCT re.ClinicID, re.Sex, re.DNAPcr, re.Result
   FROM (
     SELECT n.ClinicID, ei.Sex, n.DNAPcr, n.Result
     FROM (

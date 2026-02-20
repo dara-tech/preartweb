@@ -4,43 +4,41 @@
 SET @StartDate = '2025-04-01';
 SET @EndDate = '2025-06-30';
 
--- Outer query: filter only 9 months
--- Matches logic from Rinfants.vb line 437-442: COUNT(IF(c.DNAPcr = 5 and c.Result = X, 1, null))
--- The aggregate query uses UNION: tests from tbletest + visits from tblevmain with null results
--- Waiting results: COUNT(IF(c.DNAPcr = 5 and c.Result is null, 1, null)) - matches line 441-442
--- Detail form will add WHERE result IS NULL when demographic group is "Male_Waiting" or "Female_Waiting"
-SELECT DISTINCT
-    c.ClinicID AS clinicid,
-    c.Sex AS sex,
-    CASE 
-        WHEN c.Sex = 0 THEN 'Female'
-        WHEN c.Sex = 1 THEN 'Male'
-        ELSE 'Unknown'
-    END AS sex_display,
-    c.DaBirth,
-    c.DafirstVisit,
-    c.DatVisit,
-    COALESCE(c.DaBlood, c.DatVisit) AS TestDate,
-    c.DNAPcr AS dna_test_type,
-    CASE 
-        WHEN c.DNAPcr = 0 THEN 'At Birth'
-        WHEN c.DNAPcr = 1 THEN '4-6 Weeks'
-        WHEN c.DNAPcr = 5 THEN '9 Months'
-        WHEN c.DNAPcr = 3 THEN 'OI'
-        WHEN c.DNAPcr = 4 THEN 'Confirmatory'
-        ELSE CONCAT('Type: ', c.DNAPcr)
-    END AS dna_test_display,
-    c.OI AS other_dna,
-    c.Result AS result,
-    CASE 
-        WHEN c.Result IS NULL THEN 'Waiting'
-        WHEN c.Result = 1 THEN 'Positive'
-        WHEN c.Result = 0 THEN 'Negative'
-        ELSE CONCAT('Result: ', c.Result)
-    END AS result_display,
-    CASE WHEN TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit))/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit))/365) AS CHAR), ' yr') END AS age_at_test,
-    'Infant' AS patient_type
+-- Outer query: one row per (ClinicID, Sex, Result) so detail count matches aggregate distinct count.
+-- Aggregate uses SELECT DISTINCT (ClinicID, Sex, DNAPcr, Result) so Pending = distinct infants with Result IS NULL.
+SELECT
+    ranked.clinicid,
+    ranked.sex,
+    ranked.sex_display,
+    ranked.DaBirth,
+    ranked.DafirstVisit,
+    ranked.DatVisit,
+    ranked.TestDate,
+    ranked.dna_test_type,
+    ranked.dna_test_display,
+    ranked.other_dna,
+    ranked.result,
+    ranked.result_display,
+    ranked.age_at_test,
+    ranked.patient_type
 FROM (
+    SELECT
+        c.ClinicID AS clinicid,
+        c.Sex AS sex,
+        CASE WHEN c.Sex = 0 THEN 'Female' WHEN c.Sex = 1 THEN 'Male' ELSE 'Unknown' END AS sex_display,
+        c.DaBirth,
+        c.DafirstVisit,
+        c.DatVisit,
+        COALESCE(c.DaBlood, c.DatVisit) AS TestDate,
+        c.DNAPcr AS dna_test_type,
+        CASE WHEN c.DNAPcr = 0 THEN 'At Birth' WHEN c.DNAPcr = 1 THEN '4-6 Weeks' WHEN c.DNAPcr = 5 THEN '9 Months' WHEN c.DNAPcr = 3 THEN 'OI' WHEN c.DNAPcr = 4 THEN 'Confirmatory' ELSE CONCAT('Type: ', c.DNAPcr) END AS dna_test_display,
+        c.OI AS other_dna,
+        c.Result AS result,
+        CASE WHEN c.Result IS NULL THEN 'Waiting' WHEN c.Result = 1 THEN 'Positive' WHEN c.Result = 0 THEN 'Negative' ELSE CONCAT('Result: ', c.Result) END AS result_display,
+        CASE WHEN TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit))/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit))/365) AS CHAR), ' yr') END AS age_at_test,
+        'Infant' AS patient_type,
+        ROW_NUMBER() OVER (PARTITION BY c.ClinicID, c.Sex, c.Result ORDER BY COALESCE(c.DaBlood, c.DatVisit) DESC) AS rn
+    FROM (
     -- Part 1: Tests from tbletest where DatTestArr is in date range (includes all tests, even with NULL results)
     -- Match aggregate query Part 1: selects n.ClinicID, ei.Sex, n.DNAPcr, n.OI, n.Result, n.DaRresult, n.DatTestArr, n.DaBlood
     SELECT DISTINCT 
@@ -130,4 +128,6 @@ FROM (
     INNER JOIN tbleimain ei ON req.ClinicID = ei.ClinicID
     WHERE et.Result IS NULL  -- Match aggregate query: WHERE et.Result Is null (includes both no match and null result)
 ) c
-ORDER BY TestDate DESC, clinicid
+) ranked
+WHERE ranked.rn = 1
+ORDER BY ranked.TestDate DESC, ranked.clinicid

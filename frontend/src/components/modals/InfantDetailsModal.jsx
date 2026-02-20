@@ -130,8 +130,8 @@ const normalizeAgeCategory = (value) => {
   return null
 }
 
-// Normalize result / outcome fields so we can filter by \"negative\" / \"positive\"
-// Result/Result_display (DNA): 0 = Negative, 1 = Positive. Antibody: 0 = Positive, 1 = Negative.
+// Normalize result / outcome fields so we can filter by \"negative\" / \"positive\" / \"pending\"
+// Result/Result_display (DNA): 0 = Negative, 1 = Positive, null = Waiting/Pending. Antibody: 0 = Positive, 1 = Negative.
 const getResultCategory = (row) => {
   const display = String(
     row.Result_display || row.result_display ||
@@ -142,12 +142,14 @@ const getResultCategory = (row) => {
     row.Antibody_display != null || row.antibody_display != null
   if (display.includes('negative')) return 'negative'
   if (display.includes('positive')) return 'positive'
+  if (display.includes('waiting') || display.includes('pending')) return 'pending'
   if (isAntibody) {
     if (code === 0 || code === '0') return 'positive'
     if (code === 1 || code === '1') return 'negative'
   } else {
     if (code === 0 || code === '0') return 'negative'
     if (code === 1 || code === '1') return 'positive'
+    if (code == null || code === '' || code === undefined) return 'pending'
   }
   return null
 }
