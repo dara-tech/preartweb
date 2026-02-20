@@ -95,6 +95,47 @@ const SECTION_DEFS = [
     }
   },
   {
+    scriptId: '06_INFANT_DNA_REQUESTED_aggregate',
+    detailScriptIds: [
+      '06_INFANT_DNA_REQUESTED_BIRTH_details',
+      '06_INFANT_DNA_REQUESTED_46WEEKS_details',
+      '06_INFANT_DNA_REQUESTED_9MONTHS_details',
+      '06_INFANT_DNA_REQUESTED_CONFIRM_details',
+      '06_INFANT_DNA_REQUESTED_OI_details'
+    ],
+    sectionNumber: 6,
+    sectionLabelEn: 'Number of DNA PCR requested by clinician during this quarter',
+    sectionLabelKh: 'ចំនួនតេស្ត DNA PCR ដែលគ្រូពេទ្យស្នើក្នុងត្រីមាសនេះ',
+    normalizer: (rows) => {
+      const r = rows && rows[0];
+      const mBirth = Number(r?.m_birth ?? 0);
+      const fBirth = Number(r?.f_birth ?? 0);
+      const m46w = Number(r?.m_46w ?? 0);
+      const f46w = Number(r?.f_46w ?? 0);
+      const m9m = Number(r?.m_9m ?? 0);
+      const f9m = Number(r?.f_9m ?? 0);
+      const mConfirm = Number(r?.m_confirm ?? 0);
+      const fConfirm = Number(r?.f_confirm ?? 0);
+      const mOi = Number(r?.m_oi ?? 0);
+      const fOi = Number(r?.f_oi ?? 0);
+      return [
+        { labelEn: 'At Birth', labelKh: 'នៅពេលកើត', male: mBirth, female: fBirth, total: mBirth + fBirth },
+        { labelEn: '4-6 Weeks', labelKh: '៤-៦ សប្តាហ៍', male: m46w, female: f46w, total: m46w + f46w },
+        { labelEn: '9 Months', labelKh: '៩ ខែ', male: m9m, female: f9m, total: m9m + f9m },
+        { labelEn: 'Confirmatory', labelKh: 'បញ្ជាក់', male: mConfirm, female: fConfirm, total: mConfirm + fConfirm },
+        { labelEn: 'OI (Opportunistic Infection)', labelKh: 'OI (ជំងឺឱកាសនិយម)', male: mOi, female: fOi, total: mOi + fOi },
+        {
+          labelEn: 'Total',
+          labelKh: 'សរុប Total',
+          male: mBirth + m46w + m9m + mConfirm + mOi,
+          female: fBirth + f46w + f9m + fConfirm + fOi,
+          total: mBirth + fBirth + m46w + f46w + m9m + f9m + mConfirm + fConfirm + mOi + fOi,
+          isSubtotal: true
+        }
+      ];
+    }
+  },
+  {
     scriptId: '07_INFANT_DNA_BIRTH_aggregate',
     detailScriptId: '07_INFANT_DNA_BIRTH_details',
     sectionNumber: 7,

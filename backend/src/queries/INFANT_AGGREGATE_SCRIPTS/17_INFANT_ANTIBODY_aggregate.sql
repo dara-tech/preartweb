@@ -11,11 +11,12 @@ SET @EndDate = '2025-03-31';
 -- =====================================================
 -- MAIN QUERY
 -- =====================================================
+-- Antibody: 0 = Positive, 1 = Negative
 SELECT
-  COUNT(IF(ei.Sex = 1 AND ev.Antibody = 0, 1, NULL)) as m_negative,
-  COUNT(IF(ei.Sex = 0 AND ev.Antibody = 0, 1, NULL)) as f_negative,
-  COUNT(IF(ei.Sex = 1 AND ev.Antibody = 1, 1, NULL)) as m_positive,
-  COUNT(IF(ei.Sex = 0 AND ev.Antibody = 1, 1, NULL)) as f_positive
+  COUNT(IF(ei.Sex = 1 AND ev.Antibody = 0, 1, NULL)) as m_positive,
+  COUNT(IF(ei.Sex = 0 AND ev.Antibody = 0, 1, NULL)) as f_positive,
+  COUNT(IF(ei.Sex = 1 AND ev.Antibody = 1, 1, NULL)) as m_negative,
+  COUNT(IF(ei.Sex = 0 AND ev.Antibody = 1, 1, NULL)) as f_negative
 FROM tblEVmain ev
 INNER JOIN tblEImain ei ON ev.ClinicID = ei.ClinicID
 WHERE ev.DatVisit BETWEEN @StartDate AND @EndDate

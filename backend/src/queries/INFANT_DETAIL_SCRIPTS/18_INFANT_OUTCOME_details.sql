@@ -37,6 +37,8 @@ SELECT
         ELSE CONCAT('Status: ', tblevpatientstatus.Status)
     END as status_display,
     tblevpatientstatus.transfer_to_site as transfer_to_site,
+    CASE WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit)/365) AS CHAR), ' yr') END AS age_at_test,
+    CASE WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus)/365) AS CHAR), ' yr') END AS age_at_outcome,
     'Infant' as patient_type
 FROM tblEImain 
 INNER JOIN tblevpatientstatus ON tblEImain.ClinicID = tblevpatientstatus.ClinicID

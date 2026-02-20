@@ -13,7 +13,7 @@ SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD)
 -- MAIN QUERY
 -- =====================================================
 -- Antibody Test Results
--- Matches logic from Rinfants.vb: Antibody test (0 = Negative, 1 = Positive)
+-- Antibody: 0 = Positive, 1 = Negative
 SELECT
     tbleimain.ClinicID as clinicid,
     tbleimain.Sex as sex,
@@ -28,11 +28,12 @@ SELECT
     NULL as TestDate,
     tblevmain.Antibody as antibody_result,
     CASE 
-        WHEN tblevmain.Antibody = 0 THEN 'Negative'
-        WHEN tblevmain.Antibody = 1 THEN 'Positive'
+        WHEN tblevmain.Antibody = 1 THEN 'Negative'
+        WHEN tblevmain.Antibody = 0 THEN 'Positive'
         ELSE CONCAT('Result: ', tblevmain.Antibody)
     END as antibody_display,
     tblevmain.DaAntibody as antibody_test_date,
+    CASE WHEN TIMESTAMPDIFF(DAY, tbleimain.DaBirth, COALESCE(tblevmain.DaAntibody, tblevmain.DatVisit)) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, COALESCE(tblevmain.DaAntibody, tblevmain.DatVisit)) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, tbleimain.DaBirth, COALESCE(tblevmain.DaAntibody, tblevmain.DatVisit)) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, COALESCE(tblevmain.DaAntibody, tblevmain.DatVisit))/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, COALESCE(tblevmain.DaAntibody, tblevmain.DatVisit))/365) AS CHAR), ' yr') END AS age_at_test,
     'Infant' as patient_type
 FROM tblevmain 
 INNER JOIN tbleimain ON tblevmain.ClinicID = tbleimain.ClinicID

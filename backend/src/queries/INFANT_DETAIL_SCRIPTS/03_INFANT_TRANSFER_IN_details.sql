@@ -25,11 +25,8 @@ SELECT
     c.DaBirth as DaBirth,
     c.DafirstVisit as DafirstVisit,
     NULL as DatVisit,
-    TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit) as age_days,
-    CASE 
-        WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit) <= 76 THEN '< 2 months'
-        ELSE '> 2 months'
-    END as age_category,
+    CASE WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit)/365) AS CHAR), ' yr') END AS age_at_test,
+    CASE WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.DafirstVisit) <= 76 THEN '< 2 months' ELSE '> 2 months' END as age_category,
     c.Offin as Offin,
     CASE 
         WHEN c.Offin = 0 THEN 'Not Transferred'

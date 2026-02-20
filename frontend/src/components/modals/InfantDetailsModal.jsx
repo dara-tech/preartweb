@@ -101,12 +101,16 @@ const labelFromKey = (key) => {
     patient_type: 'Patient Type',
     age_days: 'Age (days)',
     age_category: 'Age Category',
-    antibody_result: 'Antibody_result',
-    Antibody_result: 'Antibody_result',
-    antibody_display: 'Antibody_display',
-    Antibody_display: 'Antibody_display',
-    antibody_test_date: 'Antibody_test_da...',
-    TestDate: 'Test Date'
+    antibody_result: 'Result',
+    Antibody_result: 'Result',
+    antibody_display: 'Antibody Result',
+    Antibody_display: 'Antibody Result',
+    antibody_test_date: 'Antibody Test Date',
+    TestDate: 'Test Date',
+    dna_test_display: 'DNA Test',
+    result_display: 'Result',
+    age_at_test: 'Age at Test',
+    other_dna: 'Other DNA'
   }
   return map[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()).trim()
 }
@@ -127,15 +131,24 @@ const normalizeAgeCategory = (value) => {
 }
 
 // Normalize result / outcome fields so we can filter by \"negative\" / \"positive\"
-// Supports Result/Result_display (infant report) and antibody_result/antibody_display (PNTT infant antibody details)
+// Result/Result_display (DNA): 0 = Negative, 1 = Positive. Antibody: 0 = Positive, 1 = Negative.
 const getResultCategory = (row) => {
   const display = String(
     row.Result_display || row.result_display ||
     row.Antibody_display || row.antibody_display || ''
   ).toLowerCase().trim()
   const code = row.Result ?? row.result ?? row.Antibody_result ?? row.antibody_result
-  if (display.includes('negative') || code === 0 || code === '0') return 'negative'
-  if (display.includes('positive') || code === 1 || code === '1') return 'positive'
+  const isAntibody = row.Antibody_result != null || row.antibody_result != null ||
+    row.Antibody_display != null || row.antibody_display != null
+  if (display.includes('negative')) return 'negative'
+  if (display.includes('positive')) return 'positive'
+  if (isAntibody) {
+    if (code === 0 || code === '0') return 'positive'
+    if (code === 1 || code === '1') return 'negative'
+  } else {
+    if (code === 0 || code === '0') return 'negative'
+    if (code === 1 || code === '1') return 'positive'
+  }
   return null
 }
 

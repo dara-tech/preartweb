@@ -40,6 +40,7 @@ SELECT
         WHEN MAX(c.drug_status) = 0 THEN 'Started'
         ELSE CONCAT('Status: ', MAX(c.drug_status))
     END as status_display,
+    CASE WHEN TIMESTAMPDIFF(DAY, MAX(c.DaBirth), MIN(c.start_date)) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, MAX(c.DaBirth), MIN(c.start_date)) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, MAX(c.DaBirth), MIN(c.start_date)) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, MAX(c.DaBirth), MIN(c.start_date))/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, MAX(c.DaBirth), MIN(c.start_date))/365) AS CHAR), ' yr') END AS age_at_test,
     'Infant' as patient_type
 FROM (
     SELECT DISTINCT

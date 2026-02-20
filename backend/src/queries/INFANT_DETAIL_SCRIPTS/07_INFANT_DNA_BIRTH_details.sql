@@ -13,36 +13,35 @@ SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD)
 -- MAIN QUERY
 -- =====================================================
 -- DNA PCR Test at Birth (DNAPcr = 0)
--- Matches logic from Rinfants.vb line 413-418: COUNT(IF(c.DNAPcr = 0 and c.Result = X, 1, null))
--- The aggregate query uses UNION: tests from tbletest + visits from tblevmain with null results
+-- One row per test or waiting visit (like 09/11) so detail grid shows all records and click filter works
 SELECT 
     c.ClinicID as clinicid,
-    MAX(c.Sex) as sex,
+    c.Sex as sex,
     CASE 
-        WHEN MAX(c.Sex) = 0 THEN 'Female'
-        WHEN MAX(c.Sex) = 1 THEN 'Male'
+        WHEN c.Sex = 0 THEN 'Female'
+        WHEN c.Sex = 1 THEN 'Male'
         ELSE 'Unknown'
     END as sex_display,
-    MAX(c.DaBirth) as DaBirth,
-    MAX(c.DafirstVisit) as DafirstVisit,
-    MAX(c.DatVisit) as DatVisit,
-    MAX(c.DaBlood) as TestDate,
-    MAX(c.DNAPcr) as dna_test_type,
+    c.DaBirth as DaBirth,
+    c.DafirstVisit as DafirstVisit,
+    c.DatVisit as DatVisit,
+    COALESCE(c.DaBlood, c.DatVisit) as TestDate,
+    c.DNAPcr as dna_test_type,
     CASE 
-        WHEN MAX(c.DNAPcr) = 0 THEN 'At Birth'
-        WHEN MAX(c.DNAPcr) = 1 THEN '4-6 Weeks'
-        WHEN MAX(c.DNAPcr) = 5 THEN '9 Months'
-        WHEN MAX(c.DNAPcr) = 3 THEN 'OI'
-        WHEN MAX(c.DNAPcr) = 4 THEN 'Confirmatory'
-        ELSE CONCAT('Type: ', MAX(c.DNAPcr))
+        WHEN c.DNAPcr = 0 THEN 'At Birth'
+        WHEN c.DNAPcr = 1 THEN '4-6 Weeks'
+        WHEN c.DNAPcr = 5 THEN '9 Months'
+        WHEN c.DNAPcr = 3 THEN 'OI'
+        WHEN c.DNAPcr = 4 THEN 'Confirmatory'
+        ELSE CONCAT('Type: ', c.DNAPcr)
     END as dna_test_display,
-    MAX(c.OI) as other_dna,
-    IF(SUM(CASE WHEN c.Result IS NOT NULL THEN 1 ELSE 0 END) = 0, NULL, MAX(c.Result)) as result,
+    c.OI as other_dna,
+    c.Result as result,
     CASE 
-        WHEN SUM(CASE WHEN c.Result IS NOT NULL THEN 1 ELSE 0 END) = 0 THEN 'Waiting'
-        WHEN MAX(c.Result) = 1 THEN 'Positive'
-        WHEN MAX(c.Result) = 0 THEN 'Negative'
-        ELSE CONCAT('Result: ', MAX(c.Result))
+        WHEN c.Result IS NULL THEN 'Waiting'
+        WHEN c.Result = 1 THEN 'Positive'
+        WHEN c.Result = 0 THEN 'Negative'
+        ELSE CONCAT('Result: ', c.Result)
     END as result_display,
     'Infant' as patient_type
 FROM (
@@ -127,6 +126,5 @@ FROM (
     INNER JOIN tbleimain ei ON req.ClinicID = ei.ClinicID
     WHERE et.Result IS NULL  -- No matching test OR matching test has no result (waiting)
 ) c
-GROUP BY c.ClinicID
 ORDER BY TestDate DESC, clinicid;
 

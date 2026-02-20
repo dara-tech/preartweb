@@ -44,6 +44,7 @@ SELECT
         WHEN MAX(et.Result) IS NULL THEN 'Waiting'
         ELSE CONCAT('Result: ', MAX(et.Result))
     END as result_display,
+    CASE WHEN TIMESTAMPDIFF(DAY, MAX(c.DaBirth), COALESCE(MAX(et.DaBlood), MAX(c.DatVisit))) IS NULL THEN NULL WHEN TIMESTAMPDIFF(DAY, MAX(c.DaBirth), COALESCE(MAX(et.DaBlood), MAX(c.DatVisit))) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, MAX(c.DaBirth), COALESCE(MAX(et.DaBlood), MAX(c.DatVisit))) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, MAX(c.DaBirth), COALESCE(MAX(et.DaBlood), MAX(c.DatVisit))) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, MAX(c.DaBirth), COALESCE(MAX(et.DaBlood), MAX(c.DatVisit)))/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, MAX(c.DaBirth), COALESCE(MAX(et.DaBlood), MAX(c.DatVisit)))/365) AS CHAR), ' yr') END AS age_at_test,
     'Infant' as patient_type
 FROM (
     SELECT DISTINCT 

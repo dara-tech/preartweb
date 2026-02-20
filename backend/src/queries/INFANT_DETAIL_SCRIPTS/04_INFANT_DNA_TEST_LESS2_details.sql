@@ -27,11 +27,8 @@ SELECT
     ei.DafirstVisit as DafirstVisit,
     v.DatVisit as DatVisit,
     c.TestDate as TestDate,
-    TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate) as age_days_at_test,
-    CASE 
-        WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate) <= 76 THEN '< 2 months'
-        ELSE '> 2 months'
-    END as age_category,
+    CASE WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate)/365) AS CHAR), ' yr') END AS age_at_test,
+    CASE WHEN TIMESTAMPDIFF(DAY, c.DaBirth, c.TestDate) <= 76 THEN '< 2 months' ELSE '> 2 months' END as age_category,
     'Infant' as patient_type
 FROM (
     SELECT 

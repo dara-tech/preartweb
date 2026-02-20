@@ -38,6 +38,7 @@ SELECT DISTINCT
         WHEN c.Result = 0 THEN 'Negative'
         ELSE CONCAT('Result: ', c.Result)
     END AS result_display,
+    CASE WHEN TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit)) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit))/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, c.DaBirth, COALESCE(c.DaBlood, c.DatVisit))/365) AS CHAR), ' yr') END AS age_at_test,
     'Infant' AS patient_type
 FROM (
     -- Part 1: Tests from tbletest where DatTestArr is in date range (includes all tests, even with NULL results)
