@@ -15,7 +15,7 @@ SELECT
   ei.Sex,
   ps.Status,
   COUNT(DISTINCT ei.ClinicID) as count
-FROM tblEImain ei
+FROM tbleimain ei
 INNER JOIN tblevpatientstatus ps ON ei.ClinicID = ps.ClinicID
 WHERE ps.DaStatus BETWEEN @StartDate AND @EndDate
 GROUP BY ei.Sex, ps.Status

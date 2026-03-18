@@ -17,7 +17,7 @@ SELECT
   COUNT(IF(ei.Sex = 0 AND ev.Antibody = 0, 1, NULL)) as f_positive,
   COUNT(IF(ei.Sex = 1 AND ev.Antibody = 1, 1, NULL)) as m_negative,
   COUNT(IF(ei.Sex = 0 AND ev.Antibody = 1, 1, NULL)) as f_negative
-FROM tblEVmain ev
-INNER JOIN tblEImain ei ON ev.ClinicID = ei.ClinicID
+FROM tblevmain ev
+INNER JOIN tbleimain ei ON ev.ClinicID = ei.ClinicID
 WHERE ev.DatVisit BETWEEN @StartDate AND @EndDate
   AND ev.Antibody IS NOT NULL;

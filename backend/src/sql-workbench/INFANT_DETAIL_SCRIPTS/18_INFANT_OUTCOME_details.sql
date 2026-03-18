@@ -15,15 +15,15 @@ SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD)
 -- Patient Outcomes
 -- Status codes match frmExVisit.vb form: 0=DNA PCR(+), 1=HIV+, 2=HIV-, 3=Death, 4=Lost, 5=Transfer Out
 SELECT
-    tblEImain.ClinicID as clinicid,
-    tblEImain.Sex as sex,
+    tbleimain.ClinicID as clinicid,
+    tbleimain.Sex as sex,
     CASE 
-        WHEN tblEImain.Sex = 0 THEN 'Female'
-        WHEN tblEImain.Sex = 1 THEN 'Male'
+        WHEN tbleimain.Sex = 0 THEN 'Female'
+        WHEN tbleimain.Sex = 1 THEN 'Male'
         ELSE 'Unknown'
     END as sex_display,
-    tblEImain.DaBirth as DaBirth,
-    tblEImain.DafirstVisit as DafirstVisit,
+    tbleimain.DaBirth as DaBirth,
+    tbleimain.DafirstVisit as DafirstVisit,
     NULL as DatVisit,
     tblevpatientstatus.DaStatus as outcome_date,
     tblevpatientstatus.Status as status,
@@ -38,8 +38,8 @@ SELECT
     END as status_display,
     tblevpatientstatus.transfer_to_site as transfer_to_site,
     'Infant' as patient_type
-FROM tblEImain 
-INNER JOIN tblevpatientstatus ON tblEImain.ClinicID = tblevpatientstatus.ClinicID
+FROM tbleimain 
+INNER JOIN tblevpatientstatus ON tbleimain.ClinicID = tblevpatientstatus.ClinicID
 WHERE 
     tblevpatientstatus.DaStatus BETWEEN @StartDate AND @EndDate
 ORDER BY outcome_date DESC, clinicid;

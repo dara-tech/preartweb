@@ -3,10 +3,10 @@
 -- Parameters: @StartDate (start date of current quarter - this is Sdate in VB code)
 -- Logic matches Rinfants.vb Exposed() function exactly
 -- 
--- Original query: SELECT tblEImain.ClinicID, tblEImain.Sex, tblevpatientstatus.DaStatus, tblEImain.DafirstVisit 
---                 FROM tblevpatientstatus RIGHT OUTER JOIN tblEImain ON tblevpatientstatus.ClinicID = tblEImain.ClinicID 
---                 WHERE tblEImain.DafirstVisit < Sdate
---                 GROUP BY tblEImain.ClinicID, tblEImain.Sex, tblevpatientstatus.DaStatus, tblEImain.DafirstVisit
+-- Original query: SELECT tbleimain.ClinicID, tbleimain.Sex, tblevpatientstatus.DaStatus, tbleimain.DafirstVisit 
+--                 FROM tblevpatientstatus RIGHT OUTER JOIN tbleimain ON tblevpatientstatus.ClinicID = tbleimain.ClinicID 
+--                 WHERE tbleimain.DafirstVisit < Sdate
+--                 GROUP BY tbleimain.ClinicID, tbleimain.Sex, tblevpatientstatus.DaStatus, tbleimain.DafirstVisit
 --
 -- Logic in VB code (lines 100-112):
 --   Line 100: If DaStatus is empty AND DafirstVisit < Sdate → count (GoTo K1)
@@ -17,7 +17,7 @@
 -- 
 -- Simplified logic: Count if DaStatus is empty OR DaStatus >= Sdate
 -- Note: Sdate = Start of CURRENT quarter (not end of previous quarter!)
--- Note: RIGHT OUTER JOIN = FROM tblEImain LEFT OUTER JOIN tblevpatientstatus
+-- Note: RIGHT OUTER JOIN = FROM tbleimain LEFT OUTER JOIN tblevpatientstatus
 -- Note: GROUP BY can create duplicates, so we use DISTINCT to get unique patients
 
 SELECT DISTINCT
@@ -44,7 +44,7 @@ SELECT DISTINCT
     WHEN TIMESTAMPDIFF(DAY, ei.DaBirth, ei.DafirstVisit) <= 76 THEN '< 2 months'
     ELSE '> 2 months'
   END as age_category
-FROM tblEImain ei
+FROM tbleimain ei
 LEFT OUTER JOIN tblevpatientstatus ps ON ei.ClinicID = ps.ClinicID
 WHERE ei.DafirstVisit < @StartDate
   AND (

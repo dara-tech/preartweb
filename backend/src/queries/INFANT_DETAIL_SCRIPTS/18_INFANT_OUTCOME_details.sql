@@ -15,15 +15,15 @@ SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD)
 -- Patient Outcomes
 -- Status codes match frmExVisit.vb form: 0=DNA PCR(+), 1=HIV+, 2=HIV-, 3=Death, 4=Lost, 5=Transfer Out
 SELECT
-    tblEImain.ClinicID as clinicid,
-    tblEImain.Sex as sex,
+    tbleimain.ClinicID as clinicid,
+    tbleimain.Sex as sex,
     CASE 
-        WHEN tblEImain.Sex = 0 THEN 'Female'
-        WHEN tblEImain.Sex = 1 THEN 'Male'
+        WHEN tbleimain.Sex = 0 THEN 'Female'
+        WHEN tbleimain.Sex = 1 THEN 'Male'
         ELSE 'Unknown'
     END as sex_display,
-    tblEImain.DaBirth as DaBirth,
-    tblEImain.DafirstVisit as DafirstVisit,
+    tbleimain.DaBirth as DaBirth,
+    tbleimain.DafirstVisit as DafirstVisit,
     NULL as DatVisit,
     tblevpatientstatus.DaStatus as outcome_date,
     tblevpatientstatus.Status as status,
@@ -37,11 +37,11 @@ SELECT
         ELSE CONCAT('Status: ', tblevpatientstatus.Status)
     END as status_display,
     tblevpatientstatus.transfer_to_site as transfer_to_site,
-    CASE WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblEImain.DafirstVisit)/365) AS CHAR), ' yr') END AS age_at_test,
-    CASE WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tblEImain.DaBirth, tblevpatientstatus.DaStatus)/365) AS CHAR), ' yr') END AS age_at_outcome,
+    CASE WHEN TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tbleimain.DafirstVisit) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tbleimain.DafirstVisit) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tbleimain.DafirstVisit) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tbleimain.DafirstVisit)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tbleimain.DafirstVisit)/365) AS CHAR), ' yr') END AS age_at_test,
+    CASE WHEN TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tblevpatientstatus.DaStatus) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tblevpatientstatus.DaStatus) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tblevpatientstatus.DaStatus) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tblevpatientstatus.DaStatus)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, tbleimain.DaBirth, tblevpatientstatus.DaStatus)/365) AS CHAR), ' yr') END AS age_at_outcome,
     'Infant' as patient_type
-FROM tblEImain 
-INNER JOIN tblevpatientstatus ON tblEImain.ClinicID = tblevpatientstatus.ClinicID
+FROM tbleimain 
+INNER JOIN tblevpatientstatus ON tbleimain.ClinicID = tblevpatientstatus.ClinicID
 WHERE 
     tblevpatientstatus.DaStatus BETWEEN @StartDate AND @EndDate
 ORDER BY outcome_date DESC, clinicid;

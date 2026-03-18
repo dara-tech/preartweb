@@ -21,7 +21,7 @@ FROM (
   SELECT DISTINCT
     ei.ClinicID,
     ei.Sex
-  FROM tblEImain ei
+  FROM tbleimain ei
   LEFT OUTER JOIN tblevpatientstatus ps ON ei.ClinicID = ps.ClinicID
   WHERE ei.DafirstVisit < @StartDate
     AND (

@@ -49,7 +49,7 @@ SELECT DISTINCT
     WHEN ps.Status = 5 THEN 'Transfer Out'
     ELSE 'On Care'
   END as current_status
-FROM tblEImain ei
+FROM tbleimain ei
 LEFT OUTER JOIN tblevpatientstatus ps ON ei.ClinicID = ps.ClinicID
 WHERE (
   -- Previous quarter patients (on care at start of current quarter)

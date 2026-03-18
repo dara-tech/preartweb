@@ -12,18 +12,18 @@ SET @EndDate = '2025-03-31';
 -- MAIN QUERY
 -- =====================================================
 SELECT
-  tblEImain.ClinicID,
-  tblEImain.DaBirth,
-  tblEImain.Sex,
-  tblEVmain.DatVisit,
+  tbleimain.ClinicID,
+  tbleimain.DaBirth,
+  tbleimain.Sex,
+  tblevmain.DatVisit,
   tblevarvdrug.Status,
   tblevarvdrug.Da,
-  tblEImain.DafirstVisit
-FROM tblEVmain
-INNER JOIN tblEImain ON tblEVmain.ClinicID = tblEImain.ClinicID
-RIGHT OUTER JOIN tblevarvdrug ON tblEVmain.Vid = tblevarvdrug.Vid
+  tbleimain.DafirstVisit
+FROM tblevmain
+INNER JOIN tbleimain ON tblevmain.ClinicID = tbleimain.ClinicID
+RIGHT OUTER JOIN tblevarvdrug ON tblevmain.Vid = tblevarvdrug.Vid
 WHERE (tblevarvdrug.Status = 0 
   AND tblevarvdrug.DrugName = 'Cotrimoxazole') 
   AND (tblevarvdrug.Da BETWEEN @StartDate AND @EndDate)
 GROUP BY tbleimain.clinicid
-ORDER BY tblevarvdrug.Da, tblEImain.Sex;
+ORDER BY tblevarvdrug.Da, tbleimain.Sex;

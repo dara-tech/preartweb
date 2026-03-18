@@ -14,14 +14,14 @@ SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD)
 -- =====================================================
 -- Started Cotrimoxazole
 -- Matches logic from Rinfants.vb line 240: 
--- SELECT tblEImain.ClinicID, tblEImain.DaBirth, tblEImain.Sex, tblEVmain.DatVisit, 
---        tblevarvdrug.Status, tblevarvdrug.Da, tblEImain.DafirstVisit
--- FROM tblEVmain INNER JOIN tblEImain ON tblEVmain.ClinicID = tblEImain.ClinicID 
--- RIGHT OUTER JOIN tblevarvdrug ON tblEVmain.Vid = tblevarvdrug.Vid 
+-- SELECT tbleimain.ClinicID, tbleimain.DaBirth, tbleimain.Sex, tblevmain.DatVisit, 
+--        tblevarvdrug.Status, tblevarvdrug.Da, tbleimain.DafirstVisit
+-- FROM tblevmain INNER JOIN tbleimain ON tblevmain.ClinicID = tbleimain.ClinicID 
+-- RIGHT OUTER JOIN tblevarvdrug ON tblevmain.Vid = tblevarvdrug.Vid 
 -- WHERE (tblevarvdrug.Status = 0 and tblevarvdrug.DrugName='Cotrimoxazole') 
 --   and (tblevarvdrug.Da BETWEEN @StartDate AND @EndDate) 
 -- GROUP BY tbleimain.clinicid 
--- ORDER BY tblevarvdrug.Da, tblEImain.Sex
+-- ORDER BY tblevarvdrug.Da, tbleimain.Sex
 SELECT 
     c.ClinicID as clinicid,
     MAX(c.Sex) as sex,

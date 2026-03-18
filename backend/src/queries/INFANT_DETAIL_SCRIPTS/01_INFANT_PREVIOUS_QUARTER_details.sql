@@ -42,7 +42,7 @@ SELECT DISTINCT
   CASE WHEN TIMESTAMPDIFF(DAY, ei.DaBirth, ei.DafirstVisit) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, ei.DaBirth, ei.DafirstVisit) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, ei.DaBirth, ei.DafirstVisit) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, ei.DaBirth, ei.DafirstVisit)/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, ei.DaBirth, ei.DafirstVisit)/365) AS CHAR), ' yr') END AS age_at_test,
   CASE WHEN TIMESTAMPDIFF(DAY, ei.DaBirth, COALESCE(ps.DaStatus, @EndDate)) < 31 THEN CONCAT(CAST(TIMESTAMPDIFF(DAY, ei.DaBirth, COALESCE(ps.DaStatus, @EndDate)) AS CHAR), ' days') WHEN TIMESTAMPDIFF(DAY, ei.DaBirth, COALESCE(ps.DaStatus, @EndDate)) < 365 THEN CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, ei.DaBirth, COALESCE(ps.DaStatus, @EndDate))/30) AS CHAR), ' mo') ELSE CONCAT(CAST(FLOOR(TIMESTAMPDIFF(DAY, ei.DaBirth, COALESCE(ps.DaStatus, @EndDate))/365) AS CHAR), ' yr') END AS age_at_outcome,
   CASE WHEN TIMESTAMPDIFF(DAY, ei.DaBirth, ei.DafirstVisit) <= 76 THEN '< 2 months' ELSE '> 2 months' END as age_category
-FROM tblEImain ei
+FROM tbleimain ei
 LEFT OUTER JOIN tblevpatientstatus ps ON ei.ClinicID = ps.ClinicID
 WHERE ei.DafirstVisit < @StartDate
   AND (
