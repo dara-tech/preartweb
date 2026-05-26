@@ -262,7 +262,7 @@ WITH tblactive AS (
 )
 
 SELECT 
-    '10.4. TPT Start' AS Indicator, 
+    '11.4. TPT Start' AS Indicator, 
     SUM(IF(sex = 1 AND typepatients = '≤14', 1, 0)) AS Male_0_14,
     SUM(IF(sex = 0 AND typepatients = '≤14', 1, 0)) AS Female_0_14,
     SUM(IF(sex = 1 AND typepatients = '15+', 1, 0)) AS Male_over_14,

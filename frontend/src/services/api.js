@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// Determine API URL based on environment and hostname
-const getApiUrl = () => {
+// Determine API / WebSocket base URL (no trailing path; no trailing slash)
+export const getApiBaseUrl = () => {
   const hostname = window.location.hostname
   const protocol = window.location.protocol
   
@@ -23,7 +23,7 @@ const getApiUrl = () => {
   }
 }
 
-let API_BASE_URL = import.meta.env.VITE_API_URL || getApiUrl()
+let API_BASE_URL = import.meta.env.VITE_API_URL || getApiBaseUrl()
 
 // Clean up API_BASE_URL - remove any trailing /api or /apiv1 to avoid conflicts
 if (API_BASE_URL.endsWith('/api') || API_BASE_URL.endsWith('/apiv1')) {

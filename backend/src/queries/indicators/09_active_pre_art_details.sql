@@ -138,7 +138,7 @@ tbltptdrug AS (
 
 -- Return exactly the same records as the aggregate query
 SELECT
-    '9' as step,
+    '10' as step,
     i.clinicid,
     i.Sex AS sex,
     CASE 

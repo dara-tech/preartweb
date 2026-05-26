@@ -1,6 +1,14 @@
 const AnalyticsIndicator = require('../models/AnalyticsIndicator');
 const siteOptimizedIndicators = require('./siteOptimizedIndicators');
 const { sequelize } = require('../config/database');
+const {
+  NCHADS_INDICATOR_IDS,
+  INDICATOR_FILE_MAP,
+  INDICATOR_DISPLAY_NAMES,
+  isComputedIndicatorId,
+  buildIndicator9FromComponents,
+  injectIndicator9IntoAnalyticsMap
+} = require('../config/nchadsIndicatorRegistry');
 
 class AnalyticsEngine {
   constructor() {
@@ -138,7 +146,7 @@ class AnalyticsEngine {
     }
 
     // Define all indicators to calculate
-    const indicators = ['1', '2', '3', '4', '5', '5.1.1', '5.1.2', '5.1.3', '5.2', '6', '7', '8', '8.2', '8.3', '8.4', '9', '10', '10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7', '10.8'];
+    const indicators = NCHADS_INDICATOR_IDS;
 
     // Calculate for each quarter of the year
     for (let quarter = 1; quarter <= 4; quarter++) {
@@ -215,7 +223,7 @@ class AnalyticsEngine {
     }
 
     // Define all indicators to calculate
-    const indicators = ['1', '2', '3', '4', '5', '5.1.1', '5.1.2', '5.1.3', '5.2', '6', '7', '8', '8.2', '8.3', '8.4', '9', '10', '10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7', '10.8'];
+    const indicators = NCHADS_INDICATOR_IDS;
     log(`📋 Processing ${indicators.length} indicators across 4 quarters`, 'info', { 
       indicatorCount: indicators.length, 
       siteCount: sites.length,
@@ -320,36 +328,20 @@ class AnalyticsEngine {
       siteCode: siteCode
     };
 
-    // Map short indicator ID to full query file name
-    const indicatorMapping = {
-      '1': '01_active_art_previous',
-      '2': '02_active_pre_art_previous',
-      '3': '03_newly_enrolled',
-      '4': '04_retested_positive',
-      '5': '05_newly_initiated',
-      '5.1.1': '05.1.1_art_same_day',
-      '5.1.2': '05.1.2_art_1_7_days',
-      '5.1.3': '05.1.3_art_over_7_days',
-      '5.2': '05.2_art_with_tld',
-      '6': '06_transfer_in',
-      '7': '07_lost_and_return',
-      '8': '08_tpt_new_start',
-      '8.2': '08.2_dead',
-      '8.3': '08.3_lost_to_followup',
-      '8.4': '08.4_transfer_out',
-      '9': '09_active_pre_art',
-      '10': '10_active_art_current',
-      '10.1': '10.1_eligible_mmd',
-      '10.2': '10.2_mmd',
-      '10.3': '10.3_tld',
-      '10.4': '10.4_tpt_start',
-      '10.5': '10.5_tpt_complete',
-      '10.6': '10.6_eligible_vl_test',
-      '10.7': '10.7_vl_tested_12m',
-      '10.8': '10.8_vl_suppression'
-    };
+    if (indicatorId === '9') {
+      const componentRows = [];
+      for (const componentId of ['9.1', '9.2', '9.3']) {
+        const row = await this._calculateIndicatorValue(componentId, siteCode, period);
+        componentRows.push(row);
+      }
+      return buildIndicator9FromComponents(...componentRows);
+    }
 
-    const queryIndicatorId = indicatorMapping[indicatorId] || indicatorId;
+    // Map short indicator ID to full query file name
+    const queryIndicatorId = INDICATOR_FILE_MAP[indicatorId] || indicatorId;
+    if (isComputedIndicatorId(indicatorId) && !INDICATOR_FILE_MAP[indicatorId]) {
+      throw new Error(`Computed indicator ${indicatorId} has no SQL query`);
+    }
     console.log(`[Analytics] Calculating indicator ${indicatorId} -> ${queryIndicatorId} for site ${siteCode}`);
     
     // Use analytics-specific method that bypasses cache
@@ -519,23 +511,10 @@ class AnalyticsEngine {
       '5.2': 'New ART started with TLD',
       '6': 'Transfer-in patients',
       '7': 'Lost and Return',
-      '8': 'TPT Start (new start)',
-      '8.2': 'Dead',
-      '8.3': 'Lost to follow up (LTFU)',
-      '8.4': 'Transfer-out',
-      '9': 'Active Pre-ART',
-      '10': 'Active ART patients in this quarter',
-      '10.1': 'Eligible MMD',
-      '10.2': 'MMD',
-      '10.3': 'TLD',
-      '10.4': 'TPT Start',
-      '10.5': 'TPT Complete',
-      '10.6': 'Eligible for VL test',
-      '10.7': 'VL tested in 12M',
-      '10.8': 'VL suppression'
+      ...INDICATOR_DISPLAY_NAMES
     };
     
-    return indicatorNames[indicatorId] || `Indicator ${indicatorId}`;
+    return indicatorNames[indicatorId] || INDICATOR_DISPLAY_NAMES[indicatorId] || `Indicator ${indicatorId}`;
   }
 
   /**
@@ -687,6 +666,8 @@ class AnalyticsEngine {
         };
         indicators[record.indicator_id] = value;
       });
+
+      injectIndicator9IntoAnalyticsMap(indicators);
 
       return {
         success: true,

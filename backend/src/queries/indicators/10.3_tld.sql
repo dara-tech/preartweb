@@ -267,7 +267,7 @@ WITH tblactive AS (
 )
 
 SELECT 
-    '10.3. TLD' AS Indicator, 
+    '11.3. TLD' AS Indicator, 
     SUM(IF(sex = 1 AND typepatients = '≤14', 1, 0)) AS Male_0_14,
     SUM(IF(sex = 0 AND typepatients = '≤14', 1, 0)) AS Female_0_14,
     SUM(IF(sex = 1 AND typepatients = '15+', 1, 0)) AS Male_over_14,

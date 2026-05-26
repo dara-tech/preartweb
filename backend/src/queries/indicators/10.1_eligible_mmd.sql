@@ -158,7 +158,7 @@ with tblactive as (
     where id = 1 and e.status is null and a.ART is not null 
 )
 
-select '10.1. Eligible MMD' as Indicator, 
+select '11.1. Eligible MMD' as Indicator, 
        sum(if(sex = 1 and typepatients = '≤14', 1, 0)) as Male_0_14,
        sum(if(sex = 0 and typepatients = '≤14', 1, 0)) as Female_0_14,
        sum(if(sex = 1 and typepatients = '15+', 1, 0)) as Male_over_14,

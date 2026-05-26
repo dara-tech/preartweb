@@ -4,6 +4,32 @@ import { Terminal } from 'lucide-react';
 import { toast } from 'sonner';
 import io from 'socket.io-client';
 
+/** Origin only — Socket.IO treats URL paths as namespaces (e.g. /apiv1 → Invalid namespace) */
+function getSocketUrl() {
+  const { hostname, protocol } = window.location;
+  const isProduction =
+    protocol === 'https:' ||
+    hostname.includes('nchads.gov.kh') ||
+    import.meta.env.PROD;
+
+  let candidate = import.meta.env.VITE_WS_URL;
+  if (!candidate) {
+    if (isProduction) candidate = `${protocol}//${hostname}`;
+    else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      candidate = 'http://localhost:3001';
+    } else {
+      candidate = `http://${hostname}:3001`;
+    }
+  }
+
+  try {
+    const base = candidate.startsWith('http') ? candidate : `${protocol}//${candidate}`;
+    return new URL(base).origin;
+  } catch {
+    return candidate.replace(/\/$/, '').replace(/\/(apiv1|api)\/?$/, '');
+  }
+}
+
 // Helper function to check if current user is a viewer
 const isViewerUser = () => {
   try {
@@ -36,16 +62,16 @@ const RealTimeLogViewer = () => {
 
     const connectSocket = () => {
       try {
-        // Use environment variable or fallback to current host
-        const wsUrl = import.meta.env.VITE_WS_URL || 
-                     (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + 
-                     window.location.host;
+        // Must hit the Node backend (Socket.IO), not the static frontend on :5173
+        const wsUrl = getSocketUrl();
         
         newSocket = io(wsUrl, {
-          transports: ['websocket', 'polling'],
+          path: '/socket.io',
+          transports: ['polling', 'websocket'],
           timeout: 20000,
           forceNew: true,
-          autoConnect: true
+          autoConnect: true,
+          withCredentials: true
         });
 
         newSocket.on('connect', () => {

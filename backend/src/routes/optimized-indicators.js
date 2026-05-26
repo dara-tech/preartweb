@@ -5,6 +5,7 @@ const analyticsEngine = require('../services/analyticsEngine');
 const { siteDatabaseManager } = require('../config/siteDatabase');
 const { performance } = require('perf_hooks');
 const timeoutHandler = require('../middleware/timeoutHandler');
+const { injectIndicator9IntoDataArray } = require('../config/nchadsIndicatorRegistry');
 const router = express.Router();
 
 // Simple request deduplication
@@ -95,7 +96,7 @@ router.get('/all', async (req, res) => {
           console.log(`📊 Using analytics data for site ${params.siteCode} (${analyticsResult.count} indicators)`);
           
           // Convert analytics data to expected format
-          const results = Object.values(analyticsResult.data);
+          const results = injectIndicator9IntoDataArray(Object.values(analyticsResult.data));
           
           return {
             success: true,
@@ -168,7 +169,7 @@ router.get('/all', async (req, res) => {
             });
           });
           
-          const aggregatedResults = Array.from(indicatorMap.values());
+          const aggregatedResults = injectIndicator9IntoDataArray(Array.from(indicatorMap.values()));
           
           return {
             success: true,
@@ -205,7 +206,7 @@ router.get('/all', async (req, res) => {
         
         // Transform the result to match the expected format
         result = {
-          results: result.results.map(r => r.data || {}),
+          results: injectIndicator9IntoDataArray(result.results.map(r => r.data || {})),
           executionTime: result.executionTime,
           successCount: result.successCount,
           errorCount: result.errorCount
@@ -272,7 +273,7 @@ router.get('/all', async (req, res) => {
         }
         
         // Convert map to array
-        const aggregatedResults = Array.from(indicatorMap.values());
+        const aggregatedResults = injectIndicator9IntoDataArray(Array.from(indicatorMap.values()));
         
         result = {
           results: aggregatedResults,

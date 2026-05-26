@@ -17,6 +17,13 @@ import {
   validateDataConsistency,
   generateReportHTML
 } from '../../components/indicators';
+import {
+  NCHADS_INDICATOR_FILE_BY_LABEL,
+  NCHADS_INDICATOR_KHMER,
+  NCHADS_MAX_INDICATOR_NUM,
+  NCHADS_NAME_SORT_ORDER,
+  isComputedIndicatorRow
+} from '../../config/nchadsIndicatorLabels';
 
 const IndicatorsReport = () => {
   const { user } = useAuth();
@@ -185,86 +192,24 @@ const IndicatorsReport = () => {
           }));
         }
         
-        // Filter indicators to show only 1-10.8 range and sort them properly
+        // Filter indicators to show only 1–11.8 (NCHADS quarterly report range)
         const filteredIndicators = indicatorsData.filter(indicator => {
           if (!indicator.Indicator) return false;
           
-          // First try to extract number from the beginning (e.g., "1. Active ART...")
-          let match = indicator.Indicator.match(/^(\d+(?:\.\d+)*)/);
+          const match = indicator.Indicator.match(/^(\d+(?:\.\d+)*)/);
           if (match) {
             const indicatorNum = parseFloat(match[1]);
-            return indicatorNum >= 1 && indicatorNum <= 10.8;
+            return indicatorNum >= 1 && indicatorNum <= NCHADS_MAX_INDICATOR_NUM;
           }
           
-          // If no number prefix, check if it's a known indicator by name
-          const knownIndicators = [
-            'Active ART patients in previous quarter',
-            'Active Pre-ART patients in previous quarter', 
-            'Newly Enrolled',
-            'Re-tested positive',
-            'Newly Initiated',
-            'New ART started: Same day',
-            'New ART started: 1-7 days',
-            'New ART started: >7 days',
-            'New ART started with TLD',
-            'Transfer-in patients',
-            'Lost and Return',
-            'TPT Start (new start)',
-            'Dead',
-            'Lost to follow up (LTFU)',
-            'Transfer-out',
-            'Active Pre-ART',
-            'Active ART patients in this quarter',
-            'Eligible MMD',
-            'MMD',
-            'TLD',
-            'TPT Start',
-            'TPT Complete',
-            'Eligible for VL test',
-            'VL tested in 12M',
-            'VL suppression'
-          ];
-          
-          return knownIndicators.includes(indicator.Indicator);
+          return Object.prototype.hasOwnProperty.call(NCHADS_NAME_SORT_ORDER, indicator.Indicator);
         }).sort((a, b) => {
-          // Sort indicators in the correct order 1-10.8
           const getIndicatorNumber = (indicator) => {
-            // First try to extract number from the beginning
             const match = indicator.Indicator.match(/^(\d+(?:\.\d+)*)/);
             if (match) {
               return parseFloat(match[1]);
             }
-            
-            // Map indicator names to their numbers for sorting
-            const nameToNumber = {
-              'Active ART patients in previous quarter': 1,
-              'Active Pre-ART patients in previous quarter': 2,
-              'Newly Enrolled': 3,
-              'Re-tested positive': 4,
-              'Newly Initiated': 5,
-              'New ART started: Same day': 5.1,
-              'New ART started: 1-7 days': 5.1,
-              'New ART started: >7 days': 5.1,
-              'New ART started with TLD': 5.2,
-              'Transfer-in patients': 6,
-              'Lost and Return': 7,
-              'TPT Start (new start)': 8,
-              'Dead': 8.2,
-              'Lost to follow up (LTFU)': 8.3,
-              'Transfer-out': 8.4,
-              'Active Pre-ART': 9,
-              'Active ART patients in this quarter': 10,
-              'Eligible MMD': 10.1,
-              'MMD': 10.2,
-              'TLD': 10.3,
-              'TPT Start': 10.4,
-              'TPT Complete': 10.5,
-              'Eligible for VL test': 10.6,
-              'VL tested in 12M': 10.7,
-              'VL suppression': 10.8
-            };
-            
-            return nameToNumber[indicator.Indicator] || 999; // Put unknown indicators at the end
+            return NCHADS_NAME_SORT_ORDER[indicator.Indicator] ?? 999;
           };
           
           return getIndicatorNumber(a) - getIndicatorNumber(b);
@@ -391,6 +336,9 @@ const IndicatorsReport = () => {
 
   // Modal handlers
   const handleIndicatorClick = async (indicator, filters = {}) => {
+    if (isComputedIndicatorRow(indicator)) {
+      return;
+    }
     setSelectedIndicator(indicator);
     setCurrentFilters(filters);
     setShowDetailsModal(true);
@@ -445,61 +393,7 @@ const IndicatorsReport = () => {
     try {
       // Map indicator names to their corresponding SQL file names
       // Handle both numbered and non-numbered indicator names
-      const indicatorMap = {
-        // Numbered versions (from original data)
-        '1. Active ART patients in previous quarter': '01_active_art_previous',
-        '2. Active Pre-ART patients in previous quarter': '02_active_pre_art_previous',
-        '3. Newly Enrolled': '03_newly_enrolled',
-        '4. Re-tested positive': '04_retested_positive',
-        '5. Newly Initiated': '05_newly_initiated',
-        '5.1.1. New ART started: Same day': '05.1.1_art_same_day',
-        '5.1.2. New ART started: 1-7 days': '05.1.2_art_1_7_days',
-        '5.1.3. New ART started: >7 days': '05.1.3_art_over_7_days',
-        '5.2. New ART started with TLD': '05.2_art_with_tld',
-        '6. Transfer-in patients': '06_transfer_in',
-        '7. Lost and Return': '07_lost_and_return',
-        '8. TPT Start (new start)': '08_tpt_new_start',
-        '8.2. Dead': '08.2_dead',
-        '8.3. Lost to follow up (LTFU)': '08.3_lost_to_followup',
-        '8.4. Transfer-out': '08.4_transfer_out',
-        '9. Active Pre-ART': '09_active_pre_art',
-        '10. Active ART patients in this quarter': '10_active_art_current',
-        '10.1. Eligible MMD': '10.1_eligible_mmd',
-        '10.2. MMD': '10.2_mmd',
-        '10.3. TLD': '10.3_tld',
-        '10.4. TPT Start': '10.4_tpt_start',
-        '10.5. TPT Complete': '10.5_tpt_complete',
-        '10.6. Eligible for VL test': '10.6_eligible_vl_test',
-        '10.7. VL tested in 12M': '10.7_vl_tested_12m',
-        '10.8. VL suppression': '10.8_vl_suppression',
-        
-        // Non-numbered versions (from analytics data)
-        'Active ART patients in previous quarter': '01_active_art_previous',
-        'Active Pre-ART patients in previous quarter': '02_active_pre_art_previous',
-        'Newly Enrolled': '03_newly_enrolled',
-        'Re-tested positive': '04_retested_positive',
-        'Newly Initiated': '05_newly_initiated',
-        'New ART started: Same day': '05.1.1_art_same_day',
-        'New ART started: 1-7 days': '05.1.2_art_1_7_days',
-        'New ART started: >7 days': '05.1.3_art_over_7_days',
-        'New ART started with TLD': '05.2_art_with_tld',
-        'Transfer-in patients': '06_transfer_in',
-        'Lost and Return': '07_lost_and_return',
-        'TPT Start (new start)': '08_tpt_new_start',
-        'Dead': '08.2_dead',
-        'Lost to follow up (LTFU)': '08.3_lost_to_followup',
-        'Transfer-out': '08.4_transfer_out',
-        'Active Pre-ART': '09_active_pre_art',
-        'Active ART patients in this quarter': '10_active_art_current',
-        'Eligible MMD': '10.1_eligible_mmd',
-        'MMD': '10.2_mmd',
-        'TLD': '10.3_tld',
-        'TPT Start': '10.4_tpt_start',
-        'TPT Complete': '10.5_tpt_complete',
-        'Eligible for VL test': '10.6_eligible_vl_test',
-        'VL tested in 12M': '10.7_vl_tested_12m',
-        'VL suppression': '10.8_vl_suppression'
-      };
+      const indicatorMap = { ...NCHADS_INDICATOR_FILE_BY_LABEL };
 
       const indicatorKey = indicatorMap[indicator.Indicator] || indicator.Indicator;
       
@@ -661,24 +555,12 @@ const IndicatorsReport = () => {
       '5.1.2. New ART started: 1-7 days': '5.1.2. ពី ១ ទៅ ៧ ថ្ងៃ (1–7 days)',
       '5.1.3. New ART started: >7 days': '5.1.3. ច្រើនជាង ៧ ថ្ងៃ (>7 days)',
       '5.2. New ART started with TLD': '5.2. ចំនួនអ្នកជំងឹចាប់ផ្តើមព្យាបាលថ្មីដោយ TDF+3TC+DTG (Number of new ART started with TLD)',
+      '5.3. New ART patients who are pregnant': '5.3. ចំនួនអ្នកជំងឺ ART ថ្មីដែលមានផ្ទៃពោះ (Number of new ART patients who are pregnant)',
       '6. Transfer-in patients': '6. ចំនួនអ្នកជំងឺដែលបានបញ្ជូនចូល (Number of transfer-in patients)',
       '7. Lost and Return': '7. ចំនួនអ្នកជំងឺដែលបានបោះបង់ហើយត្រឡប់មកវិញ (Number of Lost-Return patients)',
       '7.1. In the same ART site': '7.1. នៅក្នុងសេវា ART តែមួយ (In the same ART site)',
       '7.2. From other ART site': '7.2. មកពីសេវា ART ផ្សេង (From other ART site)',
-      '8. TPT Start (new start)': '8. ចំនួនអ្នកជំងឺចាប់ផ្តើម TPT ថ្មីក្នុងត្រីមាស (TPT Start – new start in period)',
-      '8.2. Dead': '8.2. ចំនួនអ្នកជំងឺដែលបានស្លាប់ (Dead)',
-      '8.3. Lost to follow up (LTFU)': '8.3. ចំនួនអ្នកជំងឺដែលបានបោះបង់ (Lost to follow up – LTFU)',
-      '8.4. Transfer-out': '8.4. ចំនួនអ្នកជំងឺដែលបានបញ្ជូនចេញ (Transfer-out)',
-      '9. Active Pre-ART': '9. ចំនួនអ្នកជំងឺ Pre-ART សកម្មដល់ចុងត្រីមាសនេះ (Number of active Pre-ART patients in this quarter)',
-      '10. Active ART patients in this quarter': '10. ចំនួនអ្នកជំងឺ ART សកម្មដល់ចុងត្រីមាសនេះ (Number of active ART patients in this quarter)',
-      '10.1. Eligible MMD': '10.1. ចំនួនអ្នកជំងឺដែលសមស្របសំរាប់ការផ្តល់ថ្នាំរយៈពេលវែង (Eligible for Multi Month Dispensing – MMD)',
-      '10.2. MMD': '10.2. ចំនួនអ្នកជំងឺកំពុងទទួលថ្នាំរយៈពេលវែង (Number of patients received MMD)',
-      '10.3. TLD': '10.3. ចំនួនអ្នកជំងឺកំពុងទទួលការព្យាបាលដោយ TLD (Number of patients received TLD)',
-      '10.4. TPT Start': '10.4. ចំនួនអ្នកជំងឺដែលបានចាប់ផ្តើមការបង្ការជំងឺរបេង (Number of patients started TPT)',
-      '10.5. TPT Complete': '10.5. ចំនួនអ្នកជំងឺដែលបានបញ្ចប់ការបង្ការជំងឺរបេង (Number of patients completed TPT)',
-      '10.6. Eligible for VL test': '10.6. ចំនួនអ្នកជំងឺដែលសមស្របធ្វើតេស្ត Viral Load (Eligible for Viral Load test)',
-      '10.7. VL tested in 12M': '10.7. ចំនួនអ្នកជំងឺធ្វើតេស្ត Viral Load ក្នុងរយៈពេល ១២ ខែចុងក្រោយ (Receive VL test in last 12 months)',
-      '10.8. VL suppression': '10.8. ចំនួនអ្នកជំងឺដែលមានលទ្ធផល VL ចុងក្រោយតិចជាង 1000 copies (Last VL is suppressed)'
+      ...NCHADS_INDICATOR_KHMER
     };
     return nameMap[backendName] || backendName;
   };

@@ -81,7 +81,7 @@ tblactive AS (
 )
 
 SELECT
-    '10.6' as step,
+    '11.6' as step,
     ClinicID as clinicid,
     Sex as sex,
     CASE 

@@ -13,6 +13,7 @@ import {
   SortDesc,
 } from 'lucide-react';
 import { formatDateForTable } from '@/utils/dateFormatter';
+import { NCHADS_INDICATOR_FILE_BY_LABEL } from '../../config/nchadsIndicatorLabels';
 import { getCorrectPatientType } from '@/utils/ageCalculator';
 import { toast } from 'sonner';
 
@@ -605,59 +606,7 @@ const IndicatorDetailsModal = ({
       }
       
       // Map indicator names to their corresponding SQL file names
-      const indicatorMap = {
-        '1. Active ART patients in previous quarter': '01_active_art_previous',
-        '2. Active Pre-ART patients in previous quarter': '02_active_pre_art_previous',
-        '3. Newly Enrolled': '03_newly_enrolled',
-        '4. Re-tested positive': '04_retested_positive',
-        '5. Newly Initiated': '05_newly_initiated',
-        '5.1.1. New ART started: Same day': '05.1.1_art_same_day',
-        '5.1.2. New ART started: 1-7 days': '05.1.2_art_1_7_days',
-        '5.1.3. New ART started: >7 days': '05.1.3_art_over_7_days',
-        '5.2. New ART started with TLD': '05.2_art_with_tld',
-        '6. Transfer-in patients': '06_transfer_in',
-        '7. Lost and Return': '07_lost_and_return',
-        '8. TPT Start (new start)': '08_tpt_new_start',
-        '8.2. Dead': '08.2_dead',
-        '8.3. Lost to follow up (LTFU)': '08.3_lost_to_followup',
-        '8.4. Transfer-out': '08.4_transfer_out',
-        '9. Active Pre-ART': '09_active_pre_art',
-        '10. Active ART patients in this quarter': '10_active_art_current',
-        '10.1. Eligible MMD': '10.1_eligible_mmd',
-        '10.2. MMD': '10.2_mmd',
-        '10.3. TLD': '10.3_tld',
-        '10.4. TPT Start': '10.4_tpt_start',
-        '10.5. TPT Complete': '10.5_tpt_complete',
-        '10.6. Eligible for VL test': '10.6_eligible_vl_test',
-        '10.7. VL tested in 12M': '10.7_vl_tested_12m',
-        '10.8. VL suppression': '10.8_vl_suppression',
-        // Handle analytics data names (without numbers)
-        'Active ART patients in previous quarter': '01_active_art_previous',
-        'Active Pre-ART patients in previous quarter': '02_active_pre_art_previous',
-        'Newly Enrolled': '03_newly_enrolled',
-        'Re-tested positive': '04_retested_positive',
-        'Newly Initiated': '05_newly_initiated',
-        'New ART started: Same day': '05.1.1_art_same_day',
-        'New ART started: 1-7 days': '05.1.2_art_1_7_days',
-        'New ART started: >7 days': '05.1.3_art_over_7_days',
-        'New ART started with TLD': '05.2_art_with_tld',
-        'Transfer-in patients': '06_transfer_in',
-        'Lost and Return': '07_lost_and_return',
-        'TPT Start (new start)': '08_tpt_new_start',
-        'Dead': '08.2_dead',
-        'Lost to follow up (LTFU)': '08.3_lost_to_followup',
-        'Transfer-out': '08.4_transfer_out',
-        'Active Pre-ART': '09_active_pre_art',
-        'Active ART patients in this quarter': '10_active_art_current',
-        'Eligible MMD': '10.1_eligible_mmd',
-        'MMD': '10.2_mmd',
-        'TLD': '10.3_tld',
-        'TPT Start': '10.4_tpt_start',
-        'TPT Complete': '10.5_tpt_complete',
-        'Eligible for VL test': '10.6_eligible_vl_test',
-        'VL tested in 12M': '10.7_vl_tested_12m',
-        'VL suppression': '10.8_vl_suppression'
-      };
+      const indicatorMap = { ...NCHADS_INDICATOR_FILE_BY_LABEL };
 
       // Use the same indicator key as the UI (without _details suffix)
       const indicatorKey = indicatorMap[selectedIndicator.Indicator] || selectedIndicator.Indicator;

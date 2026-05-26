@@ -2,6 +2,10 @@ const { siteDatabaseManager } = require('../config/siteDatabase');
 const { cache, cacheKeys } = require('./cache');
 const fs = require('fs');
 const path = require('path');
+const {
+  INDICATOR_DETAIL_FILE_MAP,
+  injectIndicator9IntoSiteResults
+} = require('../config/nchadsIndicatorRegistry');
 
 /**
  * Site-Optimized Indicators Service
@@ -29,6 +33,7 @@ class SiteOptimizedIndicators {
       '05.1.2_art_1_7_days.sql',
       '05.1.3_art_over_7_days.sql',
       '05.2_art_with_tld.sql',
+      '05.3_art_pregnant.sql',
       '06_transfer_in.sql',
       '07_lost_and_return.sql',
       '08_tpt_new_start.sql',
@@ -58,6 +63,7 @@ class SiteOptimizedIndicators {
       '05.1.2_art_1_7_days_details.sql',
       '05.1.3_art_over_7_days_details.sql',
       '05.2_art_with_tld_details.sql',
+      '05.3_art_pregnant_details.sql',
       '06_transfer_in_details.sql',
       '07_lost_and_return_details.sql',
       '08_tpt_new_start_details.sql',
@@ -341,7 +347,7 @@ class SiteOptimizedIndicators {
       Promise.all(slowPromises)
     ]);
 
-    const allResults = [...fastResults, ...slowResults];
+    const allResults = injectIndicator9IntoSiteResults([...fastResults, ...slowResults]);
     const executionTime = performance.now() - startTime;
     const successCount = allResults.filter(r => r.success).length;
     const errorCount = allResults.filter(r => !r.success).length;
@@ -418,35 +424,7 @@ class SiteOptimizedIndicators {
   // Get site-specific indicator details
   async executeSiteIndicatorDetails(siteCode, indicatorId, params, page = 1, limit = 50, search = '', ageGroup = '', gender = '') {
     // Map short indicator ID to full detail query name
-    const detailQueryMapping = {
-      '1': '01_active_art_previous_details',
-      '2': '02_active_pre_art_previous_details',
-      '3': '03_newly_enrolled_details',
-      '4': '04_retested_positive_details',
-      '5': '05_newly_initiated_details',
-      '5.1.1': '05.1.1_art_same_day_details',
-      '5.1.2': '05.1.2_art_1_7_days_details',
-      '5.1.3': '05.1.3_art_over_7_days_details',
-      '5.2': '05.2_art_with_tld_details',
-      '6': '06_transfer_in_details',
-      '7': '07_lost_and_return_details',
-      '8': '08_tpt_new_start_details',
-      '8.2': '08.2_dead_details',
-      '8.3': '08.3_lost_to_followup_details',
-      '8.4': '08.4_transfer_out_details',
-      '9': '09_active_pre_art_details',
-      '10': '10_active_art_current_details',
-      '10.1': '10.1_eligible_mmd_details',
-      '10.2': '10.2_mmd_details',
-      '10.3': '10.3_tld_details',
-      '10.4': '10.4_tpt_start_details',
-      '10.5': '10.5_tpt_complete_details',
-      '10.6': '10.6_eligible_vl_test_details',
-      '10.7': '10.7_vl_tested_12m_details',
-      '10.8': '10.8_vl_suppression_details'
-    };
-    
-    const detailIndicatorId = detailQueryMapping[indicatorId] || `${indicatorId}_details`;
+    const detailIndicatorId = INDICATOR_DETAIL_FILE_MAP[indicatorId] || `${indicatorId}_details`;
     const query = this.queries.get(detailIndicatorId);
     
     if (!query) {

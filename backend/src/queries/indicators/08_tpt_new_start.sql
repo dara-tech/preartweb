@@ -189,7 +189,7 @@ tpt_merged AS (
 )
 
 SELECT
-    '8. TPT Start (new start)' AS Indicator,
+    '8. Number of patients started TPT in this quarter' AS Indicator,
     IFNULL(SUM(IF(Sex = 1 AND typepatients = '≤14', 1, 0)), 0) AS Male_0_14,
     IFNULL(SUM(IF(Sex = 0 AND typepatients = '≤14', 1, 0)), 0) AS Female_0_14,
     IFNULL(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)), 0) AS Male_over_14,

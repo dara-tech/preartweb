@@ -253,7 +253,7 @@ with tblactive as (
 )
 
 select 
-    '10.5. TPT Complete' as Indicator, 
+    '11.5. TPT Complete' as Indicator, 
     sum(if(sex = 1 and typepatients = '≤14', 1, 0)) as Male_0_14,
     sum(if(sex = 0 and typepatients = '≤14', 1, 0)) as Female_0_14,
     sum(if(sex = 1 and typepatients = '15+', 1, 0)) as Male_over_14,

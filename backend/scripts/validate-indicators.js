@@ -40,34 +40,7 @@ const TEST_PARAMS = {
   tpt_drug_list: "'Isoniazid','3HP','6H'"
 };
 
-// Indicator mapping
-const INDICATOR_MAP = {
-  '1': '01_active_art_previous',
-  '2': '02_active_pre_art_previous',
-  '3': '03_newly_enrolled',
-  '4': '04_retested_positive',
-  '5': '05_newly_initiated',
-  '5.1.1': '05.1.1_art_same_day',
-  '5.1.2': '05.1.2_art_1_7_days',
-  '5.1.3': '05.1.3_art_over_7_days',
-  '5.2': '05.2_art_with_tld',
-  '6': '06_transfer_in',
-  '7': '07_lost_and_return',
-  '8': '08_tpt_new_start',
-  '8.2': '08.2_dead',
-  '8.3': '08.3_lost_to_followup',
-  '8.4': '08.4_transfer_out',
-  '9': '09_active_pre_art',
-  '10': '10_active_art_current',
-  '10.1': '10.1_eligible_mmd',
-  '10.2': '10.2_mmd',
-  '10.3': '10.3_tld',
-  '10.4': '10.4_tpt_start',
-  '10.5': '10.5_tpt_complete',
-  '10.6': '10.6_eligible_vl_test',
-  '10.7': '10.7_vl_tested_12m',
-  '10.8': '10.8_vl_suppression'
-};
+const { INDICATOR_FILE_MAP: INDICATOR_MAP } = require('../src/config/nchadsIndicatorRegistry');
 
 // Load and execute a query
 async function executeQuery(queryFile, params) {
