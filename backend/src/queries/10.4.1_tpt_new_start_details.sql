@@ -36,7 +36,7 @@ tblimain AS (
     SELECT
         ClinicID,
         DafirstVisit,
-        "≤14" AS typepatients,
+        "<=14" AS typepatients,
         '' AS TypeofReturn,
         DaBirth,
         TIMESTAMPDIFF(YEAR, DaBirth, :EndDate) AS age,
@@ -207,7 +207,7 @@ SELECT
     i.age,
     CASE
         WHEN i.typepatients = '15+' THEN 'Adult'
-        WHEN i.typepatients = '≤14' THEN 'Child'
+        WHEN i.typepatients = '<=14' THEN 'Child'
         ELSE 'Unknown'
     END AS patient_type,
     a.ART,

@@ -1,4 +1,4 @@
--- TPT Start — new start in reporting period only (8)
+-- TPT Start - new start in reporting period only (8)
 -- Same cohort logic as 10.4_tpt_start; counts patients whose first TPT start date is between :StartDate and :EndDate.
 WITH tblvisit AS (
     SELECT clinicid
@@ -23,7 +23,7 @@ tblimain AS (
     FROM tblaimain
     WHERE DafirstVisit <= :EndDate
     UNION ALL
-    SELECT ClinicID, "≤14" AS typepatients, Sex
+    SELECT ClinicID, "<=14" AS typepatients, Sex
     FROM tblcimain
     WHERE DafirstVisit <= :EndDate
 ),
@@ -190,8 +190,8 @@ tpt_merged AS (
 
 SELECT
     '8. Number of patients started TPT in this quarter' AS Indicator,
-    IFNULL(SUM(IF(Sex = 1 AND typepatients = '≤14', 1, 0)), 0) AS Male_0_14,
-    IFNULL(SUM(IF(Sex = 0 AND typepatients = '≤14', 1, 0)), 0) AS Female_0_14,
+    IFNULL(SUM(IF(Sex = 1 AND typepatients = '<=14', 1, 0)), 0) AS Male_0_14,
+    IFNULL(SUM(IF(Sex = 0 AND typepatients = '<=14', 1, 0)), 0) AS Female_0_14,
     IFNULL(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)), 0) AS Male_over_14,
     IFNULL(SUM(IF(Sex = 0 AND typepatients = '15+', 1, 0)), 0) AS Female_over_14,
     IFNULL(COUNT(*), 0) AS TOTAL

@@ -1,5 +1,16 @@
--- TPT Start — new start in reporting period only (10.4.1)
--- Same cohort logic as 10.4_tpt_start; counts patients whose first TPT start date is between :StartDate and :EndDate.
+-- =====================================================
+-- 10.4.1 TPT Start - new start in reporting period only
+-- MySQL Workbench: connect to SITE database (e.g. preart_0103), then run all
+-- =====================================================
+
+SET @StartDate = '2026-01-01';
+SET @EndDate   = '2026-03-31';
+
+-- Optional: confirm parameters
+-- SELECT @StartDate AS StartDate, @EndDate AS EndDate;
+
+-- TPT Start - new start in reporting period only (10.4.1)
+-- Counts patients whose first TPT start date is between @StartDate and @EndDate.
 WITH tblvisit AS (
     SELECT clinicid
     FROM (
@@ -9,11 +20,11 @@ WITH tblvisit AS (
         FROM (
             SELECT clinicid, DatVisit
             FROM tblavmain
-            WHERE DatVisit <= :EndDate
+            WHERE DatVisit <= @EndDate
             UNION ALL
             SELECT clinicid, DatVisit
             FROM tblcvmain
-            WHERE DatVisit <= :EndDate
+            WHERE DatVisit <= @EndDate
         ) all_visits
     ) latest_visit
     WHERE rn = 1
@@ -21,29 +32,29 @@ WITH tblvisit AS (
 tblimain AS (
     SELECT ClinicID, "15+" AS typepatients, Sex
     FROM tblaimain
-    WHERE DafirstVisit <= :EndDate
+    WHERE DafirstVisit <= @EndDate
     UNION ALL
-    SELECT ClinicID, "≤14" AS typepatients, Sex
+    SELECT ClinicID, "<=14" AS typepatients, Sex
     FROM tblcimain
-    WHERE DafirstVisit <= :EndDate
+    WHERE DafirstVisit <= @EndDate
 ),
 tblart AS (
     SELECT ClinicID, ART
     FROM tblaart
-    WHERE DaArt <= :EndDate
+    WHERE DaArt <= @EndDate
     UNION ALL
     SELECT ClinicID, ART
     FROM tblcart
-    WHERE DaArt <= :EndDate
+    WHERE DaArt <= @EndDate
 ),
 tblexit AS (
     SELECT clinicid, status
     FROM tblavpatientstatus
-    WHERE da <= :EndDate
+    WHERE da <= @EndDate
     UNION ALL
     SELECT clinicid, status
     FROM tblcvpatientstatus
-    WHERE da <= :EndDate
+    WHERE da <= @EndDate
 ),
 tbltptdrug_visit AS (
     WITH tbltptdrugs AS (
@@ -80,7 +91,7 @@ tbltptdrug_visit AS (
                 ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit ASC) AS rn
             FROM tbltptall
             WHERE status = 0
-              AND DatVisit <= :EndDate
+              AND DatVisit <= @EndDate
         ) s
         WHERE rn = 1
     ),
@@ -92,7 +103,7 @@ tbltptdrug_visit AS (
                 ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY Da DESC) AS rn
             FROM tbltptall
             WHERE status = 1
-              AND Da <= :EndDate
+              AND Da <= @EndDate
         ) s
         WHERE rn = 1
     )
@@ -133,7 +144,7 @@ tbltptdrug_forma AS (
     WHERE DaStartTPT >= '1990-01-02'
       AND TPTdrug >= 0
       AND TPT IN (1, 2)
-      AND DafirstVisit <= :EndDate
+      AND DafirstVisit <= @EndDate
     UNION ALL
     SELECT
         ClinicID AS clinicid,
@@ -151,7 +162,7 @@ tbltptdrug_forma AS (
     WHERE DaStartTPT >= '1990-01-02'
       AND TPTdrug >= 0
       AND Inh IN (0, 3)
-      AND DaFirstVisit <= :EndDate
+      AND DaFirstVisit <= @EndDate
 ),
 tpt_merged AS (
     SELECT
@@ -190,11 +201,11 @@ tpt_merged AS (
 
 SELECT
     '8. TPT Start (new start)' AS Indicator,
-    IFNULL(SUM(IF(Sex = 1 AND typepatients = '≤14', 1, 0)), 0) AS Male_0_14,
-    IFNULL(SUM(IF(Sex = 0 AND typepatients = '≤14', 1, 0)), 0) AS Female_0_14,
+    IFNULL(SUM(IF(Sex = 1 AND typepatients = '<=14', 1, 0)), 0) AS Male_0_14,
+    IFNULL(SUM(IF(Sex = 0 AND typepatients = '<=14', 1, 0)), 0) AS Female_0_14,
     IFNULL(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)), 0) AS Male_over_14,
     IFNULL(SUM(IF(Sex = 0 AND typepatients = '15+', 1, 0)), 0) AS Female_over_14,
     IFNULL(COUNT(*), 0) AS TOTAL
 FROM tpt_merged
 WHERE tptstatus != 'Not Start'
-  AND dateStart BETWEEN :StartDate AND :EndDate;
+  AND dateStart BETWEEN @StartDate AND @EndDate;
