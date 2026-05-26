@@ -1,43 +1,24 @@
 -- =====================================================
 -- ART Web Complete Indicators Analysis - Workbench SQL
--- Generated: 2025-10-16T17:34:57.186Z
+-- Generated: 2026-05-26T13:19:28.135Z
 -- 
 -- This file contains all HIV/AIDS indicators with parameters
 -- Ready to use in MySQL Workbench, phpMyAdmin, or any SQL workbench
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
--- Set these parameters before running this query
+-- Set these parameters before running the queries
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
+SET @reportingPeriod = 'Q1 2024';          -- Reporting period description
 
--- Status codes
-SET @lost_code = 0;                        -- Lost to follow-up status code
-SET @dead_code = 1;                        -- Dead status code
-SET @transfer_out_code = 3;                -- Transfer out status code
-SET @transfer_in_code = 1;                 -- Transfer in status code
-SET @mmd_eligible_code = 0;                -- MMD eligible status code
-
--- Clinical parameters
-SET @mmd_drug_quantity = 60;               -- MMD drug quantity threshold
-SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
-SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
-SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
--- =====================================================
--- PARAMETER SETUP
--- Set these parameters before running this query
-
--- Date parameters (Quarterly period)
-SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
-SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
-SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
-
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -50,6 +31,56 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
+-- DATABASE INFORMATION
+-- =====================================================
+-- This analysis uses the following main tables:
+-- - tblaimain: Adult patient data
+-- - tblcimain: Child patient data  
+-- - tbleimain: Infant patient data
+-- - tblavpatientstatus: Patient status data
+-- - tblsitename: Site information
+-- - tblclinic: Clinic information
+
+-- =====================================================
+-- INDICATOR QUERIES
+-- =====================================================
+
+-- =====================================================
+-- INDICATOR 1: 01 ACTIVE ART PREVIOUS
+-- File: 01_active_art_previous.sql
+-- =====================================================
+
+-- =====================================================
+-- 01 ACTIVE ART PREVIOUS
+-- Generated: 2026-05-26T13:19:28.136Z
+-- =====================================================
+
+-- =====================================================
+-- PARAMETER SETUP (matching service configuration)
+-- =====================================================
+-- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
+
+-- Date parameters (Quarterly period)
+SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
+SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
+SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
+
+-- Status codes (matching service defaults)
+SET @lost_code = 0;                        -- Lost to follow-up status code
+SET @dead_code = 1;                        -- Dead status code
+SET @transfer_out_code = 3;                -- Transfer out status code
+SET @transfer_in_code = 1;                 -- Transfer in status code
+SET @mmd_eligible_code = 0;                -- MMD eligible status code
+
+-- Clinical parameters
+SET @mmd_drug_quantity = 60;               -- MMD drug quantity threshold
+SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
+SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
+SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
+
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 1: Number of active ART patients in previous quarter
@@ -183,20 +214,21 @@ FROM tblactive;
 
 -- =====================================================
 -- 01 ACTIVE ART PREVIOUS DETAILS
--- Generated: 2025-10-16T17:34:57.193Z
+-- Generated: 2026-05-26T13:19:28.136Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -209,6 +241,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- 01_active_art_previous - Detailed Records (matching corrected aggregate logic)
@@ -365,20 +398,21 @@ ORDER BY DaArt DESC, ClinicID;
 
 -- =====================================================
 -- 02 ACTIVE PRE ART PREVIOUS
--- Generated: 2025-10-16T17:34:57.193Z
+-- Generated: 2026-05-26T13:19:28.136Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -391,6 +425,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 2: Active Pre-ART patients in previous quarter
@@ -471,20 +506,21 @@ where ART is null;
 
 -- =====================================================
 -- 02 ACTIVE PRE ART PREVIOUS DETAILS
--- Generated: 2025-10-16T17:34:57.193Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -497,6 +533,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 2: Active Pre-ART patients in previous quarter - Detailed Records
@@ -597,20 +634,21 @@ order by DafirstVisit DESC, clinicid;
 
 -- =====================================================
 -- 03 NEWLY ENROLLED
--- Generated: 2025-10-16T17:34:57.194Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -623,6 +661,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 3: Newly Enrolled
@@ -666,20 +705,21 @@ FROM (
 
 -- =====================================================
 -- 03 NEWLY ENROLLED DETAILS
--- Generated: 2025-10-16T17:34:57.194Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -692,6 +732,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 3: Newly Enrolled - Detailed Records (matching aggregate logic)
@@ -769,20 +810,21 @@ ORDER BY DaArt DESC, ClinicID;
 
 -- =====================================================
 -- 04 RETESTED POSITIVE
--- Generated: 2025-10-16T17:34:57.194Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -795,6 +837,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 4: Re-tested positive
@@ -870,20 +913,21 @@ FROM (
 
 -- =====================================================
 -- 04 RETESTED POSITIVE DETAILS
--- Generated: 2025-10-16T17:34:57.194Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -896,6 +940,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 4: Re-tested positive - Detailed Records
@@ -987,20 +1032,21 @@ ORDER BY p.DafirstVisit DESC, p.ClinicID;
 
 -- =====================================================
 -- 05.1.1 ART SAME DAY
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1013,6 +1059,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.1.1: New ART started: Same day
@@ -1041,20 +1088,21 @@ FROM (
 
 -- =====================================================
 -- 05.1.1 ART SAME DAY DETAILS
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1067,6 +1115,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.1.1: New ART started: Same day - Detailed Records
@@ -1145,20 +1194,21 @@ ORDER BY DaArt DESC, ClinicID;
 
 -- =====================================================
 -- 05.1.2 ART 1 7 DAYS
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1171,6 +1221,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.1.2: New ART started: 1-7 days
@@ -1199,20 +1250,21 @@ FROM (
 
 -- =====================================================
 -- 05.1.2 ART 1 7 DAYS DETAILS
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1225,6 +1277,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.1.2: New ART started: 1-7 days - Detailed Records
@@ -1302,20 +1355,21 @@ ORDER BY DaArt DESC, ClinicID;
 
 -- =====================================================
 -- 05.1.3 ART OVER 7 DAYS
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1328,6 +1382,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.1.3: New ART started: >7 days
@@ -1356,20 +1411,21 @@ FROM (
 
 -- =====================================================
 -- 05.1.3 ART OVER 7 DAYS DETAILS
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1382,6 +1438,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.1.3: New ART started: >7 days - Detailed Records
@@ -1458,20 +1515,21 @@ ORDER BY DaArt DESC, ClinicID;
 
 -- =====================================================
 -- 05.2 ART WITH TLD
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1484,6 +1542,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.2: New ART started with TLD
@@ -1518,20 +1577,21 @@ FROM (
 
 -- =====================================================
 -- 05.2 ART WITH TLD DETAILS
--- Generated: 2025-10-16T17:34:57.195Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1544,6 +1604,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5.2: New ART started with TLD - Detailed Records (matching aggregate logic)
@@ -1633,26 +1694,27 @@ ORDER BY DaArt DESC, ClinicID;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 17: 05 NEWLY INITIATED
--- File: 05_newly_initiated.sql
+-- INDICATOR 17: 05.3 ART PREGNANT
+-- File: 05.3_art_pregnant.sql
 -- =====================================================
 
 -- =====================================================
--- 05 NEWLY INITIATED
--- Generated: 2025-10-16T17:34:57.195Z
+-- 05.3 ART PREGNANT
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1665,6 +1727,149 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
+-- MAIN QUERY
+-- =====================================================
+-- Indicator 5.3: New ART patients who are pregnant (NCHADS quarterly report)
+-- Pregnancy: tblavmain.Womenstatus = 0 (per schema: 0 = pregnant, 1 = not pregnant)
+WITH tblnewartpregnant AS (
+    SELECT
+        'Adult' AS type,
+        IF(p.Sex = 0, 'Female', 'Male') AS Sex,
+        p.ClinicID,
+        art.DaArt
+    FROM tblaimain p
+    JOIN tblaart art ON p.ClinicID = art.ClinicID
+    JOIN tblavmain v ON p.ClinicID = v.ClinicID AND v.DatVisit = art.DaArt
+    WHERE
+        art.DaArt BETWEEN @StartDate AND @EndDate
+        AND (p.OffIn IS NULL OR p.OffIn <> @transfer_in_code)
+        AND (p.TypeofReturn IS NULL OR p.TypeofReturn = -1)
+        AND p.Sex = 0
+        AND v.Womenstatus = 0
+)
+
+SELECT
+    '5.3. New ART patients who are pregnant' AS Indicator,
+    IFNULL(COUNT(*), 0) AS TOTAL,
+    0 AS Male_0_14,
+    0 AS Female_0_14,
+    0 AS Male_over_14,
+    IFNULL(SUM(CASE WHEN type = 'Adult' AND Sex = 'Female' THEN 1 ELSE 0 END), 0) AS Female_over_14
+FROM tblnewartpregnant;
+
+
+-- =====================================================
+
+-- =====================================================
+-- INDICATOR 18: 05.3 ART PREGNANT DETAILS
+-- File: 05.3_art_pregnant_details.sql
+-- =====================================================
+
+-- =====================================================
+-- 05.3 ART PREGNANT DETAILS
+-- Generated: 2026-05-26T13:19:28.137Z
+-- =====================================================
+
+-- =====================================================
+-- PARAMETER SETUP (matching service configuration)
+-- =====================================================
+-- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
+
+-- Date parameters (Quarterly period)
+SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
+SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
+SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
+
+-- Status codes (matching service defaults)
+SET @lost_code = 0;                        -- Lost to follow-up status code
+SET @dead_code = 1;                        -- Dead status code
+SET @transfer_out_code = 3;                -- Transfer out status code
+SET @transfer_in_code = 1;                 -- Transfer in status code
+SET @mmd_eligible_code = 0;                -- MMD eligible status code
+
+-- Clinical parameters
+SET @mmd_drug_quantity = 60;               -- MMD drug quantity threshold
+SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
+SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
+SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
+
+-- =====================================================
+-- MAIN QUERY
+-- =====================================================
+-- Indicator 5.3: New ART patients who are pregnant - Detailed Records
+SELECT
+    '5.3' AS step,
+    p.ClinicID AS clinicid,
+    art.ART AS art_number,
+    p.Sex AS sex,
+    'Female' AS sex_display,
+    '15+' AS typepatients,
+    p.DaBirth AS DaBirth,
+    p.DafirstVisit AS DafirstVisit,
+    art.DaArt AS DaArt,
+    v.DatVisit AS DatVisit,
+    p.OffIn AS OffIn,
+    'Adult' AS patient_type,
+    TIMESTAMPDIFF(YEAR, p.DaBirth, @EndDate) AS age,
+    v.Womenstatus AS Womenstatus,
+    v.DaPreg AS DaPreg,
+    CASE
+        WHEN p.OffIn = 0 THEN 'Not Transferred'
+        WHEN p.OffIn = 2 THEN 'Transferred In'
+        WHEN p.OffIn = 3 THEN 'Transferred Out'
+        ELSE CONCAT('Status: ', p.OffIn)
+    END AS transfer_status
+FROM tblaimain p
+JOIN tblaart art ON p.ClinicID = art.ClinicID
+JOIN tblavmain v ON p.ClinicID = v.ClinicID AND v.DatVisit = art.DaArt
+WHERE
+    art.DaArt BETWEEN @StartDate AND @EndDate
+    AND (p.OffIn IS NULL OR p.OffIn <> @transfer_in_code)
+    AND (p.TypeofReturn IS NULL OR p.TypeofReturn = -1)
+    AND p.Sex = 0
+    AND v.Womenstatus = 0
+ORDER BY DaArt DESC, ClinicID;
+
+
+-- =====================================================
+
+-- =====================================================
+-- INDICATOR 19: 05 NEWLY INITIATED
+-- File: 05_newly_initiated.sql
+-- =====================================================
+
+-- =====================================================
+-- 05 NEWLY INITIATED
+-- Generated: 2026-05-26T13:19:28.137Z
+-- =====================================================
+
+-- =====================================================
+-- PARAMETER SETUP (matching service configuration)
+-- =====================================================
+-- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
+
+-- Date parameters (Quarterly period)
+SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
+SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
+SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
+
+-- Status codes (matching service defaults)
+SET @lost_code = 0;                        -- Lost to follow-up status code
+SET @dead_code = 1;                        -- Dead status code
+SET @transfer_out_code = 3;                -- Transfer out status code
+SET @transfer_in_code = 1;                 -- Transfer in status code
+SET @mmd_eligible_code = 0;                -- MMD eligible status code
+
+-- Clinical parameters
+SET @mmd_drug_quantity = 60;               -- MMD drug quantity threshold
+SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
+SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
+SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
+
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5: Newly Initiated
@@ -1712,26 +1917,27 @@ FROM tblnewlyinitiated;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 18: 05 NEWLY INITIATED DETAILS
+-- INDICATOR 20: 05 NEWLY INITIATED DETAILS
 -- File: 05_newly_initiated_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 05 NEWLY INITIATED DETAILS
--- Generated: 2025-10-16T17:34:57.196Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1744,6 +1950,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 5: Newly Initiated - Detailed Records
@@ -1815,26 +2022,27 @@ ORDER BY DaArt DESC, ClinicID;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 19: 06 TRANSFER IN
+-- INDICATOR 21: 06 TRANSFER IN
 -- File: 06_transfer_in.sql
 -- =====================================================
 
 -- =====================================================
 -- 06 TRANSFER IN
--- Generated: 2025-10-16T17:34:57.196Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1847,6 +2055,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 6: Number of transfer-in patients
@@ -1885,26 +2094,27 @@ FROM (
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 20: 06 TRANSFER IN DETAILS
+-- INDICATOR 22: 06 TRANSFER IN DETAILS
 -- File: 06_transfer_in_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 06 TRANSFER IN DETAILS
--- Generated: 2025-10-16T17:34:57.196Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -1917,6 +2127,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 6: Transfer-in patients - Detailed Records
@@ -1999,26 +2210,27 @@ ORDER BY DaArt DESC, ClinicID;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 21: 07 LOST AND RETURN
+-- INDICATOR 23: 07 LOST AND RETURN
 -- File: 07_lost_and_return.sql
 -- =====================================================
 
 -- =====================================================
 -- 07 LOST AND RETURN
--- Generated: 2025-10-16T17:34:57.196Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2031,6 +2243,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 7: Lost and Return
@@ -2068,26 +2281,27 @@ FROM (
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 22: 07 LOST AND RETURN DETAILS
+-- INDICATOR 24: 07 LOST AND RETURN DETAILS
 -- File: 07_lost_and_return_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 07 LOST AND RETURN DETAILS
--- Generated: 2025-10-16T17:34:57.196Z
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2100,6 +2314,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 7: Lost and Return - Detailed Records (matching corrected aggregate logic)
@@ -2178,26 +2393,27 @@ ORDER BY DafirstVisit DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 23: 08.1 DEAD
--- File: 08.1_dead.sql
+-- INDICATOR 25: 08.2 DEAD
+-- File: 08.2_dead.sql
 -- =====================================================
 
 -- =====================================================
--- 08.1 DEAD
--- Generated: 2025-10-16T17:34:57.196Z
+-- 08.2 DEAD
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2210,11 +2426,12 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 8.1: Dead
+-- Indicator 9.1: Dead
 SELECT
-    '8.1. Dead' AS Indicator,
+    '9.1. Dead' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN PatientList.type = 'Child' AND PatientList.Sex = 'Male' THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN PatientList.type = 'Child' AND PatientList.Sex = 'Female' THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -2230,26 +2447,27 @@ FROM (
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 24: 08.1 DEAD DETAILS
--- File: 08.1_dead_details.sql
+-- INDICATOR 26: 08.2 DEAD DETAILS
+-- File: 08.2_dead_details.sql
 -- =====================================================
 
 -- =====================================================
--- 08.1 DEAD DETAILS
--- Generated: 2025-10-16T17:34:57.196Z
+-- 08.2 DEAD DETAILS
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2262,9 +2480,10 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 8.1: Dead - Detailed Records (matching aggregate logic exactly)
+-- Indicator 9.1: Dead - Detailed Records (matching aggregate logic exactly)
 SELECT
     main.ClinicID as clinicid,
     art.ART as art_number,
@@ -2370,26 +2589,27 @@ ORDER BY death_date DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 25: 08.2 LOST TO FOLLOWUP
--- File: 08.2_lost_to_followup.sql
+-- INDICATOR 27: 08.3 LOST TO FOLLOWUP
+-- File: 08.3_lost_to_followup.sql
 -- =====================================================
 
 -- =====================================================
--- 08.2 LOST TO FOLLOWUP
--- Generated: 2025-10-16T17:34:57.196Z
+-- 08.3 LOST TO FOLLOWUP
+-- Generated: 2026-05-26T13:19:28.137Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2402,11 +2622,12 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 8.2: Lost to follow up (LTFU)
+-- Indicator 9.2: Lost to follow up (LTFU)
 SELECT
-    '8.2. Lost to follow up (LTFU)' AS Indicator,
+    '9.2. Lost to follow up (LTFU)' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN PatientList.type = 'Child' AND PatientList.Sex = 'Male' THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN PatientList.type = 'Child' AND PatientList.Sex = 'Female' THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -2422,26 +2643,27 @@ FROM (
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 26: 08.2 LOST TO FOLLOWUP DETAILS
--- File: 08.2_lost_to_followup_details.sql
+-- INDICATOR 28: 08.3 LOST TO FOLLOWUP DETAILS
+-- File: 08.3_lost_to_followup_details.sql
 -- =====================================================
 
 -- =====================================================
--- 08.2 LOST TO FOLLOWUP DETAILS
--- Generated: 2025-10-16T17:34:57.196Z
+-- 08.3 LOST TO FOLLOWUP DETAILS
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2454,9 +2676,10 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 8.2: Lost to follow up (LTFU) - Detailed Records (matching aggregate logic)
+-- Indicator 8.3: Lost to follow up (LTFU) - Detailed Records (matching aggregate logic)
 SELECT
     main.ClinicID as clinicid,
     art.ART as art_number,
@@ -2522,26 +2745,27 @@ ORDER BY ltf_date DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 27: 08.3 TRANSFER OUT
--- File: 08.3_transfer_out.sql
+-- INDICATOR 29: 08.4 TRANSFER OUT
+-- File: 08.4_transfer_out.sql
 -- =====================================================
 
 -- =====================================================
--- 08.3 TRANSFER OUT
--- Generated: 2025-10-16T17:34:57.198Z
+-- 08.4 TRANSFER OUT
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2554,11 +2778,12 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 8.3: Transfer-out
+-- Indicator 9.3: Transfer-out
 SELECT
-    '8.3. Transfer-out' AS Indicator,
+    '9.3. Transferred-out' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN PatientList.type = 'Child' AND PatientList.Sex = 'Male' THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN PatientList.type = 'Child' AND PatientList.Sex = 'Female' THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -2574,26 +2799,27 @@ FROM (
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 28: 08.3 TRANSFER OUT DETAILS
--- File: 08.3_transfer_out_details.sql
+-- INDICATOR 30: 08.4 TRANSFER OUT DETAILS
+-- File: 08.4_transfer_out_details.sql
 -- =====================================================
 
 -- =====================================================
--- 08.3 TRANSFER OUT DETAILS
--- Generated: 2025-10-16T17:34:57.198Z
+-- 08.4 TRANSFER OUT DETAILS
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2606,11 +2832,12 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 8.3: Transfer-out - Detailed Records (matching aggregate logic)
+-- Indicator 8.4: Transfer-out - Detailed Records (matching aggregate logic)
 SELECT
-    '8.3' as step,
+    '9.3' as step,
     main.ClinicID as clinicid,
     art.ART as art_number,
     main.Sex as sex,
@@ -2643,7 +2870,7 @@ WHERE
 UNION ALL
 
 SELECT
-    '8.3' as step,
+    '9.3' as step,
     main.ClinicID as clinicid,
     art.ART as art_number,
     main.Sex as sex,
@@ -2678,26 +2905,27 @@ ORDER BY transfer_date DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 29: 09 ACTIVE PRE ART
--- File: 09_active_pre_art.sql
+-- INDICATOR 31: 08 TPT NEW START
+-- File: 08_tpt_new_start.sql
 -- =====================================================
 
 -- =====================================================
--- 09 ACTIVE PRE ART
--- Generated: 2025-10-16T17:34:57.198Z
+-- 08 TPT NEW START
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2710,6 +2938,568 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
+-- MAIN QUERY
+-- =====================================================
+-- TPT Start - new start in reporting period only (8)
+-- Same cohort logic as 10.4_tpt_start; counts patients whose first TPT start date is between @StartDate and @EndDate.
+WITH tblvisit AS (
+    SELECT clinicid
+    FROM (
+        SELECT
+            clinicid,
+            ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS rn
+        FROM (
+            SELECT clinicid, DatVisit
+            FROM tblavmain
+            WHERE DatVisit <= @EndDate
+            UNION ALL
+            SELECT clinicid, DatVisit
+            FROM tblcvmain
+            WHERE DatVisit <= @EndDate
+        ) all_visits
+    ) latest_visit
+    WHERE rn = 1
+),
+tblimain AS (
+    SELECT ClinicID, "15+" AS typepatients, Sex
+    FROM tblaimain
+    WHERE DafirstVisit <= @EndDate
+    UNION ALL
+    SELECT ClinicID, "<=14" AS typepatients, Sex
+    FROM tblcimain
+    WHERE DafirstVisit <= @EndDate
+),
+tblart AS (
+    SELECT ClinicID, ART
+    FROM tblaart
+    WHERE DaArt <= @EndDate
+    UNION ALL
+    SELECT ClinicID, ART
+    FROM tblcart
+    WHERE DaArt <= @EndDate
+),
+tblexit AS (
+    SELECT clinicid, status
+    FROM tblavpatientstatus
+    WHERE da <= @EndDate
+    UNION ALL
+    SELECT clinicid, status
+    FROM tblcvpatientstatus
+    WHERE da <= @EndDate
+),
+tbltptdrug_visit AS (
+    WITH tbltptdrugs AS (
+        SELECT DrugName, Status, Da, Vid
+        FROM tblavtptdrug
+        WHERE DrugName != "B6"
+        UNION ALL
+        SELECT DrugName, Status, Da, Vid
+        FROM tblcvtptdrug
+        WHERE DrugName != "B6"
+    ),
+    tptvisit AS (
+        SELECT clinicid, DatVisit, vid
+        FROM tblavmain
+        UNION ALL
+        SELECT clinicid, DatVisit, vid
+        FROM tblcvmain
+    ),
+    tbltptall AS (
+        SELECT
+            v.clinicid,
+            v.DatVisit,
+            tp.DrugName,
+            tp.Status,
+            tp.Da
+        FROM tbltptdrugs tp
+        LEFT JOIN tptvisit v ON tp.vid = v.vid
+    ),
+    tbltptstart AS (
+        SELECT *
+        FROM (
+            SELECT
+                *,
+                ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit ASC) AS rn
+            FROM tbltptall
+            WHERE status = 0
+              AND DatVisit <= @EndDate
+        ) s
+        WHERE rn = 1
+    ),
+    tbltptstope AS (
+        SELECT *
+        FROM (
+            SELECT
+                *,
+                ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY Da DESC) AS rn
+            FROM tbltptall
+            WHERE status = 1
+              AND Da <= @EndDate
+        ) s
+        WHERE rn = 1
+    )
+    SELECT
+        s.clinicid,
+        CASE
+            WHEN s.Da IS NULL OR s.Da = '1900-12-31' OR YEAR(s.Da) < 2000 OR YEAR(s.Da) > 2030
+            THEN s.DatVisit
+            ELSE s.Da
+        END AS dateStart,
+        s.DrugName AS Tptdrugname,
+        st.Da AS Datestop,
+        DATEDIFF(
+            st.Da,
+            CASE
+                WHEN s.Da IS NULL OR s.Da = '1900-12-31' OR YEAR(s.Da) < 2000 OR YEAR(s.Da) > 2030
+                THEN s.DatVisit
+                ELSE s.Da
+            END
+        ) / 30 AS duration
+    FROM tbltptstart s
+    LEFT JOIN tbltptstope st ON s.clinicid = st.clinicid
+),
+tbltptdrug_forma AS (
+    SELECT
+        ClinicID AS clinicid,
+        DaStartTPT AS dateStart,
+        CASE TPTdrug
+            WHEN 0 THEN '3HP'
+            WHEN 1 THEN '6H'
+            WHEN 2 THEN '3RH'
+            WHEN 3 THEN 'INH'
+            ELSE NULL
+        END AS Tptdrugname,
+        IF(DaEndTPT >= '1990-01-02', DaEndTPT, NULL) AS Datestop,
+        IF(DaEndTPT >= '1990-01-02', DATEDIFF(DaEndTPT, DaStartTPT) / 30, NULL) AS duration
+    FROM tblaimain
+    WHERE DaStartTPT >= '1990-01-02'
+      AND TPTdrug >= 0
+      AND TPT IN (1, 2)
+      AND DafirstVisit <= @EndDate
+    UNION ALL
+    SELECT
+        ClinicID AS clinicid,
+        DaStartTPT AS dateStart,
+        CASE TPTdrug
+            WHEN 0 THEN '3HP'
+            WHEN 1 THEN '6H'
+            WHEN 2 THEN '3RH'
+            WHEN 3 THEN 'INH'
+            ELSE NULL
+        END AS Tptdrugname,
+        IF(DaEndTPT >= '1990-01-02', DaEndTPT, NULL) AS Datestop,
+        IF(DaEndTPT >= '1990-01-02', DATEDIFF(DaEndTPT, DaStartTPT) / 30, NULL) AS duration
+    FROM tblcimain
+    WHERE DaStartTPT >= '1990-01-02'
+      AND TPTdrug >= 0
+      AND Inh IN (0, 3)
+      AND DaFirstVisit <= @EndDate
+),
+tpt_merged AS (
+    SELECT
+        v.clinicid,
+        i.typepatients,
+        i.Sex,
+        IF(tv.Tptdrugname IS NOT NULL, tv.Tptdrugname, tf.Tptdrugname) AS Tptdrugname,
+        IF(tv.Tptdrugname IS NOT NULL, tv.dateStart, tf.dateStart) AS dateStart,
+        IF(tv.Tptdrugname IS NOT NULL, tv.duration, tf.duration) AS duration,
+        IF(
+            tv.Tptdrugname IS NOT NULL,
+            IF(
+                LEFT(tv.Tptdrugname, 1) = 3 AND tv.duration >= 2.50, 'TPT Complete',
+                IF(
+                    LEFT(tv.Tptdrugname, 1) = 6 AND tv.duration >= 5.50, 'TPT Complete',
+                    IF(tv.Tptdrugname IS NULL, 'Not Start', 'Not complete')
+                )
+            ),
+            IF(
+                LEFT(tf.Tptdrugname, 1) = 3 AND tf.duration >= 2.50, 'TPT Complete',
+                IF(
+                    LEFT(tf.Tptdrugname, 1) = 6 AND tf.duration >= 5.50, 'TPT Complete',
+                    IF(tf.Tptdrugname IS NOT NULL, 'Not complete', 'Not Start')
+                )
+            )
+        ) AS tptstatus
+    FROM tblvisit v
+    LEFT JOIN tblimain i ON i.ClinicID = v.clinicid
+    LEFT JOIN tblart a ON a.ClinicID = v.clinicid
+    LEFT JOIN tblexit e ON e.clinicid = v.clinicid
+    LEFT JOIN tbltptdrug_visit tv ON tv.clinicid = v.clinicid
+    LEFT JOIN tbltptdrug_forma tf ON tf.clinicid = v.clinicid
+    WHERE e.status IS NULL
+      AND a.ART IS NOT NULL
+)
+
+SELECT
+    '8. Number of patients started TPT in this quarter' AS Indicator,
+    IFNULL(SUM(IF(Sex = 1 AND typepatients = '<=14', 1, 0)), 0) AS Male_0_14,
+    IFNULL(SUM(IF(Sex = 0 AND typepatients = '<=14', 1, 0)), 0) AS Female_0_14,
+    IFNULL(SUM(IF(Sex = 1 AND typepatients = '15+', 1, 0)), 0) AS Male_over_14,
+    IFNULL(SUM(IF(Sex = 0 AND typepatients = '15+', 1, 0)), 0) AS Female_over_14,
+    IFNULL(COUNT(*), 0) AS TOTAL
+FROM tpt_merged
+WHERE tptstatus != 'Not Start'
+  AND dateStart BETWEEN @StartDate AND @EndDate;
+
+
+-- =====================================================
+
+-- =====================================================
+-- INDICATOR 32: 08 TPT NEW START DETAILS
+-- File: 08_tpt_new_start_details.sql
+-- =====================================================
+
+-- =====================================================
+-- 08 TPT NEW START DETAILS
+-- Generated: 2026-05-26T13:19:28.138Z
+-- =====================================================
+
+-- =====================================================
+-- PARAMETER SETUP (matching service configuration)
+-- =====================================================
+-- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
+
+-- Date parameters (Quarterly period)
+SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
+SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
+SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
+
+-- Status codes (matching service defaults)
+SET @lost_code = 0;                        -- Lost to follow-up status code
+SET @dead_code = 1;                        -- Dead status code
+SET @transfer_out_code = 3;                -- Transfer out status code
+SET @transfer_in_code = 1;                 -- Transfer in status code
+SET @mmd_eligible_code = 0;                -- MMD eligible status code
+
+-- Clinical parameters
+SET @mmd_drug_quantity = 60;               -- MMD drug quantity threshold
+SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
+SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
+SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
+
+-- =====================================================
+-- MAIN QUERY
+-- =====================================================
+-- 8 TPT Start (new start) - Detailed Records (matching aggregate logic)
+WITH tblvisit AS (
+    SELECT clinicid, DatVisit, DaApp, vid
+    FROM (
+        SELECT
+            clinicid,
+            DatVisit,
+            DaApp,
+            vid,
+            ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit DESC) AS rn
+        FROM (
+            SELECT clinicid, DatVisit, DaApp, vid
+            FROM tblavmain
+            WHERE DatVisit <= @EndDate
+            UNION ALL
+            SELECT clinicid, DatVisit, DaApp, vid
+            FROM tblcvmain
+            WHERE DatVisit <= @EndDate
+        ) all_visits
+    ) latest_visit
+    WHERE rn = 1
+),
+tblimain AS (
+    SELECT
+        ClinicID,
+        DafirstVisit,
+        "15+" AS typepatients,
+        TypeofReturn,
+        DaBirth,
+        TIMESTAMPDIFF(YEAR, DaBirth, @EndDate) AS age,
+        Sex,
+        OffIn
+    FROM tblaimain
+    WHERE DafirstVisit <= @EndDate
+    UNION ALL
+    SELECT
+        ClinicID,
+        DafirstVisit,
+        "<=14" AS typepatients,
+        '' AS TypeofReturn,
+        DaBirth,
+        TIMESTAMPDIFF(YEAR, DaBirth, @EndDate) AS age,
+        Sex,
+        OffIn
+    FROM tblcimain
+    WHERE DafirstVisit <= @EndDate
+),
+tblart AS (
+    SELECT ClinicID, ART, DaArt, TIMESTAMPDIFF(MONTH, DaArt, @EndDate) AS nmonthART
+    FROM tblaart
+    WHERE DaArt <= @EndDate
+    UNION ALL
+    SELECT ClinicID, ART, DaArt, TIMESTAMPDIFF(MONTH, DaArt, @EndDate) AS nmonthART
+    FROM tblcart
+    WHERE DaArt <= @EndDate
+),
+tblexit AS (
+    SELECT clinicid, status
+    FROM tblavpatientstatus
+    WHERE da <= @EndDate
+    UNION ALL
+    SELECT clinicid, status
+    FROM tblcvpatientstatus
+    WHERE da <= @EndDate
+),
+tblarvdrug AS (
+    WITH tbldrug AS (
+        SELECT
+            vid,
+            GROUP_CONCAT(DISTINCT DrugName ORDER BY DrugName ASC SEPARATOR '+') AS drugname
+        FROM tblavarvdrug
+        WHERE status <> 1
+        GROUP BY vid
+        UNION ALL
+        SELECT
+            vid,
+            GROUP_CONCAT(DISTINCT DrugName ORDER BY DrugName ASC SEPARATOR '+') AS drugname
+        FROM tblcvarvdrug
+        WHERE status <> 1
+        GROUP BY vid
+    )
+    SELECT
+        vid,
+        drugname,
+        IF(LOCATE('3TC+DTG+TDF', drugname) > 0, 'TLD', 'Not-TLD') AS TLDStatus
+    FROM tbldrug
+),
+tbltptdrug_visit AS (
+    WITH tbltptdrugs AS (
+        SELECT DrugName, Status, Da, Vid
+        FROM tblavtptdrug
+        WHERE DrugName != "B6"
+        UNION ALL
+        SELECT DrugName, Status, Da, Vid
+        FROM tblcvtptdrug
+        WHERE DrugName != "B6"
+    ),
+    tptvisit AS (
+        SELECT clinicid, DatVisit, vid
+        FROM tblavmain
+        UNION ALL
+        SELECT clinicid, DatVisit, vid
+        FROM tblcvmain
+    ),
+    tbltptall AS (
+        SELECT
+            v.clinicid,
+            v.DatVisit,
+            tp.DrugName,
+            tp.Status,
+            tp.Da
+        FROM tbltptdrugs tp
+        LEFT JOIN tptvisit v ON tp.vid = v.vid
+    ),
+    tbltptstart AS (
+        SELECT *
+        FROM (
+            SELECT
+                *,
+                ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY DatVisit ASC) AS rn
+            FROM tbltptall
+            WHERE status = 0
+              AND DatVisit <= @EndDate
+        ) s
+        WHERE rn = 1
+    ),
+    tbltptstope AS (
+        SELECT *
+        FROM (
+            SELECT
+                *,
+                ROW_NUMBER() OVER (PARTITION BY clinicid ORDER BY Da DESC) AS rn
+            FROM tbltptall
+            WHERE status = 1
+              AND Da <= @EndDate
+        ) s
+        WHERE rn = 1
+    )
+    SELECT
+        s.clinicid,
+        CASE
+            WHEN s.Da IS NULL OR s.Da = '1900-12-31' OR YEAR(s.Da) < 2000 OR YEAR(s.Da) > 2030
+            THEN s.DatVisit
+            ELSE s.Da
+        END AS dateStart,
+        s.DrugName AS Tptdrugname,
+        st.Da AS Datestop,
+        DATEDIFF(
+            st.Da,
+            CASE
+                WHEN s.Da IS NULL OR s.Da = '1900-12-31' OR YEAR(s.Da) < 2000 OR YEAR(s.Da) > 2030
+                THEN s.DatVisit
+                ELSE s.Da
+            END
+        ) / 30 AS duration
+    FROM tbltptstart s
+    LEFT JOIN tbltptstope st ON s.clinicid = st.clinicid
+),
+tbltptdrug_forma AS (
+    SELECT
+        ClinicID AS clinicid,
+        DaStartTPT AS dateStart,
+        CASE TPTdrug
+            WHEN 0 THEN '3HP'
+            WHEN 1 THEN '6H'
+            WHEN 2 THEN '3RH'
+            WHEN 3 THEN 'INH'
+            ELSE NULL
+        END AS Tptdrugname,
+        IF(DaEndTPT >= '1990-01-02', DaEndTPT, NULL) AS Datestop,
+        IF(DaEndTPT >= '1990-01-02', DATEDIFF(DaEndTPT, DaStartTPT) / 30, NULL) AS duration
+    FROM tblaimain
+    WHERE DaStartTPT >= '1990-01-02'
+      AND TPTdrug >= 0
+      AND TPT IN (1, 2)
+      AND DafirstVisit <= @EndDate
+    UNION ALL
+    SELECT
+        ClinicID AS clinicid,
+        DaStartTPT AS dateStart,
+        CASE TPTdrug
+            WHEN 0 THEN '3HP'
+            WHEN 1 THEN '6H'
+            WHEN 2 THEN '3RH'
+            WHEN 3 THEN 'INH'
+            ELSE NULL
+        END AS Tptdrugname,
+        IF(DaEndTPT >= '1990-01-02', DaEndTPT, NULL) AS Datestop,
+        IF(DaEndTPT >= '1990-01-02', DATEDIFF(DaEndTPT, DaStartTPT) / 30, NULL) AS duration
+    FROM tblcimain
+    WHERE DaStartTPT >= '1990-01-02'
+      AND TPTdrug >= 0
+      AND Inh IN (0, 3)
+      AND DaFirstVisit <= @EndDate
+)
+
+SELECT
+    '8' AS step,
+    i.clinicid,
+    i.Sex AS sex,
+    CASE
+        WHEN i.Sex = 0 THEN 'Female'
+        WHEN i.Sex = 1 THEN 'Male'
+        ELSE 'Unknown'
+    END AS sex_display,
+    i.typepatients,
+    i.age,
+    CASE
+        WHEN i.typepatients = '15+' THEN 'Adult'
+        WHEN i.typepatients = '<=14' THEN 'Child'
+        ELSE 'Unknown'
+    END AS patient_type,
+    a.ART,
+    a.DaArt,
+    i.DafirstVisit,
+    i.DaBirth,
+    i.OffIn,
+    i.TypeofReturn,
+    CASE
+        WHEN i.OffIn = 0 THEN 'Not Transferred'
+        WHEN i.OffIn = 1 THEN 'Transferred In'
+        WHEN i.OffIn = 3 THEN 'Transferred Out'
+        ELSE CONCAT('Status: ', i.OffIn)
+    END AS transfer_status,
+    IF(a.nmonthART >= 6, '>6M', '<6M') AS Startartstatus,
+    IF(DATEDIFF(v.DaApp, v.DatVisit) > 80, 'MMD', 'Not-MMD') AS MMDStatus,
+    IF(
+        LEFT(i.ClinicID, 1) = 'P' AND rd.TLDStatus != 'TLD' AND LOCATE('DTG', rd.drugname) > 0,
+        'TLD',
+        rd.TLDStatus
+    ) AS TLDStatus,
+    IF(tv.Tptdrugname IS NOT NULL, tv.Tptdrugname, tf.Tptdrugname) AS Tptdrugname,
+    IF(tv.Tptdrugname IS NOT NULL, tv.dateStart, tf.dateStart) AS dateStart,
+    IF(tv.Tptdrugname IS NOT NULL, 'Visit', IF(tf.Tptdrugname IS NOT NULL, 'Form A', NULL)) AS tpt_source,
+    IF(
+        tv.Tptdrugname IS NOT NULL,
+        IF(
+            LEFT(tv.Tptdrugname, 1) = 3 AND tv.duration >= 2.50, 'TPT Complete',
+            IF(
+                LEFT(tv.Tptdrugname, 1) = 6 AND tv.duration >= 5.50, 'TPT Complete',
+                IF(tv.Tptdrugname IS NULL, 'Not Start', 'Not complete')
+            )
+        ),
+        IF(
+            LEFT(tf.Tptdrugname, 1) = 3 AND tf.duration >= 2.50, 'TPT Complete',
+            IF(
+                LEFT(tf.Tptdrugname, 1) = 6 AND tf.duration >= 5.50, 'TPT Complete',
+                IF(tf.Tptdrugname IS NOT NULL, 'Not complete', 'Not Start')
+            )
+        )
+    ) AS tptstatus
+FROM tblvisit v
+LEFT JOIN tblimain i ON i.ClinicID = v.clinicid
+LEFT JOIN tblart a ON a.ClinicID = v.clinicid
+LEFT JOIN tblexit e ON e.clinicid = v.clinicid
+LEFT JOIN tblarvdrug rd ON rd.vid = v.vid
+LEFT JOIN tbltptdrug_visit tv ON tv.clinicid = v.clinicid
+LEFT JOIN tbltptdrug_forma tf ON tf.clinicid = v.clinicid
+WHERE e.status IS NULL
+  AND a.ART IS NOT NULL
+  AND IF(
+        tv.Tptdrugname IS NOT NULL,
+        IF(
+            LEFT(tv.Tptdrugname, 1) = 3 AND tv.duration >= 2.50, 'TPT Complete',
+            IF(
+                LEFT(tv.Tptdrugname, 1) = 6 AND tv.duration >= 5.50, 'TPT Complete',
+                IF(tv.Tptdrugname IS NULL, 'Not Start', 'Not complete')
+            )
+        ),
+        IF(
+            LEFT(tf.Tptdrugname, 1) = 3 AND tf.duration >= 2.50, 'TPT Complete',
+            IF(
+                LEFT(tf.Tptdrugname, 1) = 6 AND tf.duration >= 5.50, 'TPT Complete',
+                IF(tf.Tptdrugname IS NOT NULL, 'Not complete', 'Not Start')
+            )
+        )
+      ) != 'Not Start'
+  AND IF(tv.Tptdrugname IS NOT NULL, tv.dateStart, tf.dateStart) BETWEEN @StartDate AND @EndDate
+ORDER BY a.DaArt DESC, i.clinicid;
+
+
+-- =====================================================
+
+-- =====================================================
+-- INDICATOR 33: 09 ACTIVE PRE ART
+-- File: 09_active_pre_art.sql
+-- =====================================================
+
+-- =====================================================
+-- 09 ACTIVE PRE ART
+-- Generated: 2026-05-26T13:19:28.138Z
+-- =====================================================
+
+-- =====================================================
+-- PARAMETER SETUP (matching service configuration)
+-- =====================================================
+-- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
+
+-- Date parameters (Quarterly period)
+SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
+SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
+SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
+
+-- Status codes (matching service defaults)
+SET @lost_code = 0;                        -- Lost to follow-up status code
+SET @dead_code = 1;                        -- Dead status code
+SET @transfer_out_code = 3;                -- Transfer out status code
+SET @transfer_in_code = 1;                 -- Transfer in status code
+SET @mmd_eligible_code = 0;                -- MMD eligible status code
+
+-- Clinical parameters
+SET @mmd_drug_quantity = 60;               -- MMD drug quantity threshold
+SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
+SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
+SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
+
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Active Pre-ART patients
@@ -2865,7 +3655,7 @@ with tblactive as (
     where id = 1 and e.status is null -- and a.clinicid is not null 
 )
 
-select '9. Active Pre-ART' as Indicator, 
+select '10. Active Pre-ART patients at end of this quarter' as Indicator, 
        sum(if(typepatients = '≤14' and sex = 1, 1, 0)) as Male_0_14,
        sum(if(typepatients = '≤14' and sex = 0, 1, 0)) as Female_0_14,
        sum(if(typepatients = '15+' and sex = 1, 1, 0)) as Male_over_14,
@@ -2878,26 +3668,27 @@ where ART is null;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 30: 09 ACTIVE PRE ART DETAILS
+-- INDICATOR 34: 09 ACTIVE PRE ART DETAILS
 -- File: 09_active_pre_art_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 09 ACTIVE PRE ART DETAILS
--- Generated: 2025-10-16T17:34:57.198Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -2910,6 +3701,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 9: Active Pre-ART - Detailed Records (matching aggregate logic)
@@ -3052,7 +3844,7 @@ tbltptdrug AS (
 
 -- Return exactly the same records as the aggregate query
 SELECT
-    '9' as step,
+    '10' as step,
     i.clinicid,
     i.Sex AS sex,
     CASE 
@@ -3091,26 +3883,27 @@ ORDER BY v.DatVisit DESC, i.clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 31: 10.1 ELIGIBLE MMD
+-- INDICATOR 35: 10.1 ELIGIBLE MMD
 -- File: 10.1_eligible_mmd.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.1 ELIGIBLE MMD
--- Generated: 2025-10-16T17:34:57.198Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -3123,6 +3916,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Eligible for MMD
@@ -3285,7 +4079,7 @@ with tblactive as (
     where id = 1 and e.status is null and a.ART is not null 
 )
 
-select '10.1. Eligible MMD' as Indicator, 
+select '11.1. Eligible MMD' as Indicator, 
        sum(if(sex = 1 and typepatients = '≤14', 1, 0)) as Male_0_14,
        sum(if(sex = 0 and typepatients = '≤14', 1, 0)) as Female_0_14,
        sum(if(sex = 1 and typepatients = '15+', 1, 0)) as Male_over_14,
@@ -3298,26 +4092,27 @@ where ART is not null and Startartstatus = '>6M';
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 32: 10.1 ELIGIBLE MMD DETAILS
+-- INDICATOR 36: 10.1 ELIGIBLE MMD DETAILS
 -- File: 10.1_eligible_mmd_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.1 ELIGIBLE MMD DETAILS
--- Generated: 2025-10-16T17:34:57.199Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -3330,6 +4125,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10.1: Eligible MMD - Detailed Records (matching corrected aggregate logic)
@@ -3492,7 +4288,7 @@ WITH tblactive AS (
 )
 
 SELECT
-    '10.1' as step,
+    '11.1' as step,
     clinicid,
     Sex AS sex,
     CASE 
@@ -3530,26 +4326,27 @@ ORDER BY DaArt DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 33: 10.2 MMD
+-- INDICATOR 37: 10.2 MMD
 -- File: 10.2_mmd.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.2 MMD
--- Generated: 2025-10-16T17:34:57.199Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -3562,6 +4359,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- MMD
@@ -3838,7 +4636,7 @@ WITH tblactive AS (
 )
 
 SELECT 
-    '10.2. MMD' AS Indicator, 
+    '11.2. MMD' AS Indicator, 
     SUM(IF(sex = 1 AND typepatients = '≤14', 1, 0)) AS Male_0_14,
     SUM(IF(sex = 0 AND typepatients = '≤14', 1, 0)) AS Female_0_14,
     SUM(IF(sex = 1 AND typepatients = '15+', 1, 0)) AS Male_over_14,
@@ -3853,26 +4651,27 @@ WHERE ART IS NOT NULL
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 34: 10.2 MMD DETAILS
+-- INDICATOR 38: 10.2 MMD DETAILS
 -- File: 10.2_mmd_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.2 MMD DETAILS
--- Generated: 2025-10-16T17:34:57.200Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -3885,6 +4684,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- 10.2 MMD - Detailed Records (matching corrected aggregate logic)
@@ -4160,7 +4960,7 @@ WITH tblactive AS (
 )
 
 SELECT
-    '10.2' as step,
+    '11.2' as step,
     clinicid,
     Sex AS sex,
     CASE 
@@ -4200,26 +5000,27 @@ ORDER BY DaArt DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 35: 10.3 TLD
+-- INDICATOR 39: 10.3 TLD
 -- File: 10.3_tld.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.3 TLD
--- Generated: 2025-10-16T17:34:57.200Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -4232,6 +5033,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- TLD
@@ -4503,7 +5305,7 @@ WITH tblactive AS (
 )
 
 SELECT 
-    '10.3. TLD' AS Indicator, 
+    '11.3. TLD' AS Indicator, 
     SUM(IF(sex = 1 AND typepatients = '≤14', 1, 0)) AS Male_0_14,
     SUM(IF(sex = 0 AND typepatients = '≤14', 1, 0)) AS Female_0_14,
     SUM(IF(sex = 1 AND typepatients = '15+', 1, 0)) AS Male_over_14,
@@ -4517,26 +5319,27 @@ WHERE ART IS NOT NULL
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 36: 10.3 TLD DETAILS
+-- INDICATOR 40: 10.3 TLD DETAILS
 -- File: 10.3_tld_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.3 TLD DETAILS
--- Generated: 2025-10-16T17:34:57.200Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -4549,6 +5352,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- 10.3 TLD - Detailed Records (matching corrected aggregate logic)
@@ -4819,7 +5623,7 @@ WITH tblactive AS (
 )
 
 SELECT
-    '10.3' as step,
+    '11.3' as step,
     clinicid,
     Sex AS sex,
     CASE 
@@ -4857,26 +5661,27 @@ ORDER BY DaArt DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 37: 10.4 TPT START
+-- INDICATOR 41: 10.4 TPT START
 -- File: 10.4_tpt_start.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.4 TPT START
--- Generated: 2025-10-16T17:34:57.201Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -4889,6 +5694,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- TPT Start
@@ -5155,7 +5961,7 @@ WITH tblactive AS (
 )
 
 SELECT 
-    '10.4. TPT Start' AS Indicator, 
+    '11.4. TPT Start' AS Indicator, 
     SUM(IF(sex = 1 AND typepatients = '≤14', 1, 0)) AS Male_0_14,
     SUM(IF(sex = 0 AND typepatients = '≤14', 1, 0)) AS Female_0_14,
     SUM(IF(sex = 1 AND typepatients = '15+', 1, 0)) AS Male_over_14,
@@ -5168,26 +5974,27 @@ WHERE ART IS NOT NULL AND tptstatus != 'Not Start';
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 38: 10.4 TPT START DETAILS
+-- INDICATOR 42: 10.4 TPT START DETAILS
 -- File: 10.4_tpt_start_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.4 TPT START DETAILS
--- Generated: 2025-10-16T17:34:57.201Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -5200,6 +6007,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- 10.4 TPT Start - Detailed Records (matching corrected aggregate logic)
@@ -5465,7 +6273,7 @@ WITH tblactive AS (
 )
 
 SELECT
-    '10.4' as step,
+    '11.4' as step,
     clinicid,
     Sex AS sex,
     CASE 
@@ -5504,26 +6312,27 @@ ORDER BY DaArt DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 39: 10.5 TPT COMPLETE
+-- INDICATOR 43: 10.5 TPT COMPLETE
 -- File: 10.5_tpt_complete.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.5 TPT COMPLETE
--- Generated: 2025-10-16T17:34:57.201Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -5536,6 +6345,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- TPT Complete
@@ -5793,7 +6603,7 @@ with tblactive as (
 )
 
 select 
-    '10.5. TPT Complete' as Indicator, 
+    '11.5. TPT Complete' as Indicator, 
     sum(if(sex = 1 and typepatients = '≤14', 1, 0)) as Male_0_14,
     sum(if(sex = 0 and typepatients = '≤14', 1, 0)) as Female_0_14,
     sum(if(sex = 1 and typepatients = '15+', 1, 0)) as Male_over_14,
@@ -5806,26 +6616,27 @@ where ART is not null and tptstatus = 'TPT Complete';
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 40: 10.5 TPT COMPLETE DETAILS
+-- INDICATOR 44: 10.5 TPT COMPLETE DETAILS
 -- File: 10.5_tpt_complete_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.5 TPT COMPLETE DETAILS
--- Generated: 2025-10-16T17:34:57.201Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -5838,6 +6649,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10.5: TPT Complete - Detailed Records (matching aggregate logic)
@@ -5943,7 +6755,7 @@ tbltptdrug AS (
 )
 
 SELECT
-    '10.5' as step,
+    '11.5' as step,
     i.clinicid,
     a.ART as art_number,
     i.Sex AS sex,
@@ -5987,26 +6799,27 @@ ORDER BY v.DatVisit DESC, i.clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 41: 10.6 ELIGIBLE VL TEST
+-- INDICATOR 45: 10.6 ELIGIBLE VL TEST
 -- File: 10.6_eligible_vl_test.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.6 ELIGIBLE VL TEST
--- Generated: 2025-10-16T17:34:57.201Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -6019,6 +6832,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10.6: Eligible for Viral Load test (Corrected to match audit query exactly)
@@ -6098,7 +6912,7 @@ tblactive AS (
 )
 
 SELECT 
-    '10.6. Eligible for VL test' AS Indicator,
+    '11.6. Eligible for VL test' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 1 THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -6111,26 +6925,27 @@ WHERE StatusVL <> '';
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 42: 10.6 ELIGIBLE VL TEST DETAILS
+-- INDICATOR 46: 10.6 ELIGIBLE VL TEST DETAILS
 -- File: 10.6_eligible_vl_test_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.6 ELIGIBLE VL TEST DETAILS
--- Generated: 2025-10-16T17:34:57.201Z
+-- Generated: 2026-05-26T13:19:28.138Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -6143,6 +6958,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- 10.6_eligible_vl_test - Detailed Records (matching corrected aggregate logic)
@@ -6228,7 +7044,7 @@ tblactive AS (
 )
 
 SELECT
-    '10.6' as step,
+    '11.6' as step,
     ClinicID as clinicid,
     Sex as sex,
     CASE 
@@ -6262,26 +7078,27 @@ ORDER BY DaArt DESC, ClinicID;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 43: 10.7 VL TESTED 12M
+-- INDICATOR 47: 10.7 VL TESTED 12M
 -- File: 10.7_vl_tested_12m.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.7 VL TESTED 12M
--- Generated: 2025-10-16T17:34:57.202Z
+-- Generated: 2026-05-26T13:19:28.139Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -6294,6 +7111,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10.7: VL tested in 12M (visit-based logic)
@@ -6554,7 +7372,7 @@ WITH tblactive AS (
 )
 
 SELECT 
-    '10.7. VL tested in 12M' AS Indicator,
+    '11.7. VL tested in 12M' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 1 THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -6569,26 +7387,27 @@ WHERE ART IS NOT NULL
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 44: 10.7 VL TESTED 12M DETAILS
+-- INDICATOR 48: 10.7 VL TESTED 12M DETAILS
 -- File: 10.7_vl_tested_12m_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.7 VL TESTED 12M DETAILS
--- Generated: 2025-10-16T17:34:57.202Z
+-- Generated: 2026-05-26T13:19:28.139Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -6601,6 +7420,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- 10.7 VL Tested 12M - Detailed Records (matching corrected aggregate logic)
@@ -6861,7 +7681,7 @@ WITH tblactive AS (
 )
 
 SELECT
-    '10.7' as step,
+    '11.7' as step,
     clinicid,
     Sex AS sex,
     CASE 
@@ -6905,26 +7725,27 @@ ORDER BY DaArt DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 45: 10.8 VL SUPPRESSION
+-- INDICATOR 49: 10.8 VL SUPPRESSION
 -- File: 10.8_vl_suppression.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.8 VL SUPPRESSION
--- Generated: 2025-10-16T17:34:57.202Z
+-- Generated: 2026-05-26T13:19:28.139Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -6937,6 +7758,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10.8: VL suppression (visit-based logic)
@@ -7197,7 +8019,7 @@ WITH tblactive AS (
 )
 
 SELECT 
-    '10.8. VL suppression' AS Indicator,
+    '11.8. VL suppression' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 1 THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -7214,26 +8036,27 @@ WHERE ART IS NOT NULL
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 46: 10.8 VL SUPPRESSION DETAILS
+-- INDICATOR 50: 10.8 VL SUPPRESSION DETAILS
 -- File: 10.8_vl_suppression_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10.8 VL SUPPRESSION DETAILS
--- Generated: 2025-10-16T17:34:57.202Z
+-- Generated: 2026-05-26T13:19:28.139Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -7246,6 +8069,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- 10.8 VL Suppression - Detailed Records (matching corrected aggregate logic)
@@ -7506,7 +8330,7 @@ WITH tblactive AS (
 )
 
 SELECT
-    '10.8' as step,
+    '11.8' as step,
     clinicid,
     Sex AS sex,
     CASE 
@@ -7552,26 +8376,27 @@ ORDER BY DaArt DESC, clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 47: 10 ACTIVE ART CURRENT
+-- INDICATOR 51: 10 ACTIVE ART CURRENT
 -- File: 10_active_art_current.sql
 -- =====================================================
 
 -- =====================================================
 -- 10 ACTIVE ART CURRENT
--- Generated: 2025-10-16T17:34:57.202Z
+-- Generated: 2026-05-26T13:19:28.139Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -7584,6 +8409,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10: Number of active ART patients in this quarter
@@ -7699,7 +8525,7 @@ tblactive AS (
 )
 
 SELECT 
-    '10. Active ART patients in this quarter' AS Indicator,
+    '11. Active ART patients at end of this quarter' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 1 THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -7711,26 +8537,27 @@ FROM tblactive;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 48: 10 ACTIVE ART CURRENT DETAILS
+-- INDICATOR 52: 10 ACTIVE ART CURRENT DETAILS
 -- File: 10_active_art_current_details.sql
 -- =====================================================
 
 -- =====================================================
 -- 10 ACTIVE ART CURRENT DETAILS
--- Generated: 2025-10-16T17:34:57.202Z
+-- Generated: 2026-05-26T13:19:28.139Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -7743,6 +8570,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10: Active ART patients in this quarter - Detailed Records
@@ -7834,7 +8662,7 @@ tblexit AS (
 )
 
 SELECT
-    '10' as step,
+    '11' as step,
     i.clinicid as site_code,
     i.clinicid,
     i.Sex AS sex,
@@ -7877,26 +8705,27 @@ ORDER BY v.DatVisit DESC, i.clinicid;
 -- =====================================================
 
 -- =====================================================
--- INDICATOR 49: VARIABLES
+-- INDICATOR 53: VARIABLES
 -- File: variables.sql
 -- =====================================================
 
 -- =====================================================
 -- VARIABLES
--- Generated: 2025-10-16T17:34:57.202Z
+-- Generated: 2026-05-26T13:19:28.139Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
 SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
--- Status codes
+-- Status codes (matching service defaults)
 SET @lost_code = 0;                        -- Lost to follow-up status code
 SET @dead_code = 1;                        -- Dead status code
 SET @transfer_out_code = 3;                -- Transfer out status code
@@ -7909,6 +8738,7 @@ SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
 SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
 SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- ===================================================================
@@ -8050,4 +8880,3 @@ SELECT
 -- =====================================================
 -- Generated by ART Web System
 -- For support, contact the development team
-

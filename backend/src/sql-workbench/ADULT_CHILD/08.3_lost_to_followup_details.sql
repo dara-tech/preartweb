@@ -1,6 +1,6 @@
 -- =====================================================
--- 05.1.1 ART SAME DAY DETAILS
--- Generated: 2026-05-26T13:19:28.143Z
+-- 08.3 LOST TO FOLLOWUP DETAILS
+-- Generated: 2026-05-26T13:19:28.146Z
 -- =====================================================
 
 -- =====================================================
@@ -30,68 +30,64 @@ SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 -- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 5.1.1: New ART started: Same day - Detailed Records
+-- Indicator 8.3: Lost to follow up (LTFU) - Detailed Records (matching aggregate logic)
 SELECT
-    '05.1.1' as step,
-    p.ClinicID as clinicid,
+    main.ClinicID as clinicid,
     art.ART as art_number,
-    p.Sex as sex,
+    main.Sex as sex,
     CASE 
-        WHEN p.Sex = 0 THEN 'Female'
-        WHEN p.Sex = 1 THEN 'Male'
+        WHEN main.Sex = 0 THEN 'Female'
+        WHEN main.Sex = 1 THEN 'Male'
         ELSE 'Unknown'
     END as sex_display,
     '15+' as typepatients,
-    p.DaBirth as DaBirth,
-    p.DafirstVisit as DafirstVisit,
-    art.DaArt as DaArt,
-    art.DaArt as DatVisit,
-    p.OffIn as OffIn,
+    main.DaBirth as DaBirth,
+    main.DafirstVisit as DafirstVisit,
+    main.OffIn as OffIn,
     'Adult' as patient_type,
-    TIMESTAMPDIFF(YEAR, p.DaBirth, @EndDate) as age,
+    TIMESTAMPDIFF(YEAR, main.DaBirth, @EndDate) as age,
     CASE 
-        WHEN p.OffIn = 0 THEN 'Not Transferred'
-        WHEN p.OffIn = 2 THEN 'Transferred In'
-        WHEN p.OffIn = 3 THEN 'Transferred Out'
-        ELSE CONCAT('Status: ', p.OffIn)
-    END as transfer_status
-FROM tblaimain p 
-JOIN tblaart art ON p.ClinicID = art.ClinicID
-WHERE 
-    art.DaArt BETWEEN @StartDate AND @EndDate
-    AND DATEDIFF(art.DaArt, p.DafirstVisit) = 0
-    AND (p.OffIn IS NULL OR p.OffIn <> @transfer_in_code)
-    AND (p.TypeofReturn IS NULL OR p.TypeofReturn = -1)
+        WHEN main.OffIn = 0 THEN 'Not Transferred'
+        WHEN main.OffIn = 2 THEN 'Transferred In'
+        WHEN main.OffIn = 3 THEN 'Transferred Out'
+        ELSE CONCAT('Status: ', main.OffIn)
+    END as transfer_status,
+    s.Da as ltf_date,
+    s.Status as ltf_status_code
+FROM tblaimain main 
+LEFT JOIN tblaart art ON main.ClinicID = art.ClinicID
+JOIN tblavpatientstatus s ON main.ClinicID = s.ClinicID
+WHERE s.Da BETWEEN @StartDate AND @EndDate 
+    AND s.Status = @lost_code
 
 UNION ALL
 
 SELECT
-    '05.1.1' as step,
-    p.ClinicID as clinicid,
+    main.ClinicID as clinicid,
     art.ART as art_number,
-    p.Sex as sex,
+    main.Sex as sex,
     CASE 
-        WHEN p.Sex = 0 THEN 'Female'
-        WHEN p.Sex = 1 THEN 'Male'
+        WHEN main.Sex = 0 THEN 'Female'
+        WHEN main.Sex = 1 THEN 'Male'
         ELSE 'Unknown'
     END as sex_display,
-    'Child' as typepatients,
-    p.DaBirth as DaBirth,
-    p.DafirstVisit as DafirstVisit,
-    art.DaArt as DaArt,
-    art.DaArt as DatVisit,
-    p.OffIn as OffIn,
+    '≤14' as typepatients,
+    main.DaBirth as DaBirth,
+    main.DafirstVisit as DafirstVisit,
+    main.OffIn as OffIn,
     'Child' as patient_type,
-    TIMESTAMPDIFF(YEAR, p.DaBirth, @EndDate) as age,
+    TIMESTAMPDIFF(YEAR, main.DaBirth, @EndDate) as age,
     CASE 
-        WHEN p.OffIn = 0 THEN 'Not Transferred'
-        WHEN p.OffIn = 2 THEN 'Transferred In'
-        WHEN p.OffIn = 3 THEN 'Transferred Out'
-        ELSE CONCAT('Status: ', p.OffIn)
-    END as transfer_status
-FROM tblcimain p 
-JOIN tblcart art ON p.ClinicID = art.ClinicID
-WHERE 
-    art.DaArt BETWEEN @StartDate AND @EndDate
-    AND DATEDIFF(art.DaArt, p.DafirstVisit) = 0
-ORDER BY DaArt DESC, ClinicID;
+        WHEN main.OffIn = 0 THEN 'Not Transferred'
+        WHEN main.OffIn = 2 THEN 'Transferred In'
+        WHEN main.OffIn = 3 THEN 'Transferred Out'
+        ELSE CONCAT('Status: ', main.OffIn)
+    END as transfer_status,
+    s.Da as ltf_date,
+    s.Status as ltf_status_code
+FROM tblcimain main 
+LEFT JOIN tblcart art ON main.ClinicID = art.ClinicID
+JOIN tblcvpatientstatus s ON main.ClinicID = s.ClinicID
+WHERE s.Da BETWEEN @StartDate AND @EndDate 
+    AND s.Status = @lost_code
+ORDER BY ltf_date DESC, clinicid;

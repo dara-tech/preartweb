@@ -1,6 +1,6 @@
 -- =====================================================
--- 05 NEWLY INITIATED DETAILS
--- Generated: 2026-05-26T13:19:28.145Z
+-- 08.4 TRANSFER OUT DETAILS
+-- Generated: 2026-05-26T13:19:28.147Z
 -- =====================================================
 
 -- =====================================================
@@ -30,67 +30,68 @@ SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
 -- =====================================================
 -- MAIN QUERY
 -- =====================================================
--- Indicator 5: Newly Initiated - Detailed Records
+-- Indicator 8.4: Transfer-out - Detailed Records (matching aggregate logic)
 SELECT
-    p.ClinicID as clinicid,
+    '9.3' as step,
+    main.ClinicID as clinicid,
     art.ART as art_number,
-    p.Sex as sex,
+    main.Sex as sex,
     CASE 
-        WHEN p.Sex = 0 THEN 'Female'
-        WHEN p.Sex = 1 THEN 'Male'
+        WHEN main.Sex = 0 THEN 'Female'
+        WHEN main.Sex = 1 THEN 'Male'
         ELSE 'Unknown'
     END as sex_display,
     '15+' as typepatients,
-    p.DaBirth as DaBirth,
-    p.DafirstVisit as DafirstVisit,
-    art.DaArt as DaArt,
-    v.DatVisit as DatVisit,
-    p.OffIn as OffIn,
+    main.DaBirth as DaBirth,
+    main.DafirstVisit as DafirstVisit,
+    main.OffIn as OffIn,
     'Adult' as patient_type,
-    TIMESTAMPDIFF(YEAR, p.DaBirth, @EndDate) as age,
+    TIMESTAMPDIFF(YEAR, main.DaBirth, @EndDate) as age,
     CASE 
-        WHEN p.OffIn = 0 THEN 'Not Transferred'
-        WHEN p.OffIn = 2 THEN 'Transferred In'
-        WHEN p.OffIn = 3 THEN 'Transferred Out'
-        ELSE CONCAT('Status: ', p.OffIn)
-    END as transfer_status
-FROM tblaimain p 
-JOIN tblaart art ON p.ClinicID = art.ClinicID
-JOIN tblavmain v ON p.ClinicID = v.ClinicID AND v.DatVisit = art.DaArt 
+        WHEN main.OffIn = 0 THEN 'Not Transferred'
+        WHEN main.OffIn = 2 THEN 'Transferred In'
+        WHEN main.OffIn = 3 THEN 'Transferred Out'
+        ELSE CONCAT('Status: ', main.OffIn)
+    END as transfer_status,
+    s.Da as transfer_date,
+    s.Status as transfer_status_code
+FROM tblaimain main 
+LEFT JOIN tblaart art ON main.ClinicID = art.ClinicID
+JOIN tblavpatientstatus s ON main.ClinicID = s.ClinicID
 WHERE 
-    art.DaArt BETWEEN @StartDate AND @EndDate 
-    AND (p.OffIn IS NULL OR p.OffIn <> @transfer_in_code)
-    AND (p.TypeofReturn IS NULL OR p.TypeofReturn = -1)
+    s.Da BETWEEN @StartDate AND @EndDate 
+    AND s.Status = @transfer_out_code
 
 UNION ALL
 
 SELECT
-    p.ClinicID as clinicid,
+    '9.3' as step,
+    main.ClinicID as clinicid,
     art.ART as art_number,
-    p.Sex as sex,
+    main.Sex as sex,
     CASE 
-        WHEN p.Sex = 0 THEN 'Female'
-        WHEN p.Sex = 1 THEN 'Male'
+        WHEN main.Sex = 0 THEN 'Female'
+        WHEN main.Sex = 1 THEN 'Male'
         ELSE 'Unknown'
     END as sex_display,
     '≤14' as typepatients,
-    p.DaBirth as DaBirth,
-    p.DafirstVisit as DafirstVisit,
-    art.DaArt as DaArt,
-    v.DatVisit as DatVisit,
-    p.OffIn as OffIn,
+    main.DaBirth as DaBirth,
+    main.DafirstVisit as DafirstVisit,
+    main.OffIn as OffIn,
     'Child' as patient_type,
-    TIMESTAMPDIFF(YEAR, p.DaBirth, @EndDate) as age,
+    TIMESTAMPDIFF(YEAR, main.DaBirth, @EndDate) as age,
     CASE 
-        WHEN p.OffIn = 0 THEN 'Not Transferred'
-        WHEN p.OffIn = 2 THEN 'Transferred In'
-        WHEN p.OffIn = 3 THEN 'Transferred Out'
-        ELSE CONCAT('Status: ', p.OffIn)
-    END as transfer_status
-FROM tblcimain p 
-JOIN tblcart art ON p.ClinicID = art.ClinicID
-JOIN tblcvmain v ON p.ClinicID = v.ClinicID AND v.DatVisit = art.DaArt
+        WHEN main.OffIn = 0 THEN 'Not Transferred'
+        WHEN main.OffIn = 2 THEN 'Transferred In'
+        WHEN main.OffIn = 3 THEN 'Transferred Out'
+        ELSE CONCAT('Status: ', main.OffIn)
+    END as transfer_status,
+    s.Da as transfer_date,
+    s.Status as transfer_status_code
+FROM tblcimain main 
+LEFT JOIN tblcart art ON main.ClinicID = art.ClinicID
+JOIN tblcvpatientstatus s ON main.ClinicID = s.ClinicID
 WHERE 
-    art.DaArt BETWEEN @StartDate AND @EndDate 
-    AND (p.OffIn IS NULL OR p.OffIn <> @transfer_in_code)
-ORDER BY DaArt DESC, ClinicID;
+    s.Da BETWEEN @StartDate AND @EndDate 
+    AND s.Status = @transfer_out_code
+ORDER BY transfer_date DESC, clinicid;

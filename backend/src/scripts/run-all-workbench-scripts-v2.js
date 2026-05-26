@@ -1,14 +1,23 @@
 const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
-// Database connection configuration
+const siteDb = process.argv[2] || process.env.WORKBENCH_DB || 'preart_0201';
+
 const DB_CONFIG = {
-  host: 'localhost',
-  user: 'root',
-  password: 'password123',
-  database: 'preart_0201'
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: siteDb,
 };
+
+const SKIP_FILES = new Set([
+  'variables.sql',
+  'artweb-complete-indicators-workbench.sql',
+  'simple_tpt_drug_query.sql',
+]);
 
 async function runScript(filePath) {
   try {
@@ -88,16 +97,31 @@ async function runScript(filePath) {
   }
 }
 
+function collectAggregateScripts(dir) {
+  return fs
+    .readdirSync(dir)
+    .filter(
+      (file) =>
+        file.endsWith('.sql') &&
+        !file.includes('details') &&
+        !SKIP_FILES.has(file)
+    )
+    .sort();
+}
+
 async function runAllScripts() {
   console.log('🚀 Running All SQL Workbench Scripts (V2)');
   console.log('=' .repeat(80));
-  
-  const workbenchDir = path.join(__dirname, '..', 'sql-workbench');
-  const files = fs.readdirSync(workbenchDir)
-    .filter(file => file.endsWith('.sql') && file !== 'variables.sql' && !file.includes('details'))
-    .sort();
-  
-  console.log(`📁 Found ${files.length} aggregate scripts to run\n`);
+  console.log(`📡 Database: ${DB_CONFIG.database} @ ${DB_CONFIG.host}:${DB_CONFIG.port}`);
+
+  const workbenchDir = path.join(__dirname, '..', 'sql-workbench', 'ADULT_CHILD');
+  if (!fs.existsSync(workbenchDir)) {
+    throw new Error(`Workbench directory not found: ${workbenchDir}`);
+  }
+
+  const files = collectAggregateScripts(workbenchDir);
+
+  console.log(`📁 Found ${files.length} aggregate scripts in ADULT_CHILD\n`);
   
   let successCount = 0;
   let failCount = 0;

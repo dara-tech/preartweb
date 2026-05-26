@@ -4,7 +4,7 @@ const path = require('path');
 // Generate comprehensive SQL workbench files with parameters
 function generateSQLWorkbenchFiles() {
   const queriesDir = path.join(__dirname, '../queries/indicators');
-  const outputDir = path.join(__dirname, '../sql-workbench');
+  const outputDir = path.join(__dirname, '../sql-workbench/ADULT_CHILD');
   
   // Create output directory
   if (!fs.existsSync(outputDir)) {

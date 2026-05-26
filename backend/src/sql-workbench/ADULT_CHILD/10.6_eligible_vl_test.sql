@@ -1,17 +1,33 @@
 -- =====================================================
 -- 10.6 ELIGIBLE VL TEST
--- Generated: 2025-10-16T17:34:57.216Z
+-- Generated: 2026-05-26T13:19:28.149Z
 -- =====================================================
 
 -- =====================================================
+-- PARAMETER SETUP (matching service configuration)
 -- =====================================================
--- PARAMETER SETUP
 -- Set these parameters before running this query
+-- These match the parameters used in the ART Web service
 
 -- Date parameters (Quarterly period)
 SET @StartDate = '2025-04-01';             -- Start date (YYYY-MM-DD)
 SET @EndDate = '2025-06-30';               -- End date (YYYY-MM-DD) - Q2 2025
+SET @PreviousEndDate = '2025-03-31';       -- Previous period end date
 
+-- Status codes (matching service defaults)
+SET @lost_code = 0;                        -- Lost to follow-up status code
+SET @dead_code = 1;                        -- Dead status code
+SET @transfer_out_code = 3;                -- Transfer out status code
+SET @transfer_in_code = 1;                 -- Transfer in status code
+SET @mmd_eligible_code = 0;                -- MMD eligible status code
+
+-- Clinical parameters
+SET @mmd_drug_quantity = 60;               -- MMD drug quantity threshold
+SET @vl_suppression_threshold = 1000;      -- Viral load suppression threshold
+SET @tld_regimen_formula = '3TC + DTG + TDF'; -- TLD regimen formula
+SET @tpt_drug_list = "'Isoniazid','3HP','6H'"; -- TPT drug list
+
+-- =====================================================
 -- MAIN QUERY
 -- =====================================================
 -- Indicator 10.6: Eligible for Viral Load test (Corrected to match audit query exactly)
@@ -91,7 +107,7 @@ tblactive AS (
 )
 
 SELECT 
-    '10.6. Eligible for VL test' AS Indicator,
+    '11.6. Eligible for VL test' AS Indicator,
     IFNULL(COUNT(*), 0) AS TOTAL,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 1 THEN 1 ELSE 0 END), 0) AS Male_0_14,
     IFNULL(SUM(CASE WHEN typepatients = '≤14' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS Female_0_14,
@@ -99,4 +115,3 @@ SELECT
     IFNULL(SUM(CASE WHEN typepatients = '15+' AND Sex = 0 THEN 1 ELSE 0 END), 0) AS Female_over_14
 FROM tblactive
 WHERE StatusVL <> '';
-
