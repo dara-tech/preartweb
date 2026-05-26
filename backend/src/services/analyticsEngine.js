@@ -138,7 +138,7 @@ class AnalyticsEngine {
     }
 
     // Define all indicators to calculate
-    const indicators = ['1', '2', '3', '4', '5', '5.1.1', '5.1.2', '5.1.3', '5.2', '6', '7', '8.1', '8.2', '8.3', '9', '10', '10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7', '10.8'];
+    const indicators = ['1', '2', '3', '4', '5', '5.1.1', '5.1.2', '5.1.3', '5.2', '6', '7', '8', '8.2', '8.3', '8.4', '9', '10', '10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7', '10.8'];
 
     // Calculate for each quarter of the year
     for (let quarter = 1; quarter <= 4; quarter++) {
@@ -215,7 +215,7 @@ class AnalyticsEngine {
     }
 
     // Define all indicators to calculate
-    const indicators = ['1', '2', '3', '4', '5', '5.1.1', '5.1.2', '5.1.3', '5.2', '6', '7', '8.1', '8.2', '8.3', '9', '10', '10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7', '10.8'];
+    const indicators = ['1', '2', '3', '4', '5', '5.1.1', '5.1.2', '5.1.3', '5.2', '6', '7', '8', '8.2', '8.3', '8.4', '9', '10', '10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7', '10.8'];
     log(`📋 Processing ${indicators.length} indicators across 4 quarters`, 'info', { 
       indicatorCount: indicators.length, 
       siteCount: sites.length,
@@ -333,9 +333,10 @@ class AnalyticsEngine {
       '5.2': '05.2_art_with_tld',
       '6': '06_transfer_in',
       '7': '07_lost_and_return',
-      '8.1': '08.1_dead',
-      '8.2': '08.2_lost_to_followup',
-      '8.3': '08.3_transfer_out',
+      '8': '08_tpt_new_start',
+      '8.2': '08.2_dead',
+      '8.3': '08.3_lost_to_followup',
+      '8.4': '08.4_transfer_out',
       '9': '09_active_pre_art',
       '10': '10_active_art_current',
       '10.1': '10.1_eligible_mmd',
@@ -518,9 +519,10 @@ class AnalyticsEngine {
       '5.2': 'New ART started with TLD',
       '6': 'Transfer-in patients',
       '7': 'Lost and Return',
-      '8.1': 'Dead',
-      '8.2': 'Lost to follow up (LTFU)',
-      '8.3': 'Transfer-out',
+      '8': 'TPT Start (new start)',
+      '8.2': 'Dead',
+      '8.3': 'Lost to follow up (LTFU)',
+      '8.4': 'Transfer-out',
       '9': 'Active Pre-ART',
       '10': 'Active ART patients in this quarter',
       '10.1': 'Eligible MMD',

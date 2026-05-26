@@ -1,4 +1,4 @@
--- Indicator 8.1: Dead - Detailed Records (matching aggregate logic exactly)
+-- Indicator 8.2: Dead - Detailed Records (matching aggregate logic exactly)
 SELECT
     main.ClinicID as clinicid,
     art.ART as art_number,

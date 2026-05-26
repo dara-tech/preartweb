@@ -1,5 +1,6 @@
--- Indicator 8.2: Lost to follow up (LTFU) - Detailed Records (matching aggregate logic)
+-- Indicator 8.4: Transfer-out - Detailed Records (matching aggregate logic)
 SELECT
+    '8.4' as step,
     main.ClinicID as clinicid,
     art.ART as art_number,
     main.Sex as sex,
@@ -20,17 +21,19 @@ SELECT
         WHEN main.OffIn = 3 THEN 'Transferred Out'
         ELSE CONCAT('Status: ', main.OffIn)
     END as transfer_status,
-    s.Da as ltf_date,
-    s.Status as ltf_status_code
+    s.Da as transfer_date,
+    s.Status as transfer_status_code
 FROM tblaimain main 
 LEFT JOIN tblaart art ON main.ClinicID = art.ClinicID
 JOIN tblavpatientstatus s ON main.ClinicID = s.ClinicID
-WHERE s.Da BETWEEN :StartDate AND :EndDate 
-    AND s.Status = :lost_code
+WHERE 
+    s.Da BETWEEN :StartDate AND :EndDate 
+    AND s.Status = :transfer_out_code
 
 UNION ALL
 
 SELECT
+    '8.4' as step,
     main.ClinicID as clinicid,
     art.ART as art_number,
     main.Sex as sex,
@@ -51,11 +54,12 @@ SELECT
         WHEN main.OffIn = 3 THEN 'Transferred Out'
         ELSE CONCAT('Status: ', main.OffIn)
     END as transfer_status,
-    s.Da as ltf_date,
-    s.Status as ltf_status_code
+    s.Da as transfer_date,
+    s.Status as transfer_status_code
 FROM tblcimain main 
 LEFT JOIN tblcart art ON main.ClinicID = art.ClinicID
 JOIN tblcvpatientstatus s ON main.ClinicID = s.ClinicID
-WHERE s.Da BETWEEN :StartDate AND :EndDate 
-    AND s.Status = :lost_code
-ORDER BY ltf_date DESC, clinicid;
+WHERE 
+    s.Da BETWEEN :StartDate AND :EndDate 
+    AND s.Status = :transfer_out_code
+ORDER BY transfer_date DESC, clinicid;

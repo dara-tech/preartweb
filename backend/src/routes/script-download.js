@@ -314,9 +314,10 @@ function getQueryDescription(fileName) {
     '05_newly_initiated.sql': 'Newly initiated ART patients',
     '06_transfer_in.sql': 'Transfer in patients',
     '07_lost_and_return.sql': 'Lost and returned patients',
-    '08.1_dead.sql': 'Deceased patients',
-    '08.2_lost_to_followup.sql': 'Lost to follow-up patients',
-    '08.3_transfer_out.sql': 'Transfer out patients',
+    '08_tpt_new_start.sql': 'TPT started (new start in period)',
+    '08.2_dead.sql': 'Deceased patients',
+    '08.3_lost_to_followup.sql': 'Lost to follow-up patients',
+    '08.4_transfer_out.sql': 'Transfer out patients',
     '09_active_pre_art.sql': 'Currently active Pre-ART patients',
     '10_active_art_current.sql': 'Currently active ART patients',
     '10.1_eligible_mmd.sql': 'Eligible for multi-month dispensing',
@@ -368,12 +369,14 @@ function getWorkbenchDescription(fileName) {
     '06_transfer_in_details.sql': 'Transfer in patients - detailed records',
     '07_lost_and_return.sql': 'Lost and return patients - workbench ready',
     '07_lost_and_return_details.sql': 'Lost and return patients - detailed records',
-    '08.1_dead.sql': 'Deceased patients - workbench ready',
-    '08.1_dead_details.sql': 'Deceased patients - detailed records',
-    '08.2_lost_to_followup.sql': 'Lost to follow-up patients - workbench ready',
-    '08.2_lost_to_followup_details.sql': 'Lost to follow-up patients - detailed records',
-    '08.3_transfer_out.sql': 'Transfer out patients - workbench ready',
-    '08.3_transfer_out_details.sql': 'Transfer out patients - detailed records',
+    '08_tpt_new_start.sql': 'TPT new start - workbench ready',
+    '08_tpt_new_start_details.sql': 'TPT new start - detailed records',
+    '08.2_dead.sql': 'Deceased patients - workbench ready',
+    '08.2_dead_details.sql': 'Deceased patients - detailed records',
+    '08.3_lost_to_followup.sql': 'Lost to follow-up patients - workbench ready',
+    '08.3_lost_to_followup_details.sql': 'Lost to follow-up patients - detailed records',
+    '08.4_transfer_out.sql': 'Transfer out patients - workbench ready',
+    '08.4_transfer_out_details.sql': 'Transfer out patients - detailed records',
     '09_active_pre_art.sql': 'Currently active Pre-ART patients - workbench ready',
     '09_active_pre_art_details.sql': 'Currently active Pre-ART patients - detailed records',
     '10_active_art_current.sql': 'Currently active ART patients - workbench ready',
@@ -515,9 +518,10 @@ Before running any scripts, ensure you have access to the ART database with the 
 - **05_newly_initiated** - Newly initiated ART patients
 - **06_transfer_in** - Transfer in patients
 - **07_lost_and_return** - Lost and returned patients
-- **08.1_dead** - Deceased patients
-- **08.2_lost_to_followup** - Lost to follow-up patients
-- **08.3_transfer_out** - Transfer out patients
+- **08_tpt_new_start** - TPT started (new start in reporting period)
+- **08.2_dead** - Deceased patients
+- **08.3_lost_to_followup** - Lost to follow-up patients
+- **08.4_transfer_out** - Transfer out patients
 - **09_active_pre_art** - Currently active Pre-ART patients
 - **10_active_art_current** - Currently active ART patients
 - **10.1_eligible_mmd** - Eligible for multi-month dispensing
