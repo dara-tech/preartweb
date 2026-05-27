@@ -73,7 +73,18 @@ const INDICATOR_DETAIL_FILE_MAP = {
 };
 
 const INDICATOR_DISPLAY_NAMES = {
+  '1': 'Active ART patients in previous quarter',
+  '2': 'Active Pre-ART patients in previous quarter',
+  '3': 'Newly Enrolled',
+  '4': 'Re-tested positive',
+  '5': 'Newly Initiated',
+  '5.1.1': 'New ART started: Same day',
+  '5.1.2': 'New ART started: 1-7 days',
+  '5.1.3': 'New ART started: >7 days',
+  '5.2': 'New ART started with TLD',
   '5.3': 'New ART patients who are pregnant',
+  '6': 'Transfer-in patients',
+  '7': 'Lost and Return',
   '8': 'Number of patients started TPT in this quarter',
   '9': 'Number of patients who left the service',
   '9.1': 'Dead',
@@ -90,6 +101,22 @@ const INDICATOR_DISPLAY_NAMES = {
   '11.7': 'VL tested in 12M',
   '11.8': 'VL suppression'
 };
+
+/** Report label with NCHADS number prefix (matches SQL `AS Indicator` column). */
+function getCanonicalIndicatorLabel(indicatorId, sqlOrStoredLabel) {
+  const trimmed = typeof sqlOrStoredLabel === 'string' ? sqlOrStoredLabel.trim() : '';
+  if (trimmed && /^\d+(?:\.\d+)*\./.test(trimmed)) {
+    return trimmed;
+  }
+  if (String(indicatorId) === '9') {
+    return INDICATOR_9_LABEL;
+  }
+  const title = INDICATOR_DISPLAY_NAMES[String(indicatorId)];
+  if (title) {
+    return `${indicatorId}. ${title}`;
+  }
+  return trimmed || `Indicator ${indicatorId}`;
+}
 
 function sumIndicatorRows(...rows) {
   const fields = ['TOTAL', 'Male_0_14', 'Female_0_14', 'Male_over_14', 'Female_over_14'];
@@ -276,5 +303,6 @@ module.exports = {
   toNchadsDownloadFileName,
   fromNchadsDownloadFileName,
   getNchadsIdForFileName,
+  getCanonicalIndicatorLabel,
   STEM_TO_NCHADS
 };

@@ -7,7 +7,8 @@ const {
   INDICATOR_DISPLAY_NAMES,
   isComputedIndicatorId,
   buildIndicator9FromComponents,
-  injectIndicator9IntoAnalyticsMap
+  injectIndicator9IntoAnalyticsMap,
+  getCanonicalIndicatorLabel
 } = require('../config/nchadsIndicatorRegistry');
 
 class AnalyticsEngine {
@@ -417,7 +418,7 @@ class AnalyticsEngine {
     const [record, created] = await AnalyticsIndicator.findOrCreate({
       where: whereClause,
       defaults: {
-        indicator_name: this._getIndicatorName(indicatorId),
+        indicator_name: getCanonicalIndicatorLabel(indicatorId),
         site_name: period.siteName || siteCode,
         period_type: period.periodType,
         period_year: period.periodYear,
@@ -448,7 +449,13 @@ class AnalyticsEngine {
   async _storeCalculationResult(record, indicatorData, startTime) {
     const duration = Date.now() - startTime;
     
+    const canonicalLabel = getCanonicalIndicatorLabel(
+      record.indicator_id,
+      indicatorData.Indicator || record.indicator_name
+    );
+
     const updateData = {
+      indicator_name: canonicalLabel,
       total: indicatorData.TOTAL || 0,
       male_0_14: indicatorData.Male_0_14 || 0,
       female_0_14: indicatorData.Female_0_14 || 0,
@@ -603,7 +610,7 @@ class AnalyticsEngine {
       if (record) {
         // Construct the value object from individual fields
         const value = {
-          Indicator: record.indicator_name,
+          Indicator: getCanonicalIndicatorLabel(record.indicator_id, record.indicator_name),
           TOTAL: record.total,
           Male_0_14: record.male_0_14,
           Female_0_14: record.female_0_14,
@@ -657,7 +664,7 @@ class AnalyticsEngine {
       records.forEach(record => {
         // Construct the value object from individual fields
         const value = {
-          Indicator: record.indicator_name,
+          Indicator: getCanonicalIndicatorLabel(record.indicator_id, record.indicator_name),
           TOTAL: record.total,
           Male_0_14: record.male_0_14,
           Female_0_14: record.female_0_14,

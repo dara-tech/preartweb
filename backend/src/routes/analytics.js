@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const analyticsEngine = require('../services/analyticsEngine');
+const { getCanonicalIndicatorLabel } = require('../config/nchadsIndicatorRegistry');
 const { sequelize } = require('../config/database');
 const { Server } = require('socket.io');
 const http = require('http');
@@ -165,7 +166,7 @@ router.get('/indicators/fast', async (req, res) => {
       if (analyticsData.length > 0) {
         // Transform analytics data to match expected format
         const transformedData = analyticsData.map(record => ({
-          Indicator: record.indicator_name,
+          Indicator: getCanonicalIndicatorLabel(record.indicator_id, record.indicator_name),
           TOTAL: record.total,
           Male_0_14: record.male_0_14,
           Female_0_14: record.female_0_14,

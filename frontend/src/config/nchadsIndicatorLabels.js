@@ -191,6 +191,18 @@ export function isComputedIndicatorRow(indicator) {
 }
 
 export const NCHADS_NAME_SORT_ORDER = {
+  'Active ART patients in previous quarter': 1,
+  'Active Pre-ART patients in previous quarter': 2,
+  'Newly Enrolled': 3,
+  'Re-tested positive': 4,
+  'Newly Initiated': 5,
+  'New ART started: Same day': 5.1,
+  'New ART started: 1-7 days': 5.2,
+  'New ART started: >7 days': 5.13,
+  'New ART started with TLD': 5.2,
+  'New ART patients who are pregnant': 5.3,
+  'Transfer-in patients': 6,
+  'Lost and Return': 7,
   'Number of patients started TPT in this quarter': 8,
   'TPT Start (new start)': 8,
   'Number of patients who left the service': 9,
