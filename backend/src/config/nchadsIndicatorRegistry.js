@@ -192,6 +192,71 @@ function injectIndicator9IntoAnalyticsMap(indicatorsMap) {
   return indicatorsMap;
 }
 
+/** SQL file stem (no .sql) → NCHADS report number */
+function buildStemToNchadsMap() {
+  const map = {};
+  for (const [id, stem] of Object.entries(INDICATOR_FILE_MAP)) {
+    map[stem] = id;
+  }
+  for (const [id, stem] of Object.entries(INDICATOR_DETAIL_FILE_MAP)) {
+    map[stem] = id;
+  }
+  return map;
+}
+
+const STEM_TO_NCHADS = buildStemToNchadsMap();
+
+/**
+ * Rename on-disk SQL (e.g. 08_tpt_new_start.sql) to NCHADS form (8_tpt_new_start.sql).
+ */
+function toNchadsDownloadFileName(fileName) {
+  if (!fileName.endsWith('.sql')) {
+    return fileName;
+  }
+  const isDetails = fileName.endsWith('_details.sql');
+  const baseStem = fileName.replace(/\.sql$/, '').replace(/_details$/, '');
+  const nchadsId = STEM_TO_NCHADS[baseStem];
+  if (!nchadsId) {
+    return fileName;
+  }
+  const aggregateStem = INDICATOR_FILE_MAP[nchadsId];
+  if (!aggregateStem) {
+    return fileName;
+  }
+  const slug = aggregateStem.replace(/^[\d.]+_/, '');
+  const detailsPart = isDetails ? '_details' : '';
+  return `${nchadsId}_${slug}${detailsPart}.sql`;
+}
+
+/** Resolve NCHADS download name back to repository SQL filename. */
+function fromNchadsDownloadFileName(fileName) {
+  if (!fileName.endsWith('.sql')) {
+    return fileName;
+  }
+  const isDetails = fileName.endsWith('_details.sql');
+  const base = fileName.replace(/\.sql$/, '').replace(/_details$/, '');
+  const match = base.match(/^(\d+(?:\.\d+)*?)_(.+)$/);
+  if (!match) {
+    return fileName;
+  }
+  const [, nchadsId, slug] = match;
+  const aggregateStem = INDICATOR_FILE_MAP[nchadsId];
+  if (!aggregateStem || aggregateStem.replace(/^[\d.]+_/, '') !== slug) {
+    return fileName;
+  }
+  if (isDetails) {
+    const detailStem = INDICATOR_DETAIL_FILE_MAP[nchadsId];
+    return detailStem ? `${detailStem}.sql` : fileName;
+  }
+  return `${aggregateStem}.sql`;
+}
+
+function getNchadsIdForFileName(fileName) {
+  const legacy = fromNchadsDownloadFileName(fileName);
+  const baseStem = legacy.replace(/\.sql$/, '').replace(/_details$/, '');
+  return STEM_TO_NCHADS[baseStem] || null;
+}
+
 module.exports = {
   NCHADS_INDICATOR_IDS,
   INDICATOR_FILE_MAP,
@@ -207,5 +272,9 @@ module.exports = {
   buildIndicator9FromAnalyticsMap,
   injectIndicator9IntoSiteResults,
   injectIndicator9IntoDataArray,
-  injectIndicator9IntoAnalyticsMap
+  injectIndicator9IntoAnalyticsMap,
+  toNchadsDownloadFileName,
+  fromNchadsDownloadFileName,
+  getNchadsIdForFileName,
+  STEM_TO_NCHADS
 };

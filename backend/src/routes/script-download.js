@@ -2,7 +2,75 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { authenticateToken } = require('../middleware/auth');
+const {
+  INDICATOR_FILE_MAP,
+  INDICATOR_DETAIL_FILE_MAP,
+  INDICATOR_DISPLAY_NAMES,
+  toNchadsDownloadFileName,
+  fromNchadsDownloadFileName,
+  getNchadsIdForFileName
+} = require('../config/nchadsIndicatorRegistry');
 const router = express.Router();
+
+const WORKBENCH_ADULT_CHILD_DIR = path.join(__dirname, '../sql-workbench/ADULT_CHILD');
+const WORKBENCH_ROOT_DIR = path.join(__dirname, '../sql-workbench');
+
+function resolveWorkbenchSqlPath(fileName) {
+  const legacyName = fromNchadsDownloadFileName(fileName);
+  const candidates = [
+    path.join(WORKBENCH_ADULT_CHILD_DIR, legacyName),
+    path.join(WORKBENCH_ADULT_CHILD_DIR, fileName),
+    path.join(WORKBENCH_ROOT_DIR, legacyName),
+    path.join(WORKBENCH_ROOT_DIR, fileName)
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) || null;
+}
+
+function resolveIndicatorQueryPath(fileName) {
+  const legacyName = fromNchadsDownloadFileName(fileName);
+  const candidates = [
+    path.join(__dirname, '../queries/indicators', legacyName),
+    path.join(__dirname, '../queries/indicators', fileName)
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) || null;
+}
+
+function addWorkbenchDirToArchive(archive, dir, baseDir, zipBasePath) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      addWorkbenchDirToArchive(archive, fullPath, baseDir, zipBasePath);
+      continue;
+    }
+    if (!entry.name.endsWith('.sql') && !entry.name.endsWith('.md')) {
+      continue;
+    }
+    const relativeParts = path.relative(baseDir, fullPath).replace(/\\/g, '/').split('/');
+    const fileName = relativeParts[relativeParts.length - 1];
+    if (fileName.endsWith('.sql')) {
+      relativeParts[relativeParts.length - 1] = toNchadsDownloadFileName(fileName);
+    }
+    archive.file(fullPath, { name: `${zipBasePath}/${relativeParts.join('/')}` });
+  }
+}
+
+function enrichSqlScriptEntry(file, category, type, relativeDir) {
+  const downloadName = toNchadsDownloadFileName(file);
+  const nchadsId = getNchadsIdForFileName(file);
+  const displayLabel = nchadsId
+    ? `${nchadsId}. ${INDICATOR_DISPLAY_NAMES[nchadsId] || file.replace(/\.sql$/, '').replace(/_/g, ' ')}`
+    : file.replace(/\.sql$/, '').replace(/_/g, ' ');
+  return {
+    name: downloadName,
+    legacyName: file,
+    nchadsId,
+    type,
+    category,
+    description: getIndicatorSqlDescription(file, nchadsId),
+    path: `${relativeDir}/${file}`
+  };
+}
 
 // Get list of available analysis scripts
 router.get('/scripts', authenticateToken, async (req, res) => {
@@ -34,30 +102,29 @@ router.get('/scripts', authenticateToken, async (req, res) => {
       const queryFiles = fs.readdirSync(queriesDir);
       queryFiles.forEach(file => {
         if (file.endsWith('.sql')) {
-          scripts.push({
-            name: file,
-            type: 'indicator-query',
-            category: 'Indicator Queries',
-            description: getQueryDescription(file),
-            path: `queries/indicators/${file}`
-          });
+          scripts.push(
+            enrichSqlScriptEntry(file, 'Indicator Queries', 'indicator-query', 'queries/indicators')
+          );
         }
       });
     }
 
-    // Read SQL workbench files
-    const workbenchDir = path.join(__dirname, '../sql-workbench');
-    if (fs.existsSync(workbenchDir)) {
-      const workbenchFiles = fs.readdirSync(workbenchDir);
+    // Read SQL workbench files (ADULT_CHILD indicators)
+    if (fs.existsSync(WORKBENCH_ADULT_CHILD_DIR)) {
+      const workbenchFiles = fs.readdirSync(WORKBENCH_ADULT_CHILD_DIR);
       workbenchFiles.forEach(file => {
         if (file.endsWith('.sql') || file.endsWith('.md')) {
-          scripts.push({
-            name: file,
-            type: 'sql-workbench',
-            category: 'SQL Workbench Files',
-            description: getWorkbenchDescription(file),
-            path: `sql-workbench/${file}`
-          });
+          const entry = file.endsWith('.sql')
+            ? enrichSqlScriptEntry(file, 'SQL Workbench Files', 'sql-workbench', 'sql-workbench/ADULT_CHILD')
+            : {
+                name: file,
+                legacyName: file,
+                type: 'sql-workbench',
+                category: 'SQL Workbench Files',
+                description: getWorkbenchDescription(file),
+                path: `sql-workbench/ADULT_CHILD/${file}`
+              };
+          scripts.push(entry);
         }
       });
     }
@@ -103,10 +170,10 @@ router.get('/scripts/:scriptType/:fileName', authenticateToken, async (req, res)
         filePath = path.join(__dirname, '../../scripts', fileName);
         break;
       case 'indicator-query':
-        filePath = path.join(__dirname, '../queries/indicators', fileName);
+        filePath = resolveIndicatorQueryPath(fileName);
         break;
       case 'sql-workbench':
-        filePath = path.join(__dirname, '../sql-workbench', fileName);
+        filePath = resolveWorkbenchSqlPath(fileName);
         break;
       case 'service':
         filePath = path.join(__dirname, '../services', fileName);
@@ -118,18 +185,22 @@ router.get('/scripts/:scriptType/:fileName', authenticateToken, async (req, res)
         });
     }
 
-    if (!fs.existsSync(filePath)) {
+    if (!filePath) {
       return res.status(404).json({
         success: false,
         message: 'Script not found'
       });
     }
 
+    const downloadFileName = fileName.endsWith('.sql')
+      ? toNchadsDownloadFileName(path.basename(filePath))
+      : fileName;
+
     const content = fs.readFileSync(filePath, 'utf8');
     let workbookContent;
     
     try {
-      workbookContent = convertToWorkbookFormat(content, fileName, scriptType);
+      workbookContent = convertToWorkbookFormat(content, downloadFileName, scriptType);
     } catch (error) {
       console.error('Error converting to workbook format:', error);
       // Fallback to original content if conversion fails
@@ -137,7 +208,7 @@ router.get('/scripts/:scriptType/:fileName', authenticateToken, async (req, res)
     }
 
     res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${downloadFileName}"`);
     res.send(workbookContent);
   } catch (error) {
     console.error('Error downloading script:', error);
@@ -151,7 +222,7 @@ router.get('/scripts/:scriptType/:fileName', authenticateToken, async (req, res)
 
 // Download the entire sql-workbench folder as a zip (includes all subfolders)
 router.get('/scripts/download-sql-workbench', authenticateToken, async (req, res) => {
-  const workbenchDir = path.join(__dirname, '../sql-workbench');
+  const workbenchDir = WORKBENCH_ROOT_DIR;
   if (!fs.existsSync(workbenchDir)) {
     return res.status(404).json({
       success: false,
@@ -182,24 +253,7 @@ router.get('/scripts/download-sql-workbench', authenticateToken, async (req, res
     res.setHeader('Content-Disposition', 'attachment; filename="sql-workbench.zip"');
     archive.pipe(res);
 
-    function addDirToArchive(dir, baseDir) {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        const relativePath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
-        if (entry.isDirectory()) {
-          addDirToArchive(fullPath, baseDir);
-        } else {
-          try {
-            archive.file(fullPath, { name: `sql-workbench/${relativePath}` });
-          } catch (fileErr) {
-            console.error('Error adding file to archive:', fullPath, fileErr);
-          }
-        }
-      }
-    }
-
-    addDirToArchive(workbenchDir, workbenchDir);
+    addWorkbenchDirToArchive(archive, workbenchDir, workbenchDir, 'sql-workbench');
     await archive.finalize();
   } catch (error) {
     console.error('Error creating sql-workbench zip:', error);
@@ -240,20 +294,8 @@ router.get('/scripts/download-all', authenticateToken, async (req, res) => {
 
     archive.pipe(res);
 
-    // Add SQL workbench files (main focus)
-    const workbenchDir = path.join(__dirname, '../sql-workbench');
-    
-    if (fs.existsSync(workbenchDir)) {
-      const files = fs.readdirSync(workbenchDir);
-      
-      // Add each file individually to ensure they're included
-      files.forEach(file => {
-        const filePath = path.join(workbenchDir, file);
-        const stats = fs.statSync(filePath);
-        if (stats.isFile()) {
-          archive.file(filePath, { name: `sql-workbench/${file}` });
-        }
-      });
+    if (fs.existsSync(WORKBENCH_ROOT_DIR)) {
+      addWorkbenchDirToArchive(archive, WORKBENCH_ROOT_DIR, WORKBENCH_ROOT_DIR, 'sql-workbench');
     }
 
     // Add README with instructions
@@ -305,31 +347,39 @@ function getScriptDescription(fileName) {
   return descriptions[fileName] || 'Backend utility script';
 }
 
-function getQueryDescription(fileName) {
-  const descriptions = {
-    '01_active_art_previous.sql': 'Active ART patients from previous period',
-    '02_active_pre_art_previous.sql': 'Active Pre-ART patients from previous period',
-    '03_newly_enrolled.sql': 'Newly enrolled patients',
-    '04_retested_positive.sql': 'Retested positive patients',
-    '05_newly_initiated.sql': 'Newly initiated ART patients',
-    '06_transfer_in.sql': 'Transfer in patients',
-    '07_lost_and_return.sql': 'Lost and returned patients',
-    '08_tpt_new_start.sql': 'TPT started (new start in period)',
-    '08.2_dead.sql': 'Deceased patients',
-    '08.3_lost_to_followup.sql': 'Lost to follow-up patients',
-    '08.4_transfer_out.sql': 'Transfer out patients',
-    '09_active_pre_art.sql': 'Currently active Pre-ART patients',
-    '10_active_art_current.sql': 'Currently active ART patients',
-    '10.1_eligible_mmd.sql': 'Eligible for multi-month dispensing',
-    '10.2_mmd.sql': 'Multi-month dispensing patients',
-    '10.3_tld.sql': 'TLD (Tenofovir/Lamivudine/Dolutegravir) patients',
-    '10.4_tpt_start.sql': 'TPT (TB Preventive Therapy) started',
-    '10.5_tpt_complete.sql': 'TPT completed',
-    '10.6_eligible_vl_test.sql': 'Eligible for viral load testing',
-    '10.7_vl_tested_12m.sql': 'Viral load tested in last 12 months',
-    '10.8_vl_suppression.sql': 'Viral load suppression'
+function getIndicatorSqlDescription(fileName, nchadsId) {
+  const isDetails = fileName.includes('_details');
+  if (nchadsId && INDICATOR_DISPLAY_NAMES[nchadsId]) {
+    const label = INDICATOR_DISPLAY_NAMES[nchadsId];
+    return isDetails
+      ? `Indicator ${nchadsId} - ${label} (detailed records)`
+      : `Indicator ${nchadsId} - ${label}`;
+  }
+  const legacyDescriptions = {
+    '01_active_art_previous.sql': 'Indicator 1 - Active ART patients from previous period',
+    '02_active_pre_art_previous.sql': 'Indicator 2 - Active Pre-ART patients from previous period',
+    '03_newly_enrolled.sql': 'Indicator 3 - Newly enrolled patients',
+    '04_retested_positive.sql': 'Indicator 4 - Retested positive patients',
+    '05_newly_initiated.sql': 'Indicator 5 - Newly initiated ART patients',
+    '05.3_art_pregnant.sql': 'Indicator 5.3 - New ART patients who are pregnant',
+    '06_transfer_in.sql': 'Indicator 6 - Transfer in patients',
+    '07_lost_and_return.sql': 'Indicator 7 - Lost and returned patients',
+    '08_tpt_new_start.sql': 'Indicator 8 - TPT started (new start in period)',
+    '08.2_dead.sql': 'Indicator 9.1 - Deceased patients',
+    '08.3_lost_to_followup.sql': 'Indicator 9.2 - Lost to follow-up patients',
+    '08.4_transfer_out.sql': 'Indicator 9.3 - Transfer out patients',
+    '09_active_pre_art.sql': 'Indicator 10 - Currently active Pre-ART patients',
+    '10_active_art_current.sql': 'Indicator 11 - Currently active ART patients',
+    '10.1_eligible_mmd.sql': 'Indicator 11.1 - Eligible for multi-month dispensing',
+    '10.2_mmd.sql': 'Indicator 11.2 - Multi-month dispensing patients',
+    '10.3_tld.sql': 'Indicator 11.3 - TLD patients',
+    '10.4_tpt_start.sql': 'Indicator 11.4 - TPT (TB Preventive Therapy) started',
+    '10.5_tpt_complete.sql': 'Indicator 11.5 - TPT completed',
+    '10.6_eligible_vl_test.sql': 'Indicator 11.6 - Eligible for viral load testing',
+    '10.7_vl_tested_12m.sql': 'Indicator 11.7 - Viral load tested in last 12 months',
+    '10.8_vl_suppression.sql': 'Indicator 11.8 - Viral load suppression'
   };
-  return descriptions[fileName] || 'Indicator calculation query';
+  return legacyDescriptions[fileName] || 'Indicator calculation query';
 }
 
 function getServiceDescription(fileName) {
@@ -345,62 +395,18 @@ function getServiceDescription(fileName) {
 }
 
 function getWorkbenchDescription(fileName) {
-  const descriptions = {
-    'artweb-complete-indicators-workbench.sql': 'Complete analysis with all indicators - ready for workbench',
-    '01_active_art_previous.sql': 'Active ART patients from previous period - workbench ready',
-    '01_active_art_previous_details.sql': 'Active ART patients from previous period - detailed records',
-    '02_active_pre_art_previous.sql': 'Active Pre-ART patients from previous period - workbench ready',
-    '02_active_pre_art_previous_details.sql': 'Active Pre-ART patients from previous period - detailed records',
-    '03_newly_enrolled.sql': 'Newly enrolled patients - workbench ready',
-    '03_newly_enrolled_details.sql': 'Newly enrolled patients - detailed records',
-    '04_retested_positive.sql': 'Retested positive patients - workbench ready',
-    '04_retested_positive_details.sql': 'Retested positive patients - detailed records',
-    '05_newly_initiated.sql': 'Newly initiated ART patients - workbench ready',
-    '05_newly_initiated_details.sql': 'Newly initiated ART patients - detailed records',
-    '05.1.1_art_same_day.sql': 'ART same day initiation - workbench ready',
-    '05.1.1_art_same_day_details.sql': 'ART same day initiation - detailed records',
-    '05.1.2_art_1_7_days.sql': 'ART initiation 1-7 days - workbench ready',
-    '05.1.2_art_1_7_days_details.sql': 'ART initiation 1-7 days - detailed records',
-    '05.1.3_art_over_7_days.sql': 'ART initiation over 7 days - workbench ready',
-    '05.1.3_art_over_7_days_details.sql': 'ART initiation over 7 days - detailed records',
-    '05.2_art_with_tld.sql': 'ART with TLD regimen - workbench ready',
-    '05.2_art_with_tld_details.sql': 'ART with TLD regimen - detailed records',
-    '06_transfer_in.sql': 'Transfer in patients - workbench ready',
-    '06_transfer_in_details.sql': 'Transfer in patients - detailed records',
-    '07_lost_and_return.sql': 'Lost and return patients - workbench ready',
-    '07_lost_and_return_details.sql': 'Lost and return patients - detailed records',
-    '08_tpt_new_start.sql': 'TPT new start - workbench ready',
-    '08_tpt_new_start_details.sql': 'TPT new start - detailed records',
-    '08.2_dead.sql': 'Deceased patients - workbench ready',
-    '08.2_dead_details.sql': 'Deceased patients - detailed records',
-    '08.3_lost_to_followup.sql': 'Lost to follow-up patients - workbench ready',
-    '08.3_lost_to_followup_details.sql': 'Lost to follow-up patients - detailed records',
-    '08.4_transfer_out.sql': 'Transfer out patients - workbench ready',
-    '08.4_transfer_out_details.sql': 'Transfer out patients - detailed records',
-    '09_active_pre_art.sql': 'Currently active Pre-ART patients - workbench ready',
-    '09_active_pre_art_details.sql': 'Currently active Pre-ART patients - detailed records',
-    '10_active_art_current.sql': 'Currently active ART patients - workbench ready',
-    '10_active_art_current_details.sql': 'Currently active ART patients - detailed records',
-    '10.1_eligible_mmd.sql': 'Eligible for multi-month dispensing - workbench ready',
-    '10.1_eligible_mmd_details.sql': 'Eligible for multi-month dispensing - detailed records',
-    '10.2_mmd.sql': 'Multi-month dispensing patients - workbench ready',
-    '10.2_mmd_details.sql': 'Multi-month dispensing patients - detailed records',
-    '10.3_tld.sql': 'TLD patients - workbench ready',
-    '10.3_tld_details.sql': 'TLD patients - detailed records',
-    '10.4_tpt_start.sql': 'TPT started patients - workbench ready',
-    '10.4_tpt_start_details.sql': 'TPT started patients - detailed records',
-    '10.5_tpt_complete.sql': 'TPT completed patients - workbench ready',
-    '10.5_tpt_complete_details.sql': 'TPT completed patients - detailed records',
-    '10.6_eligible_vl_test.sql': 'Eligible for viral load testing - workbench ready',
-    '10.6_eligible_vl_test_details.sql': 'Eligible for viral load testing - detailed records',
-    '10.7_vl_tested_12m.sql': 'Viral load tested in last 12 months - workbench ready',
-    '10.7_vl_tested_12m_details.sql': 'Viral load tested in last 12 months - detailed records',
-    '10.8_vl_suppression.sql': 'Viral load suppression - workbench ready',
-    '10.8_vl_suppression_details.sql': 'Viral load suppression - detailed records',
-    'variables.sql': 'System variables and parameters - workbench ready',
-    'README-WORKBENCH.md': 'Complete documentation for SQL workbench usage'
-  };
-  return descriptions[fileName] || 'SQL workbench file with parameters';
+  if (fileName === 'README-WORKBENCH.md') {
+    return 'Complete documentation for SQL workbench usage';
+  }
+  if (fileName === 'artweb-complete-indicators-workbench.sql') {
+    return 'Complete analysis with all indicators - ready for workbench';
+  }
+  if (fileName === 'variables.sql') {
+    return 'System variables and parameters - workbench ready';
+  }
+  const nchadsId = getNchadsIdForFileName(fileName);
+  const base = getIndicatorSqlDescription(fileName, nchadsId);
+  return fileName.includes('_details') ? `${base} - workbench ready` : `${base} - workbench ready`;
 }
 
 function convertToWorkbookFormat(content, fileName, scriptType) {
@@ -509,29 +515,17 @@ Before running any scripts, ensure you have access to the ART database with the 
    node script-name.js
    \`\`\`
 
-## Indicator Descriptions
+## Indicator Descriptions (NCHADS report numbers)
 
-- **01_active_art_previous** - Active ART patients from previous period
-- **02_active_pre_art_previous** - Active Pre-ART patients from previous period
-- **03_newly_enrolled** - Newly enrolled patients
-- **04_retested_positive** - Retested positive patients
-- **05_newly_initiated** - Newly initiated ART patients
-- **06_transfer_in** - Transfer in patients
-- **07_lost_and_return** - Lost and returned patients
-- **08_tpt_new_start** - TPT started (new start in reporting period)
-- **08.2_dead** - Deceased patients
-- **08.3_lost_to_followup** - Lost to follow-up patients
-- **08.4_transfer_out** - Transfer out patients
-- **09_active_pre_art** - Currently active Pre-ART patients
-- **10_active_art_current** - Currently active ART patients
-- **10.1_eligible_mmd** - Eligible for multi-month dispensing
-- **10.2_mmd** - Multi-month dispensing patients
-- **10.3_tld** - TLD (Tenofovir/Lamivudine/Dolutegravir) patients
-- **10.4_tpt_start** - TPT (TB Preventive Therapy) started
-- **10.5_tpt_complete** - TPT completed
-- **10.6_eligible_vl_test** - Eligible for viral load testing
-- **10.7_vl_tested_12m** - Viral load tested in last 12 months
-- **10.8_vl_suppression** - Viral load suppression
+Downloaded SQL files use NCHADS indicator numbers in filenames (e.g. \`8_tpt_new_start.sql\`, \`9.1_dead.sql\`).
+
+${Object.entries(INDICATOR_FILE_MAP)
+  .map(([id, stem]) => {
+    const label = INDICATOR_DISPLAY_NAMES[id] || stem.replace(/^[\d.]+_/, '').replace(/_/g, ' ');
+  const file = toNchadsDownloadFileName(`${stem}.sql`);
+    return `- **${file}** - Indicator ${id}: ${label}`;
+  })
+  .join('\n')}
 
 ## Support
 
