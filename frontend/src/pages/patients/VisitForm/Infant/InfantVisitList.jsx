@@ -175,8 +175,8 @@ function InfantVisitList() {
         <div className="px-4 sm:px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-foreground">Infant Visits</h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <h1 className="text-sm font-medium text-muted-foreground">Infant Visits</h1>
+              <p className="text-xs text-muted-foreground mt-1">
                 {totalVisits.toLocaleString()} {totalVisits === 1 ? 'visit' : 'visits'} total
               </p>
             </div>

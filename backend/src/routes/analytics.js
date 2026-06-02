@@ -5,6 +5,37 @@ const { getCanonicalIndicatorLabel } = require('../config/nchadsIndicatorRegistr
 const { sequelize } = require('../config/database');
 const { Server } = require('socket.io');
 const http = require('http');
+const { authenticateToken } = require('../middleware/auth');
+const {
+  runEtl,
+  runEtlMulti,
+  querySummary,
+  queryCountryRollup,
+  queryProvinceRollup,
+  getEtlHistory,
+  getLastRefreshed,
+  ensureAnalyticsTables,
+  getEtlProgress,
+  clearPeriodAnalytics,
+  truncateAnalyticsTable
+} = require('../services/analyticsEtlService');
+
+let etlRunning = false;
+
+function parsePeriodQuery(query) {
+  const periodType = String(query.periodType || 'quarter').toLowerCase();
+  const year = String(query.year || new Date().getFullYear());
+  const quarter = String(query.quarter || Math.floor(new Date().getMonth() / 3) + 1);
+  const month = String(query.month || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
+
+  // Derive period label for queries
+  let periodLabel;
+  if (periodType === 'quarter') periodLabel = `${year}-Q${quarter}`;
+  else if (periodType === 'month') periodLabel = month;
+  else periodLabel = year;
+
+  return { periodType, year, quarter, month, periodLabel };
+}
 
 /**
  * GET /analytics/summary
@@ -534,6 +565,191 @@ router.post('/clear-cache', async (req, res) => {
       error: 'Failed to clear cache',
       message: error.message
     });
+  }
+});
+
+// ─── GET /apiv1/analytics/status ─────────────────────────────────────────────
+router.get('/status', authenticateToken, async (req, res) => {
+  try {
+    const { periodLabel, periodType } = parsePeriodQuery(req.query);
+    await ensureAnalyticsTables();
+
+    const lastRefreshed = await getLastRefreshed(periodLabel);
+    const history = await getEtlHistory({ limit: 5 });
+    const progress = getEtlProgress();
+
+    res.json({
+      success: true,
+      periodLabel,
+      periodType,
+      lastRefreshed,
+      hasData: Boolean(lastRefreshed),
+      etlRunning,
+      etlProgress: progress,
+      recentHistory: history
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ─── GET /apiv1/analytics/country ─────────────────────────────────────────────
+router.get('/country', authenticateToken, async (req, res) => {
+  try {
+    const { periodLabel, periodType } = parsePeriodQuery(req.query);
+    const rows = await queryCountryRollup({ periodLabel, periodType });
+    const lastRefreshed = await getLastRefreshed(periodLabel);
+
+    res.json({
+      success: true,
+      data: rows,
+      meta: {
+        periodLabel,
+        periodType,
+        lastRefreshed,
+        rowCount: rows.length
+      }
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ─── GET /apiv1/analytics/province ────────────────────────────────────────────
+router.get('/province', authenticateToken, async (req, res) => {
+  try {
+    const { periodLabel, periodType } = parsePeriodQuery(req.query);
+    const rows = await queryProvinceRollup({ periodLabel, periodType });
+    const lastRefreshed = await getLastRefreshed(periodLabel);
+
+    res.json({
+      success: true,
+      data: rows,
+      meta: {
+        periodLabel,
+        periodType,
+        lastRefreshed,
+        rowCount: rows.length
+      }
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ─── GET /apiv1/analytics/etl-history ─────────────────────────────────────────
+router.get('/etl-history', authenticateToken, async (req, res) => {
+  try {
+    const limit = Math.min(Number(req.query.limit || 20), 100);
+    const history = await getEtlHistory({ limit });
+    res.json({ success: true, data: history });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ─── POST /apiv1/analytics/refresh ────────────────────────────────────────────
+router.post('/refresh', authenticateToken, async (req, res) => {
+  if (etlRunning) {
+    return res.status(409).json({
+      success: false,
+      error: 'ETL is already running. Please wait for it to finish.'
+    });
+  }
+
+  const body = req.body || req.query;
+  const periods = Array.isArray(body.periods) ? body.periods : null;
+
+  if (periods && periods.length > 0) {
+    res.json({
+      success: true,
+      message: `ETL started for ${periods.length} period(s): ${periods.slice(0, 4).join(', ')}${periods.length > 4 ? '...' : ''}. Check /analytics/status for progress.`,
+      periods
+    });
+
+    etlRunning = true;
+    runEtlMulti({ periodKeys: periods, triggeredBy: 'manual' })
+      .then((result) => {
+        console.log(`[Analytics] Multi ETL completed: ${result.totalRows} rows across ${result.results.length} periods`);
+      })
+      .catch((e) => {
+        console.error(`[Analytics] Multi ETL failed: ${e.message}`);
+      })
+      .finally(() => {
+        etlRunning = false;
+      });
+  } else {
+    const { periodType, year, quarter, month, periodLabel } = parsePeriodQuery(body);
+
+    if (periodType === 'year') {
+      const quarterKeys = [`${year}-Q1`, `${year}-Q2`, `${year}-Q3`, `${year}-Q4`];
+
+      res.json({
+        success: true,
+        message: `Year ${year} expanded to 4 quarters: ${quarterKeys.join(', ')}. ETL started. Check /analytics/status for progress.`,
+        periods: quarterKeys,
+        periodType: 'quarter'
+      });
+
+      etlRunning = true;
+      runEtlMulti({ periodKeys: quarterKeys, triggeredBy: 'manual' })
+        .then((result) => {
+          console.log(`[Analytics] Year ETL (${year}) completed: ${result.totalRows} rows across ${result.results.length} quarters`);
+        })
+        .catch((e) => {
+          console.error(`[Analytics] Year ETL (${year}) failed: ${e.message}`);
+        })
+        .finally(() => {
+          etlRunning = false;
+        });
+
+    } else {
+      res.json({
+        success: true,
+        message: `ETL started for ${periodLabel}. Check /analytics/status for progress.`,
+        periodLabel,
+        periodType
+      });
+
+      etlRunning = true;
+      runEtl({ periodType, year, quarter, month, triggeredBy: 'manual' })
+        .then((result) => {
+          console.log(`[Analytics] ETL completed: ${result.rowCount} rows for ${result.periodLabel}`);
+        })
+        .catch((e) => {
+          console.error(`[Analytics] ETL failed: ${e.message}`);
+        })
+        .finally(() => {
+          etlRunning = false;
+        });
+    }
+  }
+});
+
+// ─── POST /apiv1/analytics/clear ─────────────────────────────────────────────
+router.post('/clear', authenticateToken, async (req, res) => {
+  try {
+    const { clearAll } = req.body || req.query || {};
+    const isClearAll = clearAll === true || clearAll === 'true' || clearAll === 1 || clearAll === '1';
+
+    if (isClearAll) {
+      await truncateAnalyticsTable();
+      return res.json({
+        success: true,
+        message: 'Successfully cleared all analytics data from the warehouse.'
+      });
+    } else {
+      const { periodLabel, periodType } = parsePeriodQuery(req.body || req.query);
+      await clearPeriodAnalytics({ periodLabel, periodType });
+      return res.json({
+        success: true,
+        message: `Successfully cleared analytics data for ${periodLabel}.`,
+        periodLabel,
+        periodType
+      });
+    }
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
   }
 });
 

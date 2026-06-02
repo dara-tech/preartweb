@@ -269,11 +269,11 @@ const QueryEditorAdmin = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Database className="h-8 w-8" />
+          <h1 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <Database className="h-4 w-4" />
             Query Editor Admin
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-1">
             Manage and execute Mortality & Retention indicator SQL queries
           </p>
         </div>

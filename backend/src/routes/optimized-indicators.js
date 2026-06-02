@@ -6,6 +6,7 @@ const { siteDatabaseManager } = require('../config/siteDatabase');
 const { performance } = require('perf_hooks');
 const timeoutHandler = require('../middleware/timeoutHandler');
 const { injectIndicator9IntoDataArray } = require('../config/nchadsIndicatorRegistry');
+const { getAggregateSequelize } = require('../config/aggregateDatabase');
 const router = express.Router();
 
 // Simple request deduplication
@@ -51,7 +52,7 @@ function determinePeriodFromDates(startDate, endDate) {
 // Get all indicators (optimized)
 router.get('/all', async (req, res) => {
   try {
-    const { startDate, endDate, previousEndDate, siteCode } = req.query;
+    const { startDate, endDate, previousEndDate, siteCode, siteLevel } = req.query;
     
     const params = {
       startDate: startDate || '2025-01-01',
@@ -59,6 +60,8 @@ router.get('/all', async (req, res) => {
       previousEndDate: previousEndDate || '2024-12-31',
       siteCode: siteCode || null
     };
+
+    const targetSiteLevel = siteLevel || (params.siteCode === 'all' ? 'country' : null);
 
     // Create a unique key for this request
     const requestKey = `all:${JSON.stringify(params)}`;
@@ -87,8 +90,64 @@ router.get('/all', async (req, res) => {
       // Determine period type and parameters for analytics
       const period = determinePeriodFromDates(params.startDate, params.endDate);
       
+      // Try to query country-level pre-aggregated data from main_dbs first
+      if (targetSiteLevel === 'country' || params.siteCode === 'all') {
+        try {
+          const { periodType, periodYear, periodQuarter } = determinePeriodFromDates(params.startDate, params.endDate);
+          const periodLabel = `${periodYear}-Q${periodQuarter}`;
+          const sequelize = getAggregateSequelize();
+          
+          const sql = `
+            SELECT
+              indicator AS Indicator,
+              SUM(male_0_14) AS Male_0_14,
+              SUM(female_0_14) AS Female_0_14,
+              SUM(male_over_14) AS Male_over_14,
+              SUM(female_over_14) AS Female_over_14,
+              SUM(male_0_14 + female_0_14 + male_over_14 + female_over_14) AS TOTAL
+            FROM analytics_indicator_summary
+            WHERE period_type = 'quarter' AND period_label = :periodLabel
+            GROUP BY indicator
+          `;
+          
+          const rows = await sequelize.query(sql, {
+            replacements: { periodLabel },
+            type: sequelize.QueryTypes.SELECT
+          });
+          
+          if (rows && rows.length > 0) {
+            console.log(`📊 Using pre-aggregated country-level data from main_dbs for ${periodLabel} (${rows.length} rows)`);
+            const formatted = rows.map(r => ({
+              Indicator: r.Indicator,
+              TOTAL: Number(r.TOTAL || 0),
+              Male_0_14: Number(r.Male_0_14 || 0),
+              Female_0_14: Number(r.Female_0_14 || 0),
+              Male_over_14: Number(r.Male_over_14 || 0),
+              Female_over_14: Number(r.Female_over_14 || 0),
+              error: null
+            }));
+            const results = injectIndicator9IntoDataArray(formatted);
+            return {
+              success: true,
+              data: results,
+              performance: {
+                executionTime: performance.now() - startTime,
+                successCount: results.length,
+                errorCount: 0
+              },
+              siteCode: 'all',
+              fromCache: true,
+              analyticsData: true
+            };
+          }
+          console.log(`📊 No country-level data found in main_dbs for ${periodLabel}, falling back to live queries`);
+        } catch (error) {
+          console.error(`📊 Error loading country-level indicators from main_dbs: ${error.message}. Falling back to live query.`);
+        }
+      }
+
       // Try to get data from analytics first
-      if (params.siteCode) {
+      if (params.siteCode && params.siteCode !== 'all') {
         // Single site - try analytics first
         const analyticsResult = await analyticsEngine.getAllIndicatorsForPeriod(params.siteCode, period);
         
@@ -193,7 +252,7 @@ router.get('/all', async (req, res) => {
       // Database query fallback
       let result;
       
-      if (params.siteCode) {
+      if (params.siteCode && params.siteCode !== 'all') {
         // Use site-specific service when siteCode is provided
         
         // Validate site exists
@@ -332,7 +391,7 @@ router.get('/all', async (req, res) => {
 router.get('/:indicatorId', async (req, res) => {
   try {
     const { indicatorId } = req.params;
-    const { startDate, endDate, previousEndDate, siteCode } = req.query;
+    const { startDate, endDate, previousEndDate, siteCode, siteLevel } = req.query;
     
     const params = {
       startDate: startDate || '2025-01-01',
@@ -340,6 +399,62 @@ router.get('/:indicatorId', async (req, res) => {
       previousEndDate: previousEndDate || '2024-12-31',
       siteCode: siteCode || null
     };
+
+    const targetSiteLevel = siteLevel || (params.siteCode === 'all' ? 'country' : null);
+
+    if (targetSiteLevel === 'country' || params.siteCode === 'all') {
+      try {
+        const { periodType, periodYear, periodQuarter } = determinePeriodFromDates(params.startDate, params.endDate);
+        const periodLabel = `${periodYear}-Q${periodQuarter}`;
+        const sequelize = getAggregateSequelize();
+        
+        const sql = `
+          SELECT
+            indicator AS Indicator,
+            SUM(male_0_14) AS Male_0_14,
+            SUM(female_0_14) AS Female_0_14,
+            SUM(male_over_14) AS Male_over_14,
+            SUM(female_over_14) AS Female_over_14,
+            SUM(male_0_14 + female_0_14 + male_over_14 + female_over_14) AS TOTAL
+          FROM analytics_indicator_summary
+          WHERE period_type = 'quarter' AND period_label = :periodLabel
+          GROUP BY indicator
+        `;
+        
+        const rows = await sequelize.query(sql, {
+          replacements: { periodLabel },
+          type: sequelize.QueryTypes.SELECT
+        });
+        
+        if (rows && rows.length > 0) {
+          const formatted = rows.map(r => ({
+            Indicator: r.Indicator,
+            TOTAL: Number(r.TOTAL || 0),
+            Male_0_14: Number(r.Male_0_14 || 0),
+            Female_0_14: Number(r.Female_0_14 || 0),
+            Male_over_14: Number(r.Male_over_14 || 0),
+            Female_over_14: Number(r.Female_over_14 || 0),
+            error: null
+          }));
+          const results = injectIndicator9IntoDataArray(formatted);
+          
+          const indicatorPattern = new RegExp(`^${indicatorId}\\.`);
+          const matchedResult = results.find(r => indicatorPattern.test(r.Indicator) || r.Indicator.startsWith(indicatorId));
+          
+          if (matchedResult) {
+            return res.json({
+              success: true,
+              data: matchedResult,
+              period: params,
+              fromCache: true,
+              analyticsData: true
+            });
+          }
+        }
+      } catch (error) {
+        console.error(`📊 Error loading country-level single indicator from main_dbs: ${error.message}. Falling back to live query.`);
+      }
+    }
 
     const result = await optimizedIndicators.executeIndicator(indicatorId, params, false); // Disable caching
 
@@ -511,7 +626,7 @@ router.get('/details/:indicatorId', async (req, res) => {
       try {
         // Get sites to query - either specific site or all sites
         let sites;
-        if (params.siteCode) {
+        if (params.siteCode && params.siteCode !== 'all') {
           // Single site - validate it exists
           const siteInfo = await siteDatabaseManager.getSiteInfo(params.siteCode);
           if (!siteInfo) {

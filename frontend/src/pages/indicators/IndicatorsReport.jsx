@@ -159,6 +159,9 @@ const IndicatorsReport = () => {
       // Only add siteCode if a specific site is selected (not "All Sites")
       if (selectedSite) {
         params.siteCode = selectedSite.code;
+      } else {
+        params.siteCode = 'all';
+        params.siteLevel = 'country';
       }
       
       // Always get all indicators, filtering will be done on frontend
@@ -254,11 +257,6 @@ const IndicatorsReport = () => {
       
       // Backend now returns only active sites (status = 1)
       setSites(sitesData);
-      
-      // Auto-select first site if none is selected
-      if (sitesData && sitesData.length > 0 && !selectedSite) {
-        setSelectedSite(sitesData[0]);
-      }
     } catch (error) {
       console.error('Error loading sites:', error);
       // Fallback to all sites if the new endpoint fails
@@ -270,11 +268,6 @@ const IndicatorsReport = () => {
           index === self.findIndex(s => s.code === site.code)
         );
         setSites(uniqueSites);
-        
-        // Auto-select first site if none is selected
-        if (uniqueSites && uniqueSites.length > 0 && !selectedSite) {
-          setSelectedSite(uniqueSites[0]);
-        }
       } catch (fallbackError) {
         console.error('Error loading fallback sites:', fallbackError);
         setSites([]);
@@ -424,7 +417,8 @@ const IndicatorsReport = () => {
 
       const response = await reportingApi.getIndicatorDetails(indicatorKey, {
         ...filterParams,
-        siteCode: selectedSite?.code
+        siteCode: selectedSite?.code || 'all',
+        siteLevel: selectedSite ? undefined : 'country'
       });
 
       if (response.success) {

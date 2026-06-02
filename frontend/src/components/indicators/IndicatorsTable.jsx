@@ -111,27 +111,27 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
 
   // Default Table View - Matching the image format exactly
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-2">
       {/* Indicators Table - Matching the image layout */}
       <div className="bg-card overflow-hidden rounded-none">
         <div className="overflow-x-auto">
           <table className="w-full">
             {/* Table Header */}
-            <thead className="bg-blue-800 border-b border-muted">
+            <thead className="bg-primary border-b border-primary/80">
               <tr>
-                <th className="px-4 py-4 text-center text-sm font-bold text-white border-r border-muted">
+                <th className="px-2 py-2 text-center text-xs font-bold text-white border-r border-muted">
                   សុចនាករ Indicator
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-white w-32 border-r border-muted">
+                <th className="px-2 py-2 text-right text-xs font-bold text-white w-32 border-r border-muted">
                   អាយុ Age
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-white w-24 border-r border-muted">
+                <th className="px-2 py-2 text-right text-xs font-bold text-white w-24 border-r border-muted">
                   ប្រុស Male
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-white w-32 border-r border-muted">
+                <th className="px-2 py-2 text-right text-xs font-bold text-white w-32 border-r border-muted">
                   ស្រី Female
                 </th>
-                <th className="px-3 py-4 text-right text-sm font-bold text-white w-24">
+                <th className="px-2 py-2 text-right text-xs font-bold text-white w-24">
                   សរុប Total
                 </th>
               </tr>
@@ -146,7 +146,7 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     className="border-b border-border/50"
                   >
                     {/* Indicator Name - spans 3 rows */}
-                    <td className="px-4 py-4 text-sm text-foreground align-middle text-left border-r border-border/50" rowSpan="3">
+                    <td className="px-2 py-2 text-xs text-foreground align-middle text-left border-r border-border/50" rowSpan="3">
                       <div 
                         className={`font-medium leading-tight text-left transition-colors ${
                           !isComputedIndicatorRow(indicator) && (indicator.TOTAL || 0) > 0 
@@ -167,17 +167,17 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
 
                     {/* Age 0-14 */}
-                    <td className="px-3 py-4 text-center text-sm font-medium text-muted-foreground bg-muted/50 border-r border-border/50 hover:bg-muted/70 hover:font-bold transition-all duration-200">
+                    <td className="px-2 py-1.5 text-center text-xs font-medium text-muted-foreground bg-muted/50 border-r border-border/50 hover:bg-muted/70 hover:font-bold transition-all duration-200">
                       0-14
                     </td>
 
                     {/* Male 0-14 */}
-                    <td className="px-3 py-4 text-right border-r border-border/50">
+                    <td className="px-2 py-1.5 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal transition-colors ${
+                        className={`text-base font-normal transition-colors ${
                           !isComputedIndicatorRow(indicator) && (indicator.Male_0_14 || 0) > 0 
-                            ? 'text-blue-600 cursor-pointer hover:text-blue-800 underline' 
-                            : 'text-blue-600/60 cursor-default'
+                            ? 'text-report-male cursor-pointer hover:text-report-male/80 underline'
+                            : 'text-report-male/60 cursor-default'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -190,12 +190,12 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
 
                     {/* Female 0-14 */}
-                    <td className="px-3 py-4 text-right border-r border-border/50">
+                    <td className="px-2 py-1.5 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal underline transition-colors ${
+                        className={`text-base font-normal underline transition-colors ${
                           (indicator.Female_0_14 || 0) > 0 
-                            ? 'text-pink-600 cursor-pointer hover:text-pink-800' 
-                            : 'text-pink-600/60 cursor-not-allowed'
+                            ? 'text-report-female cursor-pointer hover:text-report-female/80'
+                            : 'text-report-female/60 cursor-not-allowed'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -208,8 +208,8 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
 
                     {/* Total 0-14 — no underline, dark text */}
-                    <td className="px-3 py-4 text-right">
-                      <div className="text-lg text-foreground">
+                    <td className="px-2 py-1.5 text-right">
+                      <div className="text-base text-foreground">
                         {(Number(indicator.Male_0_14 || 0) + Number(indicator.Female_0_14 || 0)).toLocaleString()}
                       </div>
                     </td>
@@ -223,10 +223,10 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
                     <td className="px-3 py-3 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal underline transition-colors ${
+                        className={`text-base font-normal underline transition-colors ${
                           (indicator.Male_over_14 || 0) > 0 
-                            ? 'text-blue-600 cursor-pointer hover:text-blue-800' 
-                            : 'text-blue-600/60 cursor-not-allowed'
+                            ? 'text-report-male cursor-pointer hover:text-report-male/80'
+                            : 'text-report-male/60 cursor-not-allowed'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -239,10 +239,10 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                     </td>
                     <td className="px-3 py-3 text-right border-r border-border/50">
                       <div 
-                        className={`text-lg font-normal underline transition-colors ${
+                        className={`text-base font-normal underline transition-colors ${
                           (indicator.Female_over_14 || 0) > 0 
-                            ? 'text-pink-600 cursor-pointer hover:text-pink-800' 
-                            : 'text-pink-600/60 cursor-not-allowed'
+                            ? 'text-report-female cursor-pointer hover:text-report-female/80'
+                            : 'text-report-female/60 cursor-not-allowed'
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -266,12 +266,12 @@ const IndicatorsTable = ({ indicators, loading, onIndicatorClick, selectedSite, 
                       សរុប
                     </td>
                     <td className="px-3 py-3 text-right border-r border-border/50">
-                      <div className="text-lg font-bold text-blue-600 underline">
+                      <div className="text-base font-bold text-report-male underline">
                         {(Number(indicator.Male_0_14 || 0) + Number(indicator.Male_over_14 || 0)).toLocaleString()}
                       </div>
                     </td>
                     <td className="px-3 py-3 text-right border-r border-border/50">
-                      <div className="text-lg font-bold text-pink-600 underline">
+                      <div className="text-base font-bold text-report-female underline">
                         {(Number(indicator.Female_0_14 || 0) + Number(indicator.Female_over_14 || 0)).toLocaleString()}
                       </div>
                     </td>

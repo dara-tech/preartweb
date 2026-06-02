@@ -193,8 +193,8 @@ const IndicatorManagement = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-            <Settings className="h-8 w-8 text-primary" />
+          <h1 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <Settings className="h-4 w-4 text-primary" />
             Indicator Management
           </h1>
           <p className="text-muted-foreground mt-1">

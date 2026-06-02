@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +45,7 @@ const RoleManagement = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [viewMode, setViewMode] = useState('table'); // table, grid, analytics
+  const [searchParams] = useSearchParams();
 
 
   // Form states
@@ -72,6 +74,12 @@ const RoleManagement = () => {
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [users, searchTerm, roleFilter, statusFilter]);
+
+  useEffect(() => {
+    setSearchTerm(searchParams.get('q') || '');
+    setRoleFilter(searchParams.get('role') || 'all');
+    setStatusFilter(searchParams.get('status') || 'all');
+  }, [searchParams]);
 
   // Analytics data
   const analytics = useMemo(() => {
@@ -107,13 +115,25 @@ const RoleManagement = () => {
     }
   }, [canManageRoles]);
 
+  useEffect(() => {
+    const openCreateUser = () => setIsCreateDialogOpen(true);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('open-create-user', openCreateUser);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('open-create-user', openCreateUser);
+      }
+    };
+  }, []);
+
   const fetchData = async () => {
     try {
       setLoading(true);
       const [usersData, rolesData, sitesResponse] = await Promise.all([
         roleApi.getUsers(),
         roleApi.getRoles(),
-        fetch(`${window.location.protocol}//${window.location.hostname}:3001/apiv1/lookups/sites-registry`, {
+        fetch(`${import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : `${window.location.protocol}//${window.location.hostname}`)}/apiv1/lookups/sites-registry`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         })
       ]);
@@ -351,35 +371,13 @@ const RoleManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <div className="space-y-8">
-        {/* Advanced Header */}
-        <div className="space-y-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-md">
-                  <Shield className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-primary">
-                    Role Management
-                  </h1>
-               
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-             
-              
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} >
-                <DialogTrigger asChild>
-                  <Button className=" from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white transition-all duration-200">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create User
-                  </Button>
-                </DialogTrigger>
+    <div className="min-h-screen bg-background">
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} >
+            <DialogTrigger asChild>
+              <span className="hidden" />
+            </DialogTrigger>
             <DialogContent className="max-w-md bg-background">
               <DialogHeader>
                 <DialogTitle>Create New User</DialogTitle>
@@ -466,122 +464,41 @@ const RoleManagement = () => {
             </DialogContent>
           </Dialog>
         </div>
-        </div>
 
-        {/* Analytics Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="border-border bg-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Users</p>
-                  <p className="text-3xl font-bold text-foreground">{analytics.totalUsers}</p>
-                </div>
-                <div className="p-3 bg-primary rounded-md">
-                  <Users className="h-6 w-6 text-primary-foreground" />
-                </div>
-              </div>
+            <CardContent className="p-3">
+              <p className="text-xs font-medium text-muted-foreground">Total users</p>
+              <p className="text-2xl font-semibold text-foreground">{analytics.totalUsers}</p>
             </CardContent>
           </Card>
 
           <Card className="border-border bg-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Users</p>
-                  <p className="text-3xl font-bold text-foreground">{analytics.activeUsers}</p>
-                  <p className="text-xs text-muted-foreground">{analytics.activePercentage}% of total</p>
-                </div>
-                <div className="p-3 bg-primary rounded-md">
-                  <UserCheck className="h-6 w-6 text-primary-foreground" />
-                </div>
-              </div>
+            <CardContent className="p-3">
+              <p className="text-xs font-medium text-muted-foreground">Active users</p>
+              <p className="text-2xl font-semibold text-foreground">{analytics.activeUsers}</p>
+              <p className="text-xs text-muted-foreground">{analytics.activePercentage}% roles</p>
             </CardContent>
           </Card>
 
           <Card className="border-border bg-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Recent Users</p>
-                  <p className="text-3xl font-bold text-foreground">{analytics.recentUsers}</p>
-                  <p className="text-xs text-muted-foreground">Last 7 days</p>
-                </div>
-                <div className="p-3 bg-primary rounded-md">
-                  <TrendingUp className="h-6 w-6 text-primary-foreground" />
-                </div>
-              </div>
+            <CardContent className="p-3">
+              <p className="text-xs font-medium text-muted-foreground">Site scoped</p>
+              <p className="text-2xl font-semibold text-foreground">{sites.length}</p>
+              <p className="text-xs text-muted-foreground">{sites.length} org unit rows</p>
             </CardContent>
           </Card>
 
           <Card className="border-border bg-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Admin Users</p>
-                  <p className="text-3xl font-bold text-foreground">
-                    {(analytics.roleStats.super_admin || 0) + (analytics.roleStats.admin || 0)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Super Admin + Admin</p>
-                </div>
-                <div className="p-3 bg-primary rounded-md">
-                  <Crown className="h-6 w-6 text-primary-foreground" />
-                </div>
-              </div>
+            <CardContent className="p-3">
+              <p className="text-xs font-medium text-muted-foreground">Role types</p>
+              <p className="text-2xl font-semibold text-foreground">{roles.length}</p>
+              <p className="text-xs text-muted-foreground">{users.length} assignments</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Advanced Search and Filters */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search users by name or username..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-background/50"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Filter by role" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background backdrop-blur-sm">
-                    <SelectItem value="all">All Roles</SelectItem>
-                    {roles.map(role => (
-                      <SelectItem key={role.value} value={role.value}>
-                        {role.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background backdrop-blur-sm">
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        
 
         {/* Error Message */}
         {error && (
@@ -596,24 +513,9 @@ const RoleManagement = () => {
         )}
 
         {/* Main Content */}
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Users & Roles
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="logs" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              User Logs
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="users" className="space-y-4">
 
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-6">
+          <TabsContent value="users" className="space-y-3">
             {/* Bulk Actions Bar */}
             {selectedUsers.length > 0 && (
               <Card className="/5 border-primary/20">
@@ -665,58 +567,24 @@ const RoleManagement = () => {
               </Card>
             )}
 
-            {/* Enhanced Users Table */}
-            <Card className=" border-border/50 p-2">
-              <CardHeader className="bg-gradient-to-r from-card to-card/80">
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-md">
-                      <Users className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold">User Management</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {filteredUsers.length} of {users.length} users
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {analytics.activeUsers} Active
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {analytics.inactiveUsers} Inactive
-                    </Badge>
-                  </div>
-                </CardTitle>
-              </CardHeader>
+            <Card className="border-border/80 p-0">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-muted/30">
-                        <TableHead className="w-12">
-                          <Checkbox
-                            checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                            onCheckedChange={handleSelectAll}
-                          />
-                        </TableHead>
-                        <TableHead className="min-w-[140px]">User</TableHead>
-                        <TableHead className="min-w-[120px]">Role</TableHead>
-                        <TableHead className="min-w-[150px]">Sites</TableHead>
-                        <TableHead className="min-w-[100px]">Status</TableHead>
-                        <TableHead className="min-w-[120px]">Last Login</TableHead>
-                        <TableHead className="min-w-[200px]">Actions</TableHead>
+                      <TableRow className="bg-muted/20">
+                        <TableHead className="min-w-[70px]">ID</TableHead>
+                        <TableHead className="min-w-[220px]">User</TableHead>
+                        <TableHead className="min-w-[160px]">Roles</TableHead>
+                        <TableHead className="min-w-[180px]">Site access</TableHead>
+                        <TableHead className="min-w-[120px]">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.map((user) => (
                         <TableRow key={user.id} className="hover:bg-muted/20 transition-colors">
                           <TableCell>
-                            <Checkbox
-                              checked={selectedUsers.includes(user.id)}
-                              onCheckedChange={(checked) => handleSelectUser(user.id, checked)}
-                            />
+                            <div className="text-xs text-muted-foreground">{user.id}</div>
                           </TableCell>
                           <TableCell>
                             <div className="space-y-1">
@@ -748,60 +616,6 @@ const RoleManagement = () => {
                                 <><XCircle className="h-3 w-3 mr-1" /> Inactive</>
                               )}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm text-muted-foreground">
-                              {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditUser(user)}
-                                title="Edit User"
-                                className="h-8 w-8 p-0"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handlePasswordClick(user)}
-                                title="Change Password"
-                                className="h-8 w-8 p-0"
-                              >
-                                <Key className="h-4 w-4" />
-                              </Button>
-                              
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleToggleStatus(user)}
-                                title={user.status === 1 ? "Deactivate User" : "Activate User"}
-                                className="h-8 w-8 p-0"
-                              >
-                                {user.status === 1 ? (
-                                  <UserX className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <UserCheck className="h-4 w-4 text-primary" />
-                                )}
-                              </Button>
-                              
-                              {isSuperAdmin && user.id !== loggedInUser?.id && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDeleteClick(user)}
-                                  title="Delete User"
-                                  className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -1081,7 +895,6 @@ const RoleManagement = () => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
     </div>
   );
 };

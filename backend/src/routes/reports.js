@@ -8,6 +8,45 @@ const pnttReportService = require('../services/pnttReportService');
 
 const router = express.Router();
 
+// Helper to merge list-based report aggregates (Infant and PNTT reports) across multiple sites
+function mergeReportData(reports) {
+  if (reports.length === 0) return { success: true, data: [] };
+  if (reports.length === 1) return reports[0];
+  
+  // Create deep copy of the first report's data structure
+  const mergedData = JSON.parse(JSON.stringify(reports[0].data));
+  
+  for (let i = 1; i < reports.length; i++) {
+    const reportData = reports[i].data;
+    if (!reportData) continue;
+    
+    for (let s = 0; s < mergedData.length; s++) {
+      const mergedSection = mergedData[s];
+      const section = reportData.find(sec => sec.sectionNumber === mergedSection.sectionNumber || sec.scriptId === mergedSection.scriptId);
+      if (!section || !section.rows) continue;
+      
+      for (let r = 0; r < mergedSection.rows.length; r++) {
+        const mergedRow = mergedSection.rows[r];
+        // Match rows by labelEn or labelKh
+        const row = section.rows.find(row => row.labelEn === mergedRow.labelEn && row.labelKh === mergedRow.labelKh);
+        if (!row) continue;
+        
+        // Sum basic columns
+        if (mergedRow.male !== undefined && row.male !== undefined) mergedRow.male += Number(row.male || 0);
+        if (mergedRow.female !== undefined && row.female !== undefined) mergedRow.female += Number(row.female || 0);
+        if (mergedRow.total !== undefined && row.total !== undefined) mergedRow.total += Number(row.total || 0);
+        
+        // Sum PNTT risk factor columns
+        if (mergedRow.ever !== undefined && row.ever !== undefined) mergedRow.ever += Number(row.ever || 0);
+        if (mergedRow.sixMonths !== undefined && row.sixMonths !== undefined) mergedRow.sixMonths += Number(row.sixMonths || 0);
+        if (mergedRow.never !== undefined && row.never !== undefined) mergedRow.never += Number(row.never || 0);
+      }
+    }
+  }
+  
+  return { success: true, data: mergedData };
+}
+
 /**
  * @route GET /apiv1/reports/infant-report
  * @desc Get infant report data (aggregates from INFANT_AGGREGATE_SCRIPTS) for a site and period
@@ -32,19 +71,39 @@ router.get('/infant-report',
         });
       }
       const { siteCode, startDate, endDate, previousEndDate } = req.query;
-      const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
-      if (!siteInfo) {
-        return res.status(404).json({
-          success: false,
-          error: `Site ${siteCode} not found`
-        });
+      
+      let sites = [];
+      if (siteCode === 'all') {
+        sites = await siteDatabaseManager.getAllSites();
+      } else {
+        const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
+        if (!siteInfo) {
+          return res.status(404).json({
+            success: false,
+            error: `Site ${siteCode} not found`
+          });
+        }
+        sites = [siteInfo];
       }
-      const result = await infantReportService.getReportData(siteCode, {
-        startDate: startDate || '2025-01-01',
-        endDate: endDate || '2025-03-31',
-        previousEndDate: previousEndDate || '2024-12-31'
-      });
-      return res.json(result);
+
+      const reportResults = [];
+      for (const site of sites) {
+        try {
+          const result = await infantReportService.getReportData(site.code, {
+            startDate: startDate || '2025-01-01',
+            endDate: endDate || '2025-03-31',
+            previousEndDate: previousEndDate || '2024-12-31'
+          });
+          if (result && result.success) {
+            reportResults.push(result);
+          }
+        } catch (err) {
+          console.error(`Error fetching infant report for site ${site.code}:`, err);
+        }
+      }
+
+      const merged = mergeReportData(reportResults);
+      return res.json(merged);
     } catch (error) {
       console.error('Error fetching infant report:', error);
       return res.status(500).json({
@@ -81,28 +140,44 @@ router.get('/infant-report/details',
         });
       }
       const { siteCode, scriptId, startDate, endDate, previousEndDate } = req.query;
-      const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
-      if (!siteInfo) {
-        return res.status(404).json({
-          success: false,
-          error: `Site ${siteCode} not found`
-        });
+      let sites = [];
+      if (siteCode === 'all') {
+        sites = await siteDatabaseManager.getAllSites();
+      } else {
+        const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
+        if (!siteInfo) {
+          return res.status(404).json({
+            success: false,
+            error: `Site ${siteCode} not found`
+          });
+        }
+        sites = [siteInfo];
       }
-      const result = await infantReportService.runDetailScript(siteCode, scriptId, {
-        startDate: startDate || '2025-01-01',
-        endDate: endDate || '2025-03-31',
-        previousEndDate: previousEndDate || '2024-12-31'
-      });
-      if (result.error) {
-        return res.status(400).json({
-          success: false,
-          error: result.error,
-          data: []
-        });
+
+      let allRows = [];
+      for (const site of sites) {
+        try {
+          const result = await infantReportService.runDetailScript(site.code, scriptId, {
+            startDate: startDate || '2025-01-01',
+            endDate: endDate || '2025-03-31',
+            previousEndDate: previousEndDate || '2024-12-31'
+          });
+          if (result && result.rows) {
+            const withSite = result.rows.map(r => ({
+              ...r,
+              site_code: site.code,
+              site_name: site.name
+            }));
+            allRows.push(...withSite);
+          }
+        } catch (err) {
+          console.error(`Error running infant details for site ${site.code}:`, err);
+        }
       }
+
       return res.json({
         success: true,
-        data: result.rows || []
+        data: allRows
       });
     } catch (error) {
       console.error('Error fetching infant report details:', error);
@@ -139,19 +214,38 @@ router.get('/pntt-report',
         });
       }
       const { siteCode, startDate, endDate, previousEndDate } = req.query;
-      const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
-      if (!siteInfo) {
-        return res.status(404).json({
-          success: false,
-          error: `Site ${siteCode} not found`
-        });
+      let sites = [];
+      if (siteCode === 'all') {
+        sites = await siteDatabaseManager.getAllSites();
+      } else {
+        const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
+        if (!siteInfo) {
+          return res.status(404).json({
+            success: false,
+            error: `Site ${siteCode} not found`
+          });
+        }
+        sites = [siteInfo];
       }
-      const result = await pnttReportService.getReportData(siteCode, {
-        startDate: startDate || '2025-01-01',
-        endDate: endDate || '2025-03-31',
-        previousEndDate: previousEndDate || '2024-12-31'
-      });
-      return res.json(result);
+
+      const reportResults = [];
+      for (const site of sites) {
+        try {
+          const result = await pnttReportService.getReportData(site.code, {
+            startDate: startDate || '2025-01-01',
+            endDate: endDate || '2025-03-31',
+            previousEndDate: previousEndDate || '2024-12-31'
+          });
+          if (result && result.success) {
+            reportResults.push(result);
+          }
+        } catch (err) {
+          console.error(`Error fetching PNTT report for site ${site.code}:`, err);
+        }
+      }
+
+      const merged = mergeReportData(reportResults);
+      return res.json(merged);
     } catch (error) {
       console.error('Error fetching PNTT report:', error);
       return res.status(500).json({
@@ -188,28 +282,44 @@ router.get('/pntt-report/details',
         });
       }
       const { siteCode, scriptId, startDate, endDate, previousEndDate } = req.query;
-      const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
-      if (!siteInfo) {
-        return res.status(404).json({
-          success: false,
-          error: `Site ${siteCode} not found`
-        });
+      let sites = [];
+      if (siteCode === 'all') {
+        sites = await siteDatabaseManager.getAllSites();
+      } else {
+        const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
+        if (!siteInfo) {
+          return res.status(404).json({
+            success: false,
+            error: `Site ${siteCode} not found`
+          });
+        }
+        sites = [siteInfo];
       }
-      const result = await pnttReportService.runDetailScript(siteCode, scriptId, {
-        startDate: startDate || '2025-01-01',
-        endDate: endDate || '2025-03-31',
-        previousEndDate: previousEndDate || '2024-12-31'
-      });
-      if (result.error) {
-        return res.status(400).json({
-          success: false,
-          error: result.error,
-          data: []
-        });
+
+      let allRows = [];
+      for (const site of sites) {
+        try {
+          const result = await pnttReportService.runDetailScript(site.code, scriptId, {
+            startDate: startDate || '2025-01-01',
+            endDate: endDate || '2025-03-31',
+            previousEndDate: previousEndDate || '2024-12-31'
+          });
+          if (result && result.rows) {
+            const withSite = result.rows.map(r => ({
+              ...r,
+              site_code: site.code,
+              site_name: site.name
+            }));
+            allRows.push(...withSite);
+          }
+        } catch (err) {
+          console.error(`Error running PNTT details for site ${site.code}:`, err);
+        }
       }
+
       return res.json({
         success: true,
-        data: result.rows || []
+        data: allRows
       });
     } catch (error) {
       console.error('Error fetching PNTT report details:', error);

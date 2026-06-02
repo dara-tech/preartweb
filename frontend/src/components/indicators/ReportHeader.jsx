@@ -86,8 +86,8 @@ const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, titleEn, ti
 
   return (
     <div className="bg-card border border-border overflow-hidden mb-6">
-      {/* Title — blue-800 header, white text (consistent across all reports) */}
-      <div className="w-full px-6 pt-2 pb-4 text-center border-b border-blue-900/50 bg-blue-800 rounded-none">
+      {/* Title — primary header, white text (consistent across all reports) */}
+      <div className="w-full px-6 pt-2 pb-4 text-center border-b border-primary/50 bg-primary rounded-none">
         <div className="h-0.5 w-12 mx-auto mb-3 rounded-none" />
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight text-center">
           {displayTitleKh} {displayTitleEn}

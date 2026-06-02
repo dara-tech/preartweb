@@ -504,7 +504,7 @@ const CQIDashboard = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('cqi.dashboard')}</h1>
+          <h1 className="text-sm font-medium text-muted-foreground">{t('cqi.dashboard')}</h1>
           <p className="text-gray-600">{t('cqi.title')}</p>
           {selectedSite && selectedSite !== 'all' && (
             <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">

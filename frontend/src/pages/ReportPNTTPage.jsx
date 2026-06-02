@@ -249,18 +249,18 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
   /** First section (risk): columns កត្តាប្រឈម | អ្នកចុះឈ្មោះថ្មី (ធ្លាប់, ៦ខែ, មិនធ្លាប់) | ករណីតាមដានបន្ត (ធ្លាប់, ៦ខែ, មិនធ្លាប់) */
   const tableHeaderRisk = (
     <>
-      <tr className="bg-blue-800 border-b border-muted">
+      <tr className="bg-primary border-b border-muted">
         <th className="border-r border-muted px-3 py-2.5 text-left font-bold text-white w-[28%]" rowSpan={2}>
           កត្តាប្រឈម
         </th>
-        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-blue-800" colSpan={3}>
+        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-primary" colSpan={3}>
           អ្នកចុះឈ្មោះថ្មី
         </th>
-        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-blue-800" colSpan={3}>
+        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-primary" colSpan={3}>
           ករណីតាមដានបន្ត
         </th>
       </tr>
-      <tr className="bg-blue-800 border-b border-muted">
+      <tr className="bg-primary border-b border-muted">
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[12%]">ធ្លាប់</th>
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[12%]">៦ខែ</th>
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[12%]">មិនធ្លាប់</th>
@@ -400,18 +400,18 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
 
   const tableHeader = (
     <>
-      <tr className="bg-blue-800 border-b border-muted">
+      <tr className="bg-primary border-b border-muted">
         <th className="border-r border-muted px-3 py-2.5 text-left font-bold text-white w-[28%] align-middle" rowSpan={2}>
           សូចនាករ
         </th>
-        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-blue-800" colSpan={3}>
+        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-primary" colSpan={3}>
           អ្នកចុះឈ្មោះថ្មី
         </th>
-        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-blue-800" colSpan={3}>
+        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-primary" colSpan={3}>
           ករណីតាមដានបន្ត
         </th>
       </tr>
-      <tr className="bg-blue-800 border-b border-muted">
+      <tr className="bg-primary border-b border-muted">
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[12%]">ប្រុស</th>
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[12%]">ស្រី</th>
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[12%]">សរុប</th>
@@ -425,18 +425,18 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, selectedSite }
   /** Partners block (section 3): សូចនាករ (rowSpan 2) | អ្នកចុះឈ្មោះថ្មី (ប្រុស ស្រី សរុប) | ករណីតាមដានបន្ត (ប្រុស ស្រី សរុប) */
   const tableHeaderPartners = (
     <>
-      <tr className="bg-blue-800 border-b border-muted">
+      <tr className="bg-primary border-b border-muted">
         <th className="border-r border-muted px-3 py-2.5 text-left font-bold text-white w-[40%] align-middle" rowSpan={2} colSpan={2}>
           សូចនាករ
         </th>
-        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-blue-800" colSpan={3}>
+        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-primary" colSpan={3}>
           អ្នកចុះឈ្មោះថ្មី
         </th>
-        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-blue-800" colSpan={3}>
+        <th className="border-r border-muted px-2 py-2.5 text-center font-bold text-white bg-primary" colSpan={3}>
           ករណីតាមដានបន្ត
         </th>
       </tr>
-      <tr className="bg-blue-800 border-b border-muted">
+      <tr className="bg-primary border-b border-muted">
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[10%]">ប្រុស</th>
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[10%]">ស្រី</th>
         <th className="border-r border-muted px-2 py-2 text-center font-medium text-white w-[10%]">សរុប</th>
@@ -1027,7 +1027,6 @@ export default function ReportPNTTPage() {
       const data = response?.sites ?? response?.data ?? response
       const list = Array.isArray(data) ? data : []
       setSites(list)
-      if (list.length > 0 && !selectedSite) setSelectedSite(list[0])
     } catch (err) {
       setSites([])
     } finally {
@@ -1041,17 +1040,19 @@ export default function ReportPNTTPage() {
   }, [])
 
   const fetchReport = useCallback(async () => {
-    if (!selectedSite?.code) {
-      setSections([])
-      return
-    }
     setLoading(true)
     setError(null)
     try {
-      const response = await pnttReportApi.getPnttReport({
-        siteCode: selectedSite.code,
+      const params = {
         ...dateRange
-      })
+      }
+      if (selectedSite) {
+        params.siteCode = selectedSite.code
+      } else {
+        params.siteCode = 'all'
+        params.siteLevel = 'country'
+      }
+      const response = await pnttReportApi.getPnttReport(params)
       if (response && response.success) {
         const list = Array.isArray(response.data) ? response.data : []
         setSections(list)
@@ -1071,7 +1072,9 @@ export default function ReportPNTTPage() {
 
   const handleSectionCellClick = useCallback(async (section, row, rowIdx, column) => {
     const scriptId = getDetailScriptId(section)
-    if (!scriptId || !selectedSite?.code) return
+    if (!scriptId) return
+    const siteCode = selectedSite?.code || 'all'
+    const siteLevel = selectedSite ? undefined : 'country'
     const title = section.sectionLabelEn
       ? `${section.sectionNumber}. ${section.sectionLabelEn}${row.labelEn ? ` — ${row.labelEn}` : ''}`
       : `${section.sectionNumber}. ${section.sectionLabelKh || 'Detail'}`
@@ -1098,7 +1101,8 @@ export default function ReportPNTTPage() {
     setDetailsLoading(true)
     try {
       const res = await pnttReportApi.getPnttReportDetails({
-        siteCode: selectedSite.code,
+        siteCode,
+        siteLevel,
         scriptId,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
@@ -1217,7 +1221,7 @@ export default function ReportPNTTPage() {
             sections={sections}
             loading={loading}
             onSectionCellClick={handleSectionCellClick}
-            selectedSite={selectedSite}
+            selectedSite={selectedSite || { code: 'all' }}
           />
         </div>
 

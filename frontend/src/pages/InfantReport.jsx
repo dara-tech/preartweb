@@ -42,7 +42,7 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, dateRange, sel
   return (
     <table className="w-full border-collapse border border-border/50 text-sm" style={{ tableLayout: 'fixed' }}>
       <thead>
-        <tr className="bg-blue-800 border-b border-muted">
+        <tr className="bg-primary border-b border-muted">
           <th className="border-r border-muted px-3 py-2.5 text-left font-bold text-white w-[70%]" colSpan={2}>Category</th>
           <th className="border-r border-muted px-3 py-2.5 text-center font-bold text-white w-[10%]">Male (M)</th>
           <th className="border-r border-muted px-3 py-2.5 text-center font-bold text-white w-[10%]">Female (F)</th>
@@ -59,7 +59,7 @@ const MainReportTable = ({ sections, loading, onSectionCellClick, dateRange, sel
                 const isSubtotal = row.isSubtotal
                 const isZebra = !isSubtotal && (sectionIdx + rowIdx) % 2 === 1
                 const detailScriptId = !isSubtotal ? getDetailScriptId(section, rowIdx) : null
-                const isCellClickable = onSectionCellClick && detailScriptId && selectedSite?.code
+                const isCellClickable = onSectionCellClick && detailScriptId
                 const cellClick = (col) => (e) => {
                   e.stopPropagation()
                   if (isCellClickable) onSectionCellClick(section, row, rowIdx, col)
@@ -193,7 +193,6 @@ const InfantReport = () => {
       const data = response?.sites ?? response?.data ?? response
       const list = Array.isArray(data) ? data : []
       setSites(list)
-      if (list.length > 0 && !selectedSite) setSelectedSite(list[0])
     } catch (err) {
       setSites([])
     } finally {
@@ -207,17 +206,19 @@ const InfantReport = () => {
   }, [])
 
   const fetchReport = useCallback(async () => {
-    if (!selectedSite?.code) {
-      setSections([])
-      return
-    }
     setLoading(true)
     setError(null)
     try {
-      const response = await infantReportApi.getInfantReport({
-        siteCode: selectedSite.code,
+      const params = {
         ...dateRange
-      })
+      }
+      if (selectedSite) {
+        params.siteCode = selectedSite.code
+      } else {
+        params.siteCode = 'all'
+        params.siteLevel = 'country'
+      }
+      const response = await infantReportApi.getInfantReport(params)
       if (response && response.success) {
         const list = Array.isArray(response.data) ? response.data : []
         setSections(list)
@@ -258,7 +259,9 @@ const InfantReport = () => {
 
   const handleSectionCellClick = useCallback(async (section, row, rowIdx, column) => {
     const scriptId = getDetailScriptId(section, rowIdx)
-    if (!scriptId || !selectedSite?.code) return
+    if (!scriptId) return
+    const siteCode = selectedSite?.code || 'all'
+    const siteLevel = selectedSite ? undefined : 'country'
     const title = section.sectionLabelEn
       ? `${section.sectionNumber}. ${section.sectionLabelEn}${row.labelEn ? ` — ${row.labelEn}` : ''}`
       : `${section.sectionNumber}. ${section.sectionLabelKh || 'Detail'}`
@@ -279,7 +282,8 @@ const InfantReport = () => {
     setDetailsLoading(true)
     try {
       const res = await infantReportApi.getInfantReportDetails({
-        siteCode: selectedSite.code,
+        siteCode,
+        siteLevel,
         scriptId,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,

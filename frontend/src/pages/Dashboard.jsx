@@ -55,7 +55,7 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+        <h1 className="text-sm font-medium text-muted-foreground">{t('dashboard.title')}</h1>
         <p className="text-gray-600">{t('common.appName')}</p>
       </div>
 

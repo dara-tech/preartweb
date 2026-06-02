@@ -54,7 +54,7 @@ const RoleManagement = () => {
       const [usersData, rolesData, sitesResponse] = await Promise.all([
         roleApi.getUsers(),
         roleApi.getRoles(),
-        fetch('http://localhost:3001/apiv1/sites', {
+        fetch(`${import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : `${window.location.protocol}//${window.location.hostname}`)}/apiv1/sites`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         })
       ]);
@@ -242,7 +242,7 @@ const RoleManagement = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Role Management</h1>
+            <h1 className="text-sm font-medium text-muted-foreground">Role Management</h1>
             <p className="text-muted-foreground">Manage user roles and permissions</p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

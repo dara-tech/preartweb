@@ -322,13 +322,13 @@ const CQIPeriodComparisonPage = () => {
               </div>
               
               {/* Title with Icon */}
-              <h1 className="text-2xl font-bold flex items-center gap-3 text-foreground">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <FaChartLine className="h-6 w-6 text-primary" />
+              <h1 className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
+                <div className="p-1 bg-primary/10 rounded-none">
+                  <FaChartLine className="h-4 w-4 text-primary" />
                 </div>
                 {t('comparison.title')}
               </h1>
-              <p className="text-sm text-muted-foreground mt-1.5">
+              <p className="text-xs text-muted-foreground mt-1">
                 {t('comparison.subtitle')}
               </p>
             </div>

@@ -37,8 +37,8 @@ function PatientList() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-foreground">Patient Management</h1>
-              <p className="text-sm text-muted-foreground mt-1">Select patient type to manage</p>
+              <h1 className="text-sm font-medium text-muted-foreground">Patient Management</h1>
+              <p className="text-xs text-muted-foreground mt-1">Select patient type to manage</p>
             </div>
             <div className="flex items-center gap-3">
             <Button 

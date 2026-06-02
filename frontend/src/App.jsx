@@ -22,6 +22,7 @@ import DataImportExport from './pages/DataManagement/components/DataImportExport
 import IndicatorsReport from './pages/indicators/IndicatorsReport'
 import InfantReport from './pages/InfantReport'
 import ReportPNTTPage from './pages/ReportPNTTPage'
+import CountryAnalyticsPage from './pages/CountryAnalyticsPage'
 import MortalityRetentionIndicators from './pages/MortalityRetentionIndicators'
 import AnalyticsAdmin from './pages/admin/AnalyticsAdmin'
 import CQIDashboard from './pages/CQIDashboard'
@@ -201,6 +202,7 @@ function App() {
             <Route path="reports/adult-child" element={<IndicatorsReport />} />
             <Route path="reports/infants" element={<InfantReport />} />
             <Route path="reports/pntt" element={<ReportPNTTPage />} />
+            <Route path="reports/country-analytics" element={<CountryAnalyticsPage />} />
             <Route path="mortality-retention-indicators" element={<MortalityRetentionIndicators />} />
           </Route>
           <Route path="cqi-dashboard" element={

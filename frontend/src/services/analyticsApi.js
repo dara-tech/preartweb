@@ -182,6 +182,90 @@ const analyticsApi = {
       console.error('Reset auto-increment failed:', error);
       throw error;
     }
+  },
+
+  // Get warehouse status
+  getAnalyticsStatus: async ({ periodType, year, quarter, month } = {}) => {
+    try {
+      const params = new URLSearchParams();
+      if (periodType) params.append('periodType', periodType);
+      if (year) params.append('year', year.toString());
+      if (quarter) params.append('quarter', quarter.toString());
+      if (month) params.append('month', month.toString());
+      const response = await api.get(`/apiv1/analytics/status?${params}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get analytics status failed:', error);
+      throw error;
+    }
+  },
+
+  // Get country analytics rollup
+  getCountryAnalytics: async ({ periodType, year, quarter, month } = {}) => {
+    try {
+      const params = new URLSearchParams();
+      if (periodType) params.append('periodType', periodType);
+      if (year) params.append('year', year.toString());
+      if (quarter) params.append('quarter', quarter.toString());
+      if (month) params.append('month', month.toString());
+      const response = await api.get(`/apiv1/analytics/country?${params}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get country analytics failed:', error);
+      throw error;
+    }
+  },
+
+  // Get province analytics rollup
+  getProvinceAnalytics: async ({ periodType, year, quarter, month } = {}) => {
+    try {
+      const params = new URLSearchParams();
+      if (periodType) params.append('periodType', periodType);
+      if (year) params.append('year', year.toString());
+      if (quarter) params.append('quarter', quarter.toString());
+      if (month) params.append('month', month.toString());
+      const response = await api.get(`/apiv1/analytics/province?${params}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get province analytics failed:', error);
+      throw error;
+    }
+  },
+
+  // Get ETL run history log
+  getEtlHistory: async ({ limit = 20 } = {}) => {
+    try {
+      const response = await api.get(`/apiv1/analytics/etl-history?limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get ETL history failed:', error);
+      throw error;
+    }
+  },
+
+  // Trigger ETL refresh
+  triggerAnalyticsRefresh: async ({ periodType, year, quarter, month, periods } = {}) => {
+    try {
+      const payload = periods && periods.length > 0
+        ? { periods }
+        : { periodType, year, quarter, month };
+      const response = await api.post('/apiv1/analytics/refresh', payload);
+      return response.data;
+    } catch (error) {
+      console.error('Trigger analytics refresh failed:', error);
+      throw error;
+    }
+  },
+
+  // Clear analytics data
+  clearAnalyticsData: async ({ periodType, year, quarter, month, clearAll } = {}) => {
+    try {
+      const response = await api.post('/apiv1/analytics/clear', { periodType, year, quarter, month, clearAll });
+      return response.data;
+    } catch (error) {
+      console.error('Clear analytics data failed:', error);
+      throw error;
+    }
   }
 };
 

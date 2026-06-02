@@ -3,7 +3,7 @@ import api from './api'
 export const reportingApi = {
   // Get all indicators (site-specific or all sites combined)
   getAllIndicators: async (params = {}) => {
-    const { siteCode, startDate, endDate, previousEndDate, useCache = true } = params
+    const { siteCode, startDate, endDate, previousEndDate, useCache = true, siteLevel } = params
     const queryParams = {
       startDate,
       endDate,
@@ -13,6 +13,9 @@ export const reportingApi = {
     
     if (siteCode) {
       queryParams.siteCode = siteCode
+    }
+    if (siteLevel) {
+      queryParams.siteLevel = siteLevel
     }
     
     const response = await api.get('/apiv1/indicators-optimized/all', { params: queryParams })
@@ -21,7 +24,7 @@ export const reportingApi = {
 
   // Get specific indicator
   getIndicator: async (indicatorId, params = {}) => {
-    const { siteCode, startDate, endDate, previousEndDate, useCache = true } = params
+    const { siteCode, startDate, endDate, previousEndDate, useCache = true, siteLevel } = params
     const queryParams = {
       startDate,
       endDate,
@@ -31,6 +34,9 @@ export const reportingApi = {
     
     if (siteCode) {
       queryParams.siteCode = siteCode
+    }
+    if (siteLevel) {
+      queryParams.siteLevel = siteLevel
     }
     
     const response = await api.get(`/apiv1/indicators-optimized/${indicatorId}`, { params: queryParams })
@@ -50,7 +56,8 @@ export const reportingApi = {
       searchTerm = '',
       ageGroup = '',
       gender = '',
-      useCache = true 
+      useCache = true,
+      siteLevel
     } = params
     
     // Use search if provided, otherwise use searchTerm
@@ -71,6 +78,9 @@ export const reportingApi = {
     // Add siteCode if provided
     if (siteCode) {
       queryParams.siteCode = siteCode
+    }
+    if (siteLevel) {
+      queryParams.siteLevel = siteLevel
     }
     
     
