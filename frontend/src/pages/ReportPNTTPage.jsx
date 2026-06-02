@@ -993,7 +993,7 @@ export default function ReportPNTTPage() {
     return q === 1 ? 4 : q - 1
   })
   const [sites, setSites] = useState([])
-  const [selectedSite, setSelectedSite] = useState(null)
+  const [selectedSite, setSelectedSite] = useState({ code: 'cambodia', name: 'Cambodia', level: 'country' })
   const [sitesLoading, setSitesLoading] = useState(false)
 
   const availableYears = generateAvailableYears()
@@ -1048,8 +1048,11 @@ export default function ReportPNTTPage() {
       }
       if (selectedSite) {
         params.siteCode = selectedSite.code
+        if (selectedSite.level) {
+          params.siteLevel = selectedSite.level
+        }
       } else {
-        params.siteCode = 'all'
+        params.siteCode = 'cambodia'
         params.siteLevel = 'country'
       }
       const response = await pnttReportApi.getPnttReport(params)
@@ -1073,8 +1076,8 @@ export default function ReportPNTTPage() {
   const handleSectionCellClick = useCallback(async (section, row, rowIdx, column) => {
     const scriptId = getDetailScriptId(section)
     if (!scriptId) return
-    const siteCode = selectedSite?.code || 'all'
-    const siteLevel = selectedSite ? undefined : 'country'
+    const siteCode = selectedSite?.code || 'cambodia'
+    const siteLevel = selectedSite?.level || (selectedSite?.code === 'cambodia' ? 'country' : undefined)
     const title = section.sectionLabelEn
       ? `${section.sectionNumber}. ${section.sectionLabelEn}${row.labelEn ? ` — ${row.labelEn}` : ''}`
       : `${section.sectionNumber}. ${section.sectionLabelKh || 'Detail'}`
@@ -1127,7 +1130,11 @@ export default function ReportPNTTPage() {
 
   const exportToCSV = useCallback(() => {
     const timestamp = new Date().toISOString().split('T')[0]
-    const siteLabel = selectedSite ? `${selectedSite.code} - ${selectedSite.name || ''}` : 'All Sites'
+    const siteLabel = selectedSite 
+      ? (selectedSite.code === 'cambodia' || selectedSite.code === 'all' 
+         ? selectedSite.name 
+         : `${selectedSite.code} - ${selectedSite.name || ''}`) 
+      : 'Cambodia'
     const reportTitle = `PNTT Report - ${siteLabel} - ${dateRange.startDate} to ${dateRange.endDate}`
     const header = ['Section', 'Section Label', 'Row', 'Male', 'Female', 'Total', 'Ever', 'Six Months', 'Never']
     const rows = [header]

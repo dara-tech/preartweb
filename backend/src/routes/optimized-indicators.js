@@ -61,7 +61,7 @@ router.get('/all', async (req, res) => {
       siteCode: siteCode || null
     };
 
-    const targetSiteLevel = siteLevel || (params.siteCode === 'all' ? 'country' : null);
+    const targetSiteLevel = siteLevel || (params.siteCode === 'all' || params.siteCode === 'cambodia' ? 'country' : null);
 
     // Create a unique key for this request
     const requestKey = `all:${JSON.stringify(params)}`;
@@ -91,7 +91,7 @@ router.get('/all', async (req, res) => {
       const period = determinePeriodFromDates(params.startDate, params.endDate);
       
       // Try to query country-level pre-aggregated data from main_dbs first
-      if (targetSiteLevel === 'country' || params.siteCode === 'all') {
+      if (targetSiteLevel === 'country' || params.siteCode === 'cambodia') {
         try {
           const { periodType, periodYear, periodQuarter } = determinePeriodFromDates(params.startDate, params.endDate);
           const periodLabel = `${periodYear}-Q${periodQuarter}`;
@@ -147,7 +147,7 @@ router.get('/all', async (req, res) => {
       }
 
       // Try to get data from analytics first
-      if (params.siteCode && params.siteCode !== 'all') {
+      if (params.siteCode && params.siteCode !== 'all' && params.siteCode !== 'cambodia') {
         // Single site - try analytics first
         const analyticsResult = await analyticsEngine.getAllIndicatorsForPeriod(params.siteCode, period);
         
@@ -252,7 +252,7 @@ router.get('/all', async (req, res) => {
       // Database query fallback
       let result;
       
-      if (params.siteCode && params.siteCode !== 'all') {
+      if (params.siteCode && params.siteCode !== 'all' && params.siteCode !== 'cambodia') {
         // Use site-specific service when siteCode is provided
         
         // Validate site exists
@@ -400,9 +400,9 @@ router.get('/:indicatorId', async (req, res) => {
       siteCode: siteCode || null
     };
 
-    const targetSiteLevel = siteLevel || (params.siteCode === 'all' ? 'country' : null);
+    const targetSiteLevel = siteLevel || (params.siteCode === 'all' || params.siteCode === 'cambodia' ? 'country' : null);
 
-    if (targetSiteLevel === 'country' || params.siteCode === 'all') {
+    if (targetSiteLevel === 'country' || params.siteCode === 'cambodia') {
       try {
         const { periodType, periodYear, periodQuarter } = determinePeriodFromDates(params.startDate, params.endDate);
         const periodLabel = `${periodYear}-Q${periodQuarter}`;
@@ -626,7 +626,7 @@ router.get('/details/:indicatorId', async (req, res) => {
       try {
         // Get sites to query - either specific site or all sites
         let sites;
-        if (params.siteCode && params.siteCode !== 'all') {
+        if (params.siteCode && params.siteCode !== 'all' && params.siteCode !== 'cambodia') {
           // Single site - validate it exists
           const siteInfo = await siteDatabaseManager.getSiteInfo(params.siteCode);
           if (!siteInfo) {

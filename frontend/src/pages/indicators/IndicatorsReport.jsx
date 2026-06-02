@@ -69,7 +69,7 @@ const IndicatorsReport = () => {
   
   // Site filtering
   const [sites, setSites] = useState([]);
-  const [selectedSite, setSelectedSite] = useState(null);
+  const [selectedSite, setSelectedSite] = useState({ code: 'cambodia', name: 'Cambodia', level: 'country' });
   const [sitesLoading, setSitesLoading] = useState(false);
   
   // Auto-select first site when sites are loaded
@@ -159,8 +159,11 @@ const IndicatorsReport = () => {
       // Only add siteCode if a specific site is selected (not "All Sites")
       if (selectedSite) {
         params.siteCode = selectedSite.code;
+        if (selectedSite.level) {
+          params.siteLevel = selectedSite.level;
+        }
       } else {
-        params.siteCode = 'all';
+        params.siteCode = 'cambodia';
         params.siteLevel = 'country';
       }
       
@@ -171,7 +174,7 @@ const IndicatorsReport = () => {
         // Process the data based on whether it's site-specific or all sites
         let indicatorsData = [];
         
-        if (selectedSite) {
+        if (selectedSite && selectedSite.code !== 'all' && selectedSite.code !== 'cambodia') {
           // Site-specific data: response.data is an array of indicator objects
           indicatorsData = response.data.map(indicatorData => ({
             Indicator: indicatorData.Indicator,
@@ -417,8 +420,8 @@ const IndicatorsReport = () => {
 
       const response = await reportingApi.getIndicatorDetails(indicatorKey, {
         ...filterParams,
-        siteCode: selectedSite?.code || 'all',
-        siteLevel: selectedSite ? undefined : 'country'
+        siteCode: selectedSite?.code || 'cambodia',
+        siteLevel: selectedSite?.level || (selectedSite?.code === 'cambodia' ? 'country' : undefined)
       });
 
       if (response.success) {

@@ -73,7 +73,7 @@ router.get('/infant-report',
       const { siteCode, startDate, endDate, previousEndDate } = req.query;
       
       let sites = [];
-      if (siteCode === 'all') {
+      if (siteCode === 'all' || siteCode === 'cambodia') {
         sites = await siteDatabaseManager.getAllSites();
       } else {
         const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
@@ -141,7 +141,7 @@ router.get('/infant-report/details',
       }
       const { siteCode, scriptId, startDate, endDate, previousEndDate } = req.query;
       let sites = [];
-      if (siteCode === 'all') {
+      if (siteCode === 'all' || siteCode === 'cambodia') {
         sites = await siteDatabaseManager.getAllSites();
       } else {
         const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
@@ -215,7 +215,7 @@ router.get('/pntt-report',
       }
       const { siteCode, startDate, endDate, previousEndDate } = req.query;
       let sites = [];
-      if (siteCode === 'all') {
+      if (siteCode === 'all' || siteCode === 'cambodia') {
         sites = await siteDatabaseManager.getAllSites();
       } else {
         const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
@@ -283,7 +283,7 @@ router.get('/pntt-report/details',
       }
       const { siteCode, scriptId, startDate, endDate, previousEndDate } = req.query;
       let sites = [];
-      if (siteCode === 'all') {
+      if (siteCode === 'all' || siteCode === 'cambodia') {
         sites = await siteDatabaseManager.getAllSites();
       } else {
         const siteInfo = await siteDatabaseManager.getSiteInfo(siteCode);
@@ -373,7 +373,7 @@ router.get('/idpoor-duplicated-artid',
 
       // Get sites to query
       let sitesToQuery = [];
-      if (siteId && siteId !== 'all') {
+      if (siteId && siteId !== 'all' && siteId !== 'cambodia') {
         const siteInfo = await siteDatabaseManager.getSiteInfo(siteId);
         if (!siteInfo) {
           return res.status(404).json({

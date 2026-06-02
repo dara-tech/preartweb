@@ -11,10 +11,12 @@ const SiteFilter = ({
 }) => {
   return (
     <Select 
-      value={selectedSite?.code || ''} 
+      value={selectedSite?.code || 'cambodia'} 
       onValueChange={(value) => {
         if (value === 'all') {
-          onSiteChange(null);
+          onSiteChange({ code: 'all', name: 'All Sites', level: 'registry' });
+        } else if (value === 'cambodia') {
+          onSiteChange({ code: 'cambodia', name: 'Cambodia', level: 'country' });
         } else {
           const site = sites.find(s => s.code === value);
           onSiteChange(site);
@@ -27,9 +29,14 @@ const SiteFilter = ({
       </SelectTrigger>
       <SelectContent className="max-h-60 overflow-y-auto scrollbar-hide border-border">
         {showAllOption && (
-          <SelectItem value="all">
-            All Sites
-          </SelectItem>
+          <>
+            <SelectItem value="cambodia">
+              Cambodia
+            </SelectItem>
+            <SelectItem value="all">
+              All Sites
+            </SelectItem>
+          </>
         )}
         {sites.map((site) => (
           <SelectItem key={site.code} value={site.code}>

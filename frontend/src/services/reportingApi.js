@@ -177,21 +177,27 @@ export const reportingApi = {
 
 export const infantReportApi = {
   getInfantReport: async (params = {}) => {
-    const { siteCode, startDate, endDate, previousEndDate } = params
+    const { siteCode, startDate, endDate, previousEndDate, siteLevel } = params
     if (!siteCode) {
       return { success: false, error: 'Site code is required' }
     }
     const queryParams = { siteCode, startDate, endDate, previousEndDate }
+    if (siteLevel) {
+      queryParams.siteLevel = siteLevel
+    }
     const response = await api.get('/apiv1/reports/infant-report', { params: queryParams })
     return response.data
   },
 
   getInfantReportDetails: async (params = {}) => {
-    const { siteCode, scriptId, startDate, endDate, previousEndDate } = params
+    const { siteCode, scriptId, startDate, endDate, previousEndDate, siteLevel } = params
     if (!siteCode || !scriptId) {
       return { success: false, error: 'Site code and scriptId are required', data: [] }
     }
     const queryParams = { siteCode, scriptId, startDate, endDate, previousEndDate }
+    if (siteLevel) {
+      queryParams.siteLevel = siteLevel
+    }
     const response = await api.get('/apiv1/reports/infant-report/details', { params: queryParams })
     return response.data
   }
@@ -199,21 +205,27 @@ export const infantReportApi = {
 
 export const pnttReportApi = {
   getPnttReport: async (params = {}) => {
-    const { siteCode, startDate, endDate, previousEndDate } = params
+    const { siteCode, startDate, endDate, previousEndDate, siteLevel } = params
     if (!siteCode) {
       return { success: false, error: 'Site code is required' }
     }
     const queryParams = { siteCode, startDate, endDate, previousEndDate }
+    if (siteLevel) {
+      queryParams.siteLevel = siteLevel
+    }
     const response = await api.get('/apiv1/reports/pntt-report', { params: queryParams })
     return response.data
   },
 
   getPnttReportDetails: async (params = {}) => {
-    const { siteCode, scriptId, startDate, endDate, previousEndDate } = params
+    const { siteCode, scriptId, startDate, endDate, previousEndDate, siteLevel } = params
     if (!siteCode || !scriptId) {
       return { success: false, error: 'Site code and scriptId are required', data: [] }
     }
     const queryParams = { siteCode, scriptId, startDate, endDate, previousEndDate }
+    if (siteLevel) {
+      queryParams.siteLevel = siteLevel
+    }
     const response = await api.get('/apiv1/reports/pntt-report/details', { params: queryParams })
     return response.data
   }
