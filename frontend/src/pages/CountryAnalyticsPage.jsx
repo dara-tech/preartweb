@@ -347,7 +347,7 @@ export default function CountryAnalyticsPage() {
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-background p-4 space-y-4">
       <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full flex-1 flex flex-col min-h-0">
-        <div className="flex justify-between items-center bg-card p-2 border border-border/80 rounded-none shadow-sm shrink-0 mb-4">
+        <div className="flex justify-between items-center bg-card p-2 border border-border rounded-none shadow-sm shrink-0 mb-4">
           <TabsList className="grid grid-cols-2 max-w-sm rounded-none bg-muted/50 p-1">
             <TabsTrigger value="country" className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm">Country Analytics</TabsTrigger>
             <TabsTrigger value="name_analytic" className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm">Name Analytic</TabsTrigger>
@@ -356,7 +356,7 @@ export default function CountryAnalyticsPage() {
 
         <TabsContent value="country" className="flex-1 flex flex-col min-h-0 space-y-4 data-[state=inactive]:hidden">
       {/* Header bar with controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 border shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 border border-border shadow-sm">
         <div className="flex items-center gap-2">
           <Database className="h-5 w-5 text-primary" />
           <h1 className="text-sm font-bold text-foreground">វិភាគឃ្លាំងទិន្នន័យ (Country Warehouse Analytics)</h1>
@@ -368,7 +368,7 @@ export default function CountryAnalyticsPage() {
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
             disabled={loading}
-            className="bg-background border text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary rounded-none"
+            className="bg-background border border-border text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary rounded-none"
           >
             {availableYears.map(y => (
               <option key={y} value={y}>{y}</option>
@@ -380,7 +380,7 @@ export default function CountryAnalyticsPage() {
             value={selectedQuarter}
             onChange={(e) => setSelectedQuarter(parseInt(e.target.value))}
             disabled={loading}
-            className="bg-background border text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary rounded-none"
+            className="bg-background border border-border text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary rounded-none"
           >
             <option value="1">Quarter 1</option>
             <option value="2">Quarter 2</option>
@@ -405,7 +405,7 @@ export default function CountryAnalyticsPage() {
             size="sm"
             onClick={handleExportCSV}
             disabled={loading || countryRows.length === 0}
-            className="h-8 text-xs font-semibold px-3 gap-1 rounded-none"
+            className="h-8 text-xs font-semibold px-3 gap-1 rounded-none border-border"
           >
             <Download className="h-3.5 w-3.5 text-blue-500" />
             CSV
@@ -417,7 +417,7 @@ export default function CountryAnalyticsPage() {
             size="sm"
             onClick={handleRefreshWarehouse}
             disabled={warehouseStatus.etlRunning || statusLoading}
-            className="h-8 text-xs font-semibold px-3 gap-1 rounded-none"
+            className="h-8 text-xs font-semibold px-3 gap-1 rounded-none border-border"
           >
             {warehouseStatus.etlRunning ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-500" />
@@ -436,7 +436,7 @@ export default function CountryAnalyticsPage() {
               setCleanModalOpen(true);
             }}
             disabled={loading || statusLoading || warehouseStatus.etlRunning}
-            className="h-8 text-xs font-semibold px-3 gap-1 rounded-none text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+            className="h-8 text-xs font-semibold px-3 gap-1 rounded-none text-rose-500 hover:text-rose-600 hover:bg-rose-50 border-border"
           >
             <Trash2 className="h-3.5 w-3.5" />
             សម្អាត
@@ -445,7 +445,7 @@ export default function CountryAnalyticsPage() {
       </div>
 
       {/* Sync Status Info Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted-foreground bg-card p-3 border border-border/80">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted-foreground bg-card p-3 border border-border">
         <div>
           {warehouseStatus.lastRefreshed ? (
             <>ឃ្លាំងសមកាលកម្មចុងក្រោយ (Last sync): <strong className="text-foreground">{new Date(warehouseStatus.lastRefreshed).toLocaleString()}</strong></>
@@ -458,7 +458,7 @@ export default function CountryAnalyticsPage() {
             variant="ghost"
             size="sm"
             onClick={() => setShowHistory(h => !h)}
-            className="text-[10px] h-6 px-2 gap-1 text-muted-foreground hover:text-foreground border hover:bg-muted/50 rounded-none"
+            className="text-[10px] h-6 px-2 gap-1 text-muted-foreground hover:text-foreground border border-border hover:bg-muted/50 rounded-none"
           >
             <History className="h-3 w-3" />
             Sync Logs history
@@ -597,8 +597,8 @@ export default function CountryAnalyticsPage() {
       )}
 
       {/* Main Details and Table */}
-      <div className="border border-border/80 bg-card rounded-none overflow-hidden flex-1 flex flex-col min-h-0">
-        <div className="p-3 border-b flex flex-col md:flex-row gap-3 items-stretch md:items-center md:justify-between bg-muted/15">
+      <div className="border border-border bg-card rounded-none overflow-hidden flex-1 flex flex-col min-h-0">
+        <div className="p-3 border-b border-border flex flex-col md:flex-row gap-3 items-stretch md:items-center md:justify-between bg-muted/15">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <input
@@ -606,7 +606,7 @@ export default function CountryAnalyticsPage() {
               placeholder="ស្វែងរកសូចនាករ... (Search indicators by code or label)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-background border rounded-none pl-8 pr-3 h-8 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full bg-background border border-border rounded-none pl-8 pr-3 h-8 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
           
@@ -616,7 +616,7 @@ export default function CountryAnalyticsPage() {
               size="sm"
               onClick={toggleAll}
               disabled={filteredRows.length === 0}
-              className="text-[11px] h-8 px-2.5 rounded-none font-medium bg-background"
+              className="text-[11px] h-8 px-2.5 rounded-none font-medium bg-background border-border"
             >
               {expandedIndicators.size === filteredRows.length ? 'Collapse All' : 'Expand All'}
             </Button>
@@ -785,8 +785,8 @@ export default function CountryAnalyticsPage() {
           </TabsList>
           
           <TabsContent value="data_view" className="space-y-4 data-[state=inactive]:hidden">
-            <Card className="border border-border/80 bg-card rounded-none shadow-none">
-              <CardHeader className="pb-3 border-b bg-muted/10">
+            <Card className="border border-border bg-card rounded-none shadow-none">
+              <CardHeader className="pb-3 border-b border-border bg-muted/10">
                 <div className="flex items-center space-x-2">
                   <Filter className="w-4 h-4 text-primary" />
                   <CardTitle className="text-xs font-bold text-foreground">Data Filters (Mock UI)</CardTitle>
@@ -796,28 +796,28 @@ export default function CountryAnalyticsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase">Indicator</label>
-                    <select disabled className="w-full bg-background border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
+                    <select disabled className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
                       <option>All Indicators</option>
                     </select>
                   </div>
 
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase">Site</label>
-                    <select disabled className="w-full bg-background border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
+                    <select disabled className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
                       <option>All Sites</option>
                     </select>
                   </div>
 
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase">Period</label>
-                    <input type="text" readOnly value="2025-Q1" className="w-full bg-background border text-xs px-2 py-1.5 rounded-none cursor-not-allowed" />
+                    <input type="text" readOnly value="2025-Q1" className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed" />
                   </div>
 
                   <div className="flex items-end space-x-2">
                     <Button disabled className="h-8 text-xs font-semibold px-3 gap-1 rounded-none flex-1">
                       <RefreshCw className="h-3.5 w-3.5" /> Apply Filters
                     </Button>
-                    <Button disabled variant="outline" className="h-8 text-xs font-semibold px-3 gap-1 rounded-none text-rose-500">
+                    <Button disabled variant="outline" className="h-8 text-xs font-semibold px-3 gap-1 rounded-none text-rose-500 border-border">
                       <Trash2 className="h-3.5 w-3.5" /> Reset
                     </Button>
                   </div>
@@ -826,11 +826,11 @@ export default function CountryAnalyticsPage() {
             </Card>
 
             {/* Data Table */}
-            <Card className="border border-border/80 shadow-none rounded-none">
+            <Card className="border border-border shadow-none rounded-none">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
-                    <thead className="bg-muted/30 border-b border-border/70 text-left font-bold text-foreground">
+                    <thead className="bg-muted/30 border-b border-border text-left font-bold text-foreground">
                       <tr>
                         <th className="px-3 py-2.5">សុចនាករ Indicator</th>
                         <th className="px-3 py-2.5">កន្លែង Site</th>
@@ -912,8 +912,8 @@ export default function CountryAnalyticsPage() {
           
           <TabsContent value="yearly_control" className="space-y-4 data-[state=inactive]:hidden">
             {/* Engine Control */}
-            <Card className="border border-border/80 shadow-none rounded-none">
-              <CardHeader className="pb-3 border-b bg-muted/10">
+            <Card className="border border-border shadow-none rounded-none">
+              <CardHeader className="pb-3 border-b border-border bg-muted/10">
                 <CardTitle className="flex items-center gap-2 text-xs font-bold text-foreground">
                   <Database className="h-4 w-4 text-primary" />
                   Analytics Engine Control (Mock UI)
@@ -925,10 +925,10 @@ export default function CountryAnalyticsPage() {
                   <span className="text-xs text-muted-foreground">Analytics engine is running</span>
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" disabled className="flex items-center gap-1 text-[11px] rounded-none">
+                  <Button size="sm" variant="outline" disabled className="flex items-center gap-1 text-[11px] rounded-none border-border">
                     <Power className="h-3.5 w-3.5" /> Enable
                   </Button>
-                  <Button size="sm" variant="outline" disabled className="flex items-center gap-1 text-[11px] rounded-none">
+                  <Button size="sm" variant="outline" disabled className="flex items-center gap-1 text-[11px] rounded-none border-border">
                     <PowerOff className="h-3.5 w-3.5" /> Disable
                   </Button>
                 </div>
@@ -936,8 +936,8 @@ export default function CountryAnalyticsPage() {
             </Card>
 
             {/* Yearly Analytics Selection */}
-            <Card className="border border-border/80 shadow-none rounded-none">
-              <CardHeader className="pb-3 border-b bg-muted/10">
+            <Card className="border border-border shadow-none rounded-none">
+              <CardHeader className="pb-3 border-b border-border bg-muted/10">
                 <CardTitle className="flex items-center gap-2 text-xs font-bold text-foreground">
                   <Calendar className="h-4 w-4 text-primary" />
                   Yearly Analytics (Mock UI)
@@ -947,7 +947,7 @@ export default function CountryAnalyticsPage() {
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
                     <label className="text-xs font-bold text-muted-foreground uppercase mb-1 block">Select Year</label>
-                    <select disabled className="w-full bg-background border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
+                    <select disabled className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
                       <option>2025</option>
                       <option>2026</option>
                     </select>
@@ -962,8 +962,8 @@ export default function CountryAnalyticsPage() {
             </Card>
 
             {/* Mock Real-Time Log Viewer */}
-            <Card className="border border-border/80 shadow-none rounded-none">
-              <CardHeader className="pb-3 border-b bg-muted/10">
+            <Card className="border border-border shadow-none rounded-none">
+              <CardHeader className="pb-3 border-b border-border bg-muted/10">
                 <CardTitle className="flex items-center gap-2 text-xs font-bold text-foreground">
                   <FileText className="h-4 w-4 text-primary" />
                   Real-Time Execution Logs (Mock UI)

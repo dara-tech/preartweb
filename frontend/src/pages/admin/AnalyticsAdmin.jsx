@@ -49,7 +49,7 @@ const getDisplayIndicatorName = (backendName) => {
 };
 
 const AnalyticsAdmin = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [summary, setSummary] = useState(null);
   const [analyticsData, setAnalyticsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -366,46 +366,35 @@ const AnalyticsAdmin = () => {
   const activeView = searchParams.get('view') || 'data';
 
   return (
-    <div className="space-y-4">
-      <div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="p-1">
-              <BarChart3 className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-sm font-medium text-muted-foreground">Analytics</h1>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-2 bg-background px-2 py-1 border border-border/80">
-              <Activity className="h-4 w-4 text-primary" />
-              <div className="text-sm">
-                <span className="font-medium text-foreground">{summary?.completedRecords || 0}</span>
-                <span className="text-muted-foreground"> / {summary?.totalRecords || 0}</span>
-              </div>
-              <Badge variant={summary?.successRate > 90 ? "default" : "secondary"} className="font-medium">
-                {summary?.successRate || 0}%
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-2 bg-background px-2 py-1 border border-border/80">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <span className="text-xs font-medium text-foreground">Active</span>
-            </div>
-          </div>
-        </div>
+    <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-background p-4 space-y-4">
+      <div className="flex justify-between items-center bg-card p-2 border border-border rounded-none shadow-sm shrink-0">
+        <TabsList className="grid grid-cols-2 max-w-sm rounded-none bg-muted/50 p-1">
+          <TabsTrigger 
+            value="data" 
+            onClick={() => setSearchParams({ view: 'data' })}
+            className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
+          >
+            Analytics Data
+          </TabsTrigger>
+          <TabsTrigger 
+            value="yearly" 
+            onClick={() => setSearchParams({ view: 'yearly' })}
+            className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
+          >
+            Yearly Analytics
+          </TabsTrigger>
+        </TabsList>
       </div>
 
-      <Tabs value={activeView} className="space-y-3">
-
+      <Tabs value={activeView} className="w-full flex-1 flex flex-col min-h-0 space-y-3">
         {/* Enhanced Analytics Data Tab */}
-        <TabsContent value="data" className="space-y-3">
-          {false && (
-          <Card className="border-border/80 bg-card shadow-none">
-            <CardHeader className="pb-4">
+        <TabsContent value="data" className="flex-1 flex flex-col min-h-0 space-y-3 data-[state=inactive]:hidden">
+          {true && (
+          <Card className="border border-border bg-card shadow-none rounded-none">
+            <CardHeader className="pb-4 border-b border-border bg-muted/10">
               <div className="flex items-center space-x-2">
                 <Filter className="w-4 h-4 text-primary" />
-                <CardTitle className="text-sm font-medium">Data Filters</CardTitle>
+                <CardTitle className="text-xs font-bold text-foreground">Data Filters</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -414,10 +403,10 @@ const AnalyticsAdmin = () => {
                 <div className="space-y-2">
                 
                   <Select value={filters.indicatorId} onValueChange={(value) => setFilters({...filters, indicatorId: value})}>
-                    <SelectTrigger className="h-8 w-full bg-background border-border/80 text-xs">
+                    <SelectTrigger className="h-8 w-full bg-background border border-border text-xs">
                       <SelectValue placeholder="សុចនាករ Indicator" />
                     </SelectTrigger>
-                    <SelectContent className="overflow-y-auto max-h-48 bg-background">
+                    <SelectContent className="overflow-y-auto max-h-48 bg-background border border-border">
                       <SelectItem value="all" className="font-medium">
                         <div className="flex items-center space-x-2">
                           <div className="w-1.5 h-1.5 rounded-none"></div>
@@ -437,10 +426,10 @@ const AnalyticsAdmin = () => {
                 <div className="space-y-2">
                  
                   <Select value={filters.siteCode} onValueChange={(value) => setFilters({...filters, siteCode: value})}>
-                    <SelectTrigger className="h-8 w-full bg-background border-border/80 text-xs">
+                    <SelectTrigger className="h-8 w-full bg-background border border-border text-xs">
                       <SelectValue placeholder="Site" />
                     </SelectTrigger>
-                    <SelectContent className="overflow-y-auto max-h-48 scrollbar-hide bg-background">
+                    <SelectContent className="overflow-y-auto max-h-48 scrollbar-hide bg-background border border-border">
                       <SelectItem value="all" className="font-medium">
                         <div className="flex items-center space-x-2">
                           <div className="w-1.5 h-1.5 rounded-none"></div>
@@ -467,7 +456,7 @@ const AnalyticsAdmin = () => {
                       type="text"
                       value={filters.periodYear === 'all' ? 'All Years' : `${filters.periodYear}-Q${filters.periodQuarter}`}
                       readOnly
-                      className="w-full h-8 px-2.5 pr-8 text-xs bg-background border border-border/80 rounded-none cursor-pointer"
+                      className="w-full h-8 px-2.5 pr-8 text-xs bg-background border border-border rounded-none cursor-pointer"
                       onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -476,7 +465,7 @@ const AnalyticsAdmin = () => {
 
                     {/* Enhanced Period Picker Panel */}
                     {isPeriodPickerOpen && (
-                      <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border border-border/80 rounded-none p-3 min-w-[320px]">
+                      <div ref={pickerRef} className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border border-border rounded-none p-3 min-w-[320px]">
                         {/* Year Navigation */}
                         <div className="flex items-center justify-between mb-6">
                           <Button
@@ -627,11 +616,11 @@ const AnalyticsAdmin = () => {
           )}
 
           {/* Data Table */}
-          <Card className="border-border/80 shadow-none">
+          <Card className="border border-border shadow-none rounded-none">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-muted/20 border-b border-border/70">
+                <table className="w-full text-xs border-collapse">
+                  <thead className="bg-muted/20 border-b border-border">
                     <tr>
                       <th className="text-left px-3 py-2 font-medium text-foreground">សុចនាករ Indicator</th>
                       <th className="text-left px-3 py-2 font-medium text-foreground">កន្លែង Site</th>
@@ -668,7 +657,7 @@ const AnalyticsAdmin = () => {
                       </tr>
                     ) : (
                       analyticsData.map((record) => (
-                        <tr key={record.id} className="border-b border-border/40 bg-background hover:bg-muted/15 transition-colors">
+                        <tr key={record.id} className="border-b border-border bg-background hover:bg-muted/15 transition-colors">
                           <td className="px-3 py-2 align-top">
                             <div className="space-y-0.5">
                               <div className="font-medium text-foreground leading-tight">{getDisplayIndicatorName(record.indicator_name)}</div>
@@ -721,10 +710,11 @@ const AnalyticsAdmin = () => {
         </TabsContent>
 
         {/* Yearly Analytics Tab */}
-        <TabsContent value="yearly" className="space-y-4">
+        <TabsContent value="yearly" className="flex-1 space-y-4 data-[state=inactive]:hidden">
           <YearlyAnalytics />
         </TabsContent>
       </Tabs>
+    </div>
     </div>
   );
 };
