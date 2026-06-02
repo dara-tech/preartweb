@@ -594,7 +594,7 @@ const AnalyticsAdmin = () => {
                     <Button 
                       onClick={fetchAnalyticsData} 
                       disabled={loading} 
-                      className="flex-1 hover:/90 text-primary-foreground"
+                      className="flex-1 text-primary-foreground"
                     >
                       <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                       Apply Filters
@@ -714,7 +714,6 @@ const AnalyticsAdmin = () => {
           <YearlyAnalytics />
         </TabsContent>
       </Tabs>
-    </div>
     </div>
   );
 };
