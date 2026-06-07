@@ -367,26 +367,26 @@ const AnalyticsAdmin = () => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-background p-4 space-y-4">
-      <div className="flex justify-between items-center bg-card p-2 border border-border rounded-none shadow-sm shrink-0">
-        <TabsList className="grid grid-cols-2 max-w-sm rounded-none bg-muted/50 p-1">
-          <TabsTrigger 
-            value="data" 
-            onClick={() => setSearchParams({ view: 'data' })}
-            className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
-          >
-            Analytics Data
-          </TabsTrigger>
-          <TabsTrigger 
-            value="yearly" 
-            onClick={() => setSearchParams({ view: 'yearly' })}
-            className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
-          >
-            Yearly Analytics
-          </TabsTrigger>
-        </TabsList>
-      </div>
-
       <Tabs value={activeView} className="w-full flex-1 flex flex-col min-h-0 space-y-3">
+        <div className="flex justify-between items-center bg-card p-2 border border-border rounded-none shadow-sm shrink-0">
+          <TabsList className="grid grid-cols-2 max-w-sm rounded-none bg-muted/50 p-1">
+            <TabsTrigger 
+              value="data" 
+              onClick={() => setSearchParams({ view: 'data' })}
+              className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
+            >
+              Analytics Data
+            </TabsTrigger>
+            <TabsTrigger 
+              value="yearly" 
+              onClick={() => setSearchParams({ view: 'yearly' })}
+              className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
+            >
+              Yearly Analytics
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
         {/* Enhanced Analytics Data Tab */}
         <TabsContent value="data" className="flex-1 flex flex-col min-h-0 space-y-3 data-[state=inactive]:hidden">
           {true && (

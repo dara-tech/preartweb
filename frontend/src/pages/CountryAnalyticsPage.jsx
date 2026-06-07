@@ -32,16 +32,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function CountryAnalyticsPage() {
   const { user } = useAuth();
-  const [activeMainTab, setActiveMainTab] = useState('country');
   
   // Single period key selection state
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [selectedQuarter, setSelectedQuarter] = useState(1);
+  const [selectedQuarter, setSelectedQuarter] = useState('1'); // '1', '2', '3', '4', or 'all'
 
   // Data state
   const [countryRows, setCountryRows] = useState([]);
@@ -72,6 +70,13 @@ export default function CountryAnalyticsPage() {
 
   // Derived current period label matching database warehouse format
   const currentPeriod = useMemo(() => {
+    if (selectedQuarter === 'all') {
+      return {
+        periodType: 'year',
+        year: String(selectedYear),
+        periodLabel: String(selectedYear)
+      };
+    }
     return {
       periodType: 'quarter',
       year: String(selectedYear),
@@ -346,15 +351,7 @@ export default function CountryAnalyticsPage() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0 bg-background p-4 space-y-4">
-      <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full flex-1 flex flex-col min-h-0">
-        <div className="flex justify-between items-center bg-card p-2 border border-border rounded-none shadow-sm shrink-0 mb-4">
-          <TabsList className="grid grid-cols-2 max-w-sm rounded-none bg-muted/50 p-1">
-            <TabsTrigger value="country" className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm">Country Analytics</TabsTrigger>
-            <TabsTrigger value="name_analytic" className="rounded-none text-xs font-semibold py-1.5 px-4 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm">Name Analytic</TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="country" className="flex-1 flex flex-col min-h-0 space-y-4 data-[state=inactive]:hidden">
+      <div className="flex-1 flex flex-col min-h-0 space-y-4">
       {/* Header bar with controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 border border-border shadow-sm">
         <div className="flex items-center gap-2">
@@ -375,10 +372,10 @@ export default function CountryAnalyticsPage() {
             ))}
           </select>
 
-          {/* Quarter selector */}
+          {/* Quarter/Year selector */}
           <select
             value={selectedQuarter}
-            onChange={(e) => setSelectedQuarter(parseInt(e.target.value))}
+            onChange={(e) => setSelectedQuarter(e.target.value)}
             disabled={loading}
             className="bg-background border border-border text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary rounded-none"
           >
@@ -386,6 +383,7 @@ export default function CountryAnalyticsPage() {
             <option value="2">Quarter 2</option>
             <option value="3">Quarter 3</option>
             <option value="4">Quarter 4</option>
+            <option value="all">ប្រចាំឆ្នាំ (Yearly)</option>
           </select>
 
           {/* Run button */}
@@ -774,213 +772,7 @@ export default function CountryAnalyticsPage() {
           </div>
         )}
       </div>
-      </TabsContent>
-
-      <TabsContent value="name_analytic" className="flex-1 space-y-4 data-[state=inactive]:hidden overflow-auto">
-        {/* Sub tabs from Admin Analytics */}
-        <Tabs defaultValue="data_view" className="space-y-4">
-          <TabsList className="grid grid-cols-2 max-w-[280px] rounded-none bg-muted/35 p-1">
-            <TabsTrigger value="data_view" className="rounded-none text-xs font-semibold py-1 px-3">Analytics Data</TabsTrigger>
-            <TabsTrigger value="yearly_control" className="rounded-none text-xs font-semibold py-1 px-3">Yearly Analytics</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="data_view" className="space-y-4 data-[state=inactive]:hidden">
-            <Card className="border border-border bg-card rounded-none shadow-none">
-              <CardHeader className="pb-3 border-b border-border bg-muted/10">
-                <div className="flex items-center space-x-2">
-                  <Filter className="w-4 h-4 text-primary" />
-                  <CardTitle className="text-xs font-bold text-foreground">Data Filters (Mock UI)</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Indicator</label>
-                    <select disabled className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
-                      <option>All Indicators</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Site</label>
-                    <select disabled className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
-                      <option>All Sites</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Period</label>
-                    <input type="text" readOnly value="2025-Q1" className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed" />
-                  </div>
-
-                  <div className="flex items-end space-x-2">
-                    <Button disabled className="h-8 text-xs font-semibold px-3 gap-1 rounded-none flex-1">
-                      <RefreshCw className="h-3.5 w-3.5" /> Apply Filters
-                    </Button>
-                    <Button disabled variant="outline" className="h-8 text-xs font-semibold px-3 gap-1 rounded-none text-rose-500 border-border">
-                      <Trash2 className="h-3.5 w-3.5" /> Reset
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Data Table */}
-            <Card className="border border-border shadow-none rounded-none">
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead className="bg-muted/30 border-b border-border text-left font-bold text-foreground">
-                      <tr>
-                        <th className="px-3 py-2.5">សុចនាករ Indicator</th>
-                        <th className="px-3 py-2.5">កន្លែង Site</th>
-                        <th className="px-3 py-2.5">រយៈពេល Period</th>
-                        <th className="px-3 py-2.5 text-right">សរុប Total</th>
-                        <th className="px-3 py-2.5 text-center">ស្ថានភាព Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      <tr className="border-b bg-background">
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">1. Active ART patients in previous quarter</div>
-                          <div className="text-[10px] text-muted-foreground">01_active_art_previous</div>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">All Sites</div>
-                          <div className="text-[10px] text-muted-foreground">all</div>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">quarterly 2025</div>
-                          <div className="text-[10px] text-primary">Q1</div>
-                        </td>
-                        <td className="px-3 py-2.5 text-right">
-                          <div className="text-xs font-black text-foreground">66,339</div>
-                          <div className="text-[10px] text-muted-foreground">M: 35,799 | F: 30,540</div>
-                        </td>
-                        <td className="px-3 py-2.5 text-center">
-                          <Badge className="text-[9px] font-medium bg-primary/10 text-primary rounded-none">completed</Badge>
-                        </td>
-                      </tr>
-                      <tr className="border-b bg-background">
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">2. Active Pre-ART patients in previous quarter</div>
-                          <div className="text-[10px] text-muted-foreground">02_active_pre_art_previous</div>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">All Sites</div>
-                          <div className="text-[10px] text-muted-foreground">all</div>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">quarterly 2025</div>
-                          <div className="text-[10px] text-primary">Q1</div>
-                        </td>
-                        <td className="px-3 py-2.5 text-right">
-                          <div className="text-xs font-black text-foreground">13</div>
-                          <div className="text-[10px] text-muted-foreground">M: 9 | F: 4</div>
-                        </td>
-                        <td className="px-3 py-2.5 text-center">
-                          <Badge className="text-[9px] font-medium bg-primary/10 text-primary rounded-none">completed</Badge>
-                        </td>
-                      </tr>
-                      <tr className="border-b bg-background">
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">3. Newly Enrolled</div>
-                          <div className="text-[10px] text-muted-foreground">03_newly_enrolled</div>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">All Sites</div>
-                          <div className="text-[10px] text-muted-foreground">all</div>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <div className="font-semibold text-foreground">quarterly 2025</div>
-                          <div className="text-[10px] text-primary">Q1</div>
-                        </td>
-                        <td className="px-3 py-2.5 text-right">
-                          <div className="text-xs font-black text-foreground">1,249</div>
-                          <div className="text-[10px] text-muted-foreground">M: 929 | F: 320</div>
-                        </td>
-                        <td className="px-3 py-2.5 text-center">
-                          <Badge className="text-[9px] font-medium bg-primary/10 text-primary rounded-none">completed</Badge>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="yearly_control" className="space-y-4 data-[state=inactive]:hidden">
-            {/* Engine Control */}
-            <Card className="border border-border shadow-none rounded-none">
-              <CardHeader className="pb-3 border-b border-border bg-muted/10">
-                <CardTitle className="flex items-center gap-2 text-xs font-bold text-foreground">
-                  <Database className="h-4 w-4 text-primary" />
-                  Analytics Engine Control (Mock UI)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Badge className="bg-primary/10 text-primary rounded-none text-[10px]">Enabled</Badge>
-                  <span className="text-xs text-muted-foreground">Analytics engine is running</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" disabled className="flex items-center gap-1 text-[11px] rounded-none border-border">
-                    <Power className="h-3.5 w-3.5" /> Enable
-                  </Button>
-                  <Button size="sm" variant="outline" disabled className="flex items-center gap-1 text-[11px] rounded-none border-border">
-                    <PowerOff className="h-3.5 w-3.5" /> Disable
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Yearly Analytics Selection */}
-            <Card className="border border-border shadow-none rounded-none">
-              <CardHeader className="pb-3 border-b border-border bg-muted/10">
-                <CardTitle className="flex items-center gap-2 text-xs font-bold text-foreground">
-                  <Calendar className="h-4 w-4 text-primary" />
-                  Yearly Analytics (Mock UI)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <label className="text-xs font-bold text-muted-foreground uppercase mb-1 block">Select Year</label>
-                    <select disabled className="w-full bg-background border border-border text-xs px-2 py-1.5 rounded-none cursor-not-allowed">
-                      <option>2025</option>
-                      <option>2026</option>
-                    </select>
-                  </div>
-                  <div className="pt-5">
-                    <Button disabled size="sm" className="flex items-center gap-1 rounded-none text-xs font-semibold h-8 px-3">
-                      <Play className="h-3.5 w-3.5" /> Run Analytics
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Mock Real-Time Log Viewer */}
-            <Card className="border border-border shadow-none rounded-none">
-              <CardHeader className="pb-3 border-b border-border bg-muted/10">
-                <CardTitle className="flex items-center gap-2 text-xs font-bold text-foreground">
-                  <FileText className="h-4 w-4 text-primary" />
-                  Real-Time Execution Logs (Mock UI)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 bg-zinc-950 font-mono text-[10px] text-zinc-300 space-y-1.5 rounded-none h-48 overflow-y-auto">
-                <div className="text-zinc-500">[2026-06-02 07:05:10] [info] Starting yearly ETL run for 2025...</div>
-                <div className="text-zinc-350">[2026-06-02 07:05:12] [info] Processing site: Siemreap (1209)... success</div>
-                <div className="text-zinc-350">[2026-06-02 07:05:15] [info] Processing site: Battambang (1201)... success</div>
-                <div className="text-zinc-350">[2026-06-02 07:05:18] [info] Processing site: Phnom Penh (1212)... success</div>
-                <div className="text-emerald-500">[2026-06-02 07:05:22] [success] Yearly analytics aggregation completed. 35,400 rows processed.</div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </TabsContent>
-    </Tabs>
+      </div>
 
       {/* Clean Confirmation Modal */}
       {cleanModalOpen && (

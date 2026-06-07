@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import siteApi from '../../services/siteApi';
 
-const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, titleEn, titleKh }) => {
+const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, periodType, titleEn, titleKh }) => {
   const displayTitleEn = titleEn ?? 'Quarterly Report on ART';
   const displayTitleKh = titleKh ?? 'របាយការណ៍ស្តីពីការព្យាបាលអ្នកជំងឺអេដស៍';
   const [sites, setSites] = useState([]);
@@ -28,6 +28,7 @@ const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, titleEn, ti
   // Helper function to get province name from site data
   const getProvinceName = (site) => {
     if (!site) return 'Unknown';
+    if (site.level === 'country' || site.code === 'cambodia' || site.code === 'all') return 'National / All Provinces';
     
     // If site has province field, use it directly
     if (site.province) {
@@ -46,6 +47,7 @@ const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, titleEn, ti
   // Helper function to get operational district from site
   const getOperationalDistrict = (site) => {
     if (!site || !site.code) return 'Unknown';
+    if (site.level === 'country' || site.code === 'cambodia' || site.code === 'all') return 'National / All Districts';
     
     const districtCode = site.code.substring(0, 4);
     const siteName = site.name || '';
@@ -109,7 +111,7 @@ const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, titleEn, ti
                 File Name:
               </td>
               <td className="px-4 py-3 text-foreground border-b w-1/4">
-                {selectedSite ? (selectedSite.fileName || selectedSite.file_name || selectedSite.code) : 'All Facilities'}
+                {selectedSite ? (selectedSite.level === 'country' || selectedSite.code === 'cambodia' ? 'National' : (selectedSite.fileName || selectedSite.file_name || selectedSite.code)) : 'All Facilities'}
               </td>
             </tr>
             <tr className="border-b border-border">
@@ -137,7 +139,7 @@ const ReportHeader = ({ selectedSite, selectedYear, selectedQuarter, titleEn, ti
                 Quarter:
               </td>
               <td className="px-4 py-3 text-foreground">
-                Quarter {selectedQuarter}
+                {periodType === 'year' ? 'Yearly' : `Quarter ${selectedQuarter}`}
               </td>
             </tr>
           </tbody>

@@ -1,6 +1,5 @@
 const { getAggregateSequelize } = require('../config/aggregateDatabase');
 const siteOptimizedIndicators = require('./siteOptimizedIndicators');
-const { siteDatabaseManager } = require('../config/siteDatabase');
 
 // simple helper to mimic main_art_new asyncPool
 async function runPool(items, concurrency, fn) {
@@ -42,7 +41,7 @@ function getEtlProgress() {
 // ─── Schema bootstrap ─────────────────────────────────────────────────────────
 
 /**
- * Create analytics tables inside main_dbs if they don't exist.
+ * Create analytics tables inside preart_sites_registry if they don't exist.
  * Uses CREATE TABLE IF NOT EXISTS — 100% safe to run multiple times.
  */
 async function ensureAnalyticsTables() {

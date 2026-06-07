@@ -90,7 +90,7 @@ router.get('/all', async (req, res) => {
       // Determine period type and parameters for analytics
       const period = determinePeriodFromDates(params.startDate, params.endDate);
       
-      // Try to query country-level pre-aggregated data from main_dbs first
+      // Try to query country-level pre-aggregated data from preart_sites_registry first
       if (targetSiteLevel === 'country' || params.siteCode === 'cambodia') {
         try {
           const { periodType, periodYear, periodQuarter } = determinePeriodFromDates(params.startDate, params.endDate);
@@ -116,7 +116,7 @@ router.get('/all', async (req, res) => {
           });
           
           if (rows && rows.length > 0) {
-            console.log(`📊 Using pre-aggregated country-level data from main_dbs for ${periodLabel} (${rows.length} rows)`);
+            console.log(`📊 Using pre-aggregated country-level data from preart_sites_registry for ${periodLabel} (${rows.length} rows)`);
             const formatted = rows.map(r => ({
               Indicator: r.Indicator,
               TOTAL: Number(r.TOTAL || 0),
@@ -140,9 +140,9 @@ router.get('/all', async (req, res) => {
               analyticsData: true
             };
           }
-          console.log(`📊 No country-level data found in main_dbs for ${periodLabel}, falling back to live queries`);
+          console.log(`📊 No country-level data found in preart_sites_registry for ${periodLabel}, falling back to live queries`);
         } catch (error) {
-          console.error(`📊 Error loading country-level indicators from main_dbs: ${error.message}. Falling back to live query.`);
+          console.error(`📊 Error loading country-level indicators from preart_sites_registry: ${error.message}. Falling back to live query.`);
         }
       }
 
@@ -452,7 +452,7 @@ router.get('/:indicatorId', async (req, res) => {
           }
         }
       } catch (error) {
-        console.error(`📊 Error loading country-level single indicator from main_dbs: ${error.message}. Falling back to live query.`);
+        console.error(`📊 Error loading country-level single indicator from preart_sites_registry: ${error.message}. Falling back to live query.`);
       }
     }
 

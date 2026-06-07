@@ -72,6 +72,15 @@ export const getDateRangeForYearQuarter = (year, quarter) => {
   };
 };
 
+// Get date range for selected year
+export const getDateRangeForYear = (year) => {
+  return {
+    startDate: `${year}-01-01`,
+    endDate: `${year}-12-31`,
+    previousEndDate: `${year - 1}-12-31`
+  };
+};
+
 // Calculate summary statistics
 export const calculateSummaryStats = (indicatorsData) => {
   // Helper function to find indicators with flexible matching
@@ -275,7 +284,7 @@ export const getDisplayIndicatorName = (backendName) => {
 };
 
 // Generate report HTML for printing
-export const generateReportHTML = (indicators, selectedSite, selectedYear, selectedQuarter, sites = []) => {
+export const generateReportHTML = (indicators, selectedSite, selectedYear, selectedQuarter, sites = [], periodType = 'quarter') => {
   // Get the current date and time
   const now = new Date();
   const timestamp = now.toLocaleString();
@@ -293,6 +302,7 @@ export const generateReportHTML = (indicators, selectedSite, selectedYear, selec
   // Helper functions for "All Sites" case
   const getOperationalDistrict = (site) => {
     if (!site || !site.code) return 'Unknown';
+    if (site.level === 'country' || site.code === 'cambodia' || site.code === 'all') return 'National / All Districts';
     const districtCode = site.code.substring(0, 4);
     const siteName = site.name || '';
     const nameParts = siteName.split(' ');
@@ -302,6 +312,7 @@ export const generateReportHTML = (indicators, selectedSite, selectedYear, selec
   
   const getProvinceName = (site) => {
     if (!site) return 'Unknown';
+    if (site.level === 'country' || site.code === 'cambodia' || site.code === 'all') return 'National / All Provinces';
     if (site.province) {
       return site.province;
     }
@@ -622,7 +633,7 @@ export const generateReportHTML = (indicators, selectedSite, selectedYear, selec
                 <td class="label">ឈ្មោះមន្ទីរពេទ្យបង្អែក (Facility):</td>
                 <td class="value">${siteName}</td>
                 <td class="label">ឈ្មោះឯកសារ (File Name):</td>
-                <td class="value">${selectedSite ? (selectedSite.fileName || selectedSite.file_name || siteCode) : getAllFileNames()}</td>
+                <td class="value">${selectedSite ? (selectedSite.level === 'country' || selectedSite.code === 'cambodia' ? 'National' : (selectedSite.fileName || selectedSite.file_name || siteCode)) : getAllFileNames()}</td>
               </tr>
               <tr>
                 <td class="label">ឈ្មោះស្រុកប្រតិបត្តិ (Operational District):</td>
@@ -634,7 +645,7 @@ export const generateReportHTML = (indicators, selectedSite, selectedYear, selec
                 <td class="label">ឆ្នាំ (Year):</td>
                 <td class="value">${selectedYear}</td>
                 <td class="label">ត្រីមាសទី (Quarter):</td>
-                <td class="value">Quarter ${selectedQuarter}</td>
+                <td class="value">${periodType === 'year' ? 'Yearly' : `Quarter ${selectedQuarter}`}</td>
               </tr>
             </tbody>
           </table>

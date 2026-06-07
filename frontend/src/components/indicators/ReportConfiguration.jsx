@@ -30,6 +30,8 @@ const ReportConfiguration = ({
   selectedQuarter,
   onYearChange,
   onQuarterChange,
+  periodType = 'quarter',
+  onPeriodTypeChange,
   availableYears,
   availableQuarters,
   onRefresh,
@@ -245,6 +247,21 @@ const ReportConfiguration = ({
             </div>
           </div>
 
+          {/* Period Type Selection */}
+          <div className="flex-none min-w-[120px]">
+            <div className="space-y-1 sm:space-y-2">
+              <Select value={periodType} onValueChange={onPeriodTypeChange} disabled={loading}>
+                <SelectTrigger className="w-full h-10 sm:h-11 border-input focus:ring-primary rounded-md text-sm">
+                  <SelectValue placeholder="Period Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="quarter">Quarterly</SelectItem>
+                  <SelectItem value="year">Yearly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           {/* Time Period */}
           <div className="flex-1 min-w-0">
             <div className="space-y-1 sm:space-y-2">
@@ -253,9 +270,9 @@ const ReportConfiguration = ({
                 <div className="relative">
                   <input
                     type="text"
-                    value={`${selectedYear}-Q${selectedQuarter}`}
+                    value={periodType === 'year' ? selectedYear : `${selectedYear}-Q${selectedQuarter}`}
                     readOnly
-                    className="w-full h-10 sm:h-11 px-3 pr-10 text-sm border border-input rounded-md focus:border-primary focus:ring-2 focus:ring-ring cursor-pointer transition-colors"
+                    className="w-full h-10 sm:h-11 px-3 pr-10 text-sm border border-input rounded-md focus:border-primary focus:ring-2 focus:ring-ring cursor-pointer transition-colors bg-background"
                     onClick={() => setIsPeriodPickerOpen(!isPeriodPickerOpen)}
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -292,10 +309,12 @@ const ReportConfiguration = ({
                       
                       <Button
                         type="button"
-                        onClick={() => setShowYearGrid(!showYearGrid)}
+                        onClick={() => {
+                          if (periodType !== 'year') setShowYearGrid(!showYearGrid);
+                        }}
                         variant="ghost"
-                        className="px-4 py-2 text-base font-semibold hover:text-primary rounded-md transition-colors cursor-pointer"
-                        title="Click to show year grid"
+                        className={`px-4 py-2 text-base font-semibold rounded-md transition-colors ${periodType === 'year' ? 'cursor-default' : 'hover:text-primary cursor-pointer'}`}
+                        title={periodType === 'year' ? "Current selected year" : "Click to show year grid"}
                       >
                         {selectedYear}
                       </Button>
@@ -324,7 +343,7 @@ const ReportConfiguration = ({
                     </div>
 
                     {/* Year Grid - Conditionally Visible */}
-                    {showYearGrid && (
+                    {(showYearGrid || periodType === 'year') && (
                       <div className="grid grid-cols-3 gap-2 mb-4">
                         {decadeYears.map((year) => {
                           const isSelected = year === parseInt(selectedYear);
@@ -340,6 +359,9 @@ const ReportConfiguration = ({
                                 if (isAvailable) {
                                   onYearChange(year.toString());
                                   setShowYearGrid(false);
+                                  if (periodType === 'year') {
+                                    setIsPeriodPickerOpen(false);
+                                  }
                                 }
                               }}
                               disabled={!isAvailable}
@@ -369,34 +391,36 @@ const ReportConfiguration = ({
                       </div>
                     )}
 
-                    {/* Quarter Selection */}
-                    <div className="grid grid-cols-4 gap-2">
-                      {availableQuarters.map(quarter => (
-                        <Button
-                          key={quarter.value}
-                          type="button"
-                          onClick={() => {
-                            onQuarterChange(quarter.value.toString());
-                            setIsPeriodPickerOpen(false);
-                            setShowYearGrid(false);
-                          }}
-                          disabled={quarter.disabled}
-                          variant={selectedQuarter === quarter.value ? "default" : "outline"}
-                          size="sm"
-                          className={`
-                            px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
-                            ${selectedQuarter === quarter.value
-                              ? 'bg-primary text-primary-foreground'
-                              : quarter.disabled
-                              ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                              : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'
-                            }
-                          `}
-                        >
-                          Q{quarter.value}
-                        </Button>
-                      ))}
-                    </div>
+                    {/* Quarter Selection - Only visible for Quarterly mode */}
+                    {periodType === 'quarter' && (
+                      <div className="grid grid-cols-4 gap-2">
+                        {availableQuarters.map(quarter => (
+                          <Button
+                            key={quarter.value}
+                            type="button"
+                            onClick={() => {
+                              onQuarterChange(quarter.value.toString());
+                              setIsPeriodPickerOpen(false);
+                              setShowYearGrid(false);
+                            }}
+                            disabled={quarter.disabled}
+                            variant={selectedQuarter === quarter.value ? "default" : "outline"}
+                            size="sm"
+                            className={`
+                              px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
+                              ${selectedQuarter === quarter.value
+                                ? 'bg-primary text-primary-foreground'
+                                : quarter.disabled
+                                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'
+                              }
+                            `}
+                          >
+                            Q{quarter.value}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

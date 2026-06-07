@@ -13,6 +13,7 @@ import {
   generateAvailableYears,
   generateAvailableQuarters,
   getDateRangeForYearQuarter,
+  getDateRangeForYear,
   calculateSummaryStats,
   validateDataConsistency,
   generateReportHTML
@@ -48,6 +49,7 @@ const IndicatorsReport = () => {
   });
   const [activeTab, setActiveTab] = useState('all');
   
+  const [periodType, setPeriodType] = useState('quarter');
   // Year and Quarter selection
   const [selectedYear, setSelectedYear] = useState(() => {
     const currentYear = new Date().getFullYear();
@@ -122,12 +124,14 @@ const IndicatorsReport = () => {
     
     // If selecting current year, use last completed quarter
     // If selecting previous year, allow any quarter
-    if (newYear === currentYear) {
+    if (newYear === currentYear && periodType === 'quarter') {
       setSelectedQuarter(lastCompletedQuarter);
       const dateRange = getDateRangeForYearQuarter(newYear, lastCompletedQuarter);
       setDateRange(dateRange);
     } else {
-      const dateRange = getDateRangeForYearQuarter(newYear, selectedQuarter);
+      const dateRange = periodType === 'year' 
+        ? getDateRangeForYear(newYear)
+        : getDateRangeForYearQuarter(newYear, selectedQuarter);
       setDateRange(dateRange);
     }
   };
@@ -137,8 +141,20 @@ const IndicatorsReport = () => {
     const newQuarter = parseInt(quarter);
     setSelectedQuarter(newQuarter);
     
-    const dateRange = getDateRangeForYearQuarter(selectedYear, newQuarter);
-    setDateRange(dateRange);
+    if (periodType === 'quarter') {
+      const dateRange = getDateRangeForYearQuarter(selectedYear, newQuarter);
+      setDateRange(dateRange);
+    }
+  };
+
+  // Handle period type change
+  const handlePeriodTypeChange = (type) => {
+    setPeriodType(type);
+    if (type === 'year') {
+      setDateRange(getDateRangeForYear(selectedYear));
+    } else {
+      setDateRange(getDateRangeForYearQuarter(selectedYear, selectedQuarter));
+    }
   };
 
 
@@ -293,7 +309,9 @@ const IndicatorsReport = () => {
     // Always use the last completed quarter
     const initialYear = currentQuarter === 1 ? currentYear - 1 : currentYear;
     const initialQuarter = currentQuarter === 1 ? 4 : currentQuarter - 1;
-    const initialDateRange = getDateRangeForYearQuarter(initialYear, initialQuarter);
+    const initialDateRange = periodType === 'year'
+      ? getDateRangeForYear(initialYear)
+      : getDateRangeForYearQuarter(initialYear, initialQuarter);
     setDateRange(initialDateRange);
   }, []);
 
@@ -563,7 +581,7 @@ const IndicatorsReport = () => {
   };
 
   const generateReportHTMLContent = () => {
-    return generateReportHTML(indicators, selectedSite, selectedYear, selectedQuarter, sites);
+    return generateReportHTML(indicators, selectedSite, selectedYear, selectedQuarter, sites, periodType);
    };
 
    const previewReport = () => {
@@ -603,6 +621,8 @@ const IndicatorsReport = () => {
           selectedQuarter={selectedQuarter}
           onYearChange={handleYearChange}
           onQuarterChange={handleQuarterChange}
+          periodType={periodType}
+          onPeriodTypeChange={handlePeriodTypeChange}
           availableYears={availableYears}
           availableQuarters={availableQuarters}
           onRefresh={handleRefresh}
@@ -620,6 +640,7 @@ const IndicatorsReport = () => {
           selectedSite={selectedSite}
           selectedYear={selectedYear}
           selectedQuarter={selectedQuarter}
+          periodType={periodType}
         />
 
         {/* Error Message */}

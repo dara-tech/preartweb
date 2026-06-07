@@ -6,7 +6,7 @@ let aggregateSequelize = null;
 function getAggregateSequelize() {
   if (aggregateSequelize) return aggregateSequelize;
 
-  const dbName = process.env.AGGREGATE_DB_NAME || 'main_dbs';
+  const dbName = process.env.AGGREGATE_DB_NAME || 'preart_sites_registry';
   const dbUser = process.env.AGGREGATE_DB_USER || 'root';
   const dbPass = process.env.AGGREGATE_DB_PASSWORD || '';
   const dbHost = process.env.AGGREGATE_DB_HOST || 'localhost';
