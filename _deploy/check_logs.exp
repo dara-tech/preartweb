@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+set timeout 60
+
+spawn ssh root@172.104.33.79
+expect "password:"
+send "Mpi@2025\r"
+expect "root@localhost"
+
+send "lxc exec nodejs-web -- bash -c \"export PATH=/root/.nvm/versions/node/v22.15.1/bin:\$PATH && echo === PM2 ERROR LOGS === && pm2 logs report_nchads --err --lines 50 --nostream && echo === PM2 OUT LOGS === && pm2 logs report_nchads --lines 30 --nostream && echo LOGS_DONE\"\r"
+expect "LOGS_DONE"
+
+send "exit\r"
+expect eof
