@@ -67,7 +67,7 @@ function App() {
           <Route index element={<Navigate to={getDefaultRoute()} replace />} />
           <Route path="dashboard" element={
             <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-              <Dashboard />
+              <IndicatorsReport  />
             </ProtectedRoute>
           } />
           <Route path="patients" element={
